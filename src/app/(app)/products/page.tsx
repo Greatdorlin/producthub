@@ -1,0 +1,483 @@
+import Link from "next/link";
+import { ArrowRight, Compass, Plus } from "lucide-react";
+
+import { createProductAction } from "@/app/actions";
+import { DateField } from "@/components/date-field";
+import { DateRangeFields } from "@/components/date-range-fields";
+import { ProductFormEffects } from "@/components/product-form-effects";
+import { ProductFeesField } from "@/components/product-fees-field";
+import { ValidatedForm } from "@/components/validated-form";
+import { requirePermission } from "@/lib/auth/server";
+import { getDefaultCurrency, getFieldLabel, getIndustryPreset, getRoleLabel } from "@/lib/config/industries";
+import {
+  CATEGORY_OPTIONS,
+  CURRENCY_OPTIONS,
+  currencyLabels,
+  PRODUCT_ACCESS_ROLES,
+  PRODUCT_PRIORITY,
+  priorityLabels,
+  PRODUCT_STATUS,
+  ROUTE_OPTIONS,
+  statusLabels,
+} from "@/lib/constants";
+import { getVisibleProducts } from "@/lib/data";
+import { formatCurrencyFromCents, formatDateLabel, formatDateRangeLabel, formatExpiryCountdown, getExpiryTone } from "@/lib/utils";
+
+const accessDescriptions: Record<(typeof PRODUCT_ACCESS_ROLES)[number], string> = {
+  admissions_manager: "Can open the product and update admissions work.",
+  marketing_manager: "Can upload and organise campaign assets.",
+  partnership_manager: "Can manage partnership-facing details.",
+  sales_manager: "Can update sales and pricing details.",
+  viewer: "Can open the product without editing it.",
+  affiliate: "Can use approved material for promotion.",
+};
+
+type ProductsPageProps = {
+  searchParams: Promise<{ error?: string; q?: string }>;
+};
+
+export default async function ProductsPage({ searchParams }: ProductsPageProps) {
+  const viewer = await requirePermission("products:view");
+  const allProducts = await getVisibleProducts(viewer);
+  const params = await searchParams;
+  const query = params.q?.trim().toLowerCase() ?? "";
+  const canEdit = viewer.permissions.includes("products:edit");
+  const industryPreset = getIndustryPreset();
+  const categoryOptions = industryPreset.productDefaults.categories.length
+    ? industryPreset.productDefaults.categories
+    : [...CATEGORY_OPTIONS];
+  const routeOptions = industryPreset.productDefaults.routes.length
+    ? industryPreset.productDefaults.routes
+    : [...ROUTE_OPTIONS];
+  const defaultCurrency = getDefaultCurrency();
+  const currencyOptions = Array.from(new Set([defaultCurrency, ...CURRENCY_OPTIONS]));
+  const liveCount = allProducts.filter((product) => product.status === "active").length;
+  const draftCount = allProducts.filter((product) => product.status === "draft").length;
+  const affiliateReadyCount = allProducts.filter((product) => product.accessRoles.includes("affiliate")).length;
+  const formError =
+    params.error === "invalid-sales-period"
+      ? "Sales start must be before sales end."
+      : params.error === "price-permission"
+        ? "You do not have permission to change pricing."
+        : params.error
+          ? "Check the required fields before creating the product."
+          : null;
+  const products = query
+    ? allProducts.filter((product) =>
+        [
+          product.name,
+          product.category,
+          product.route,
+          product.summary,
+          product.ownerTeam,
+          product.audience,
+          priorityLabels[product.priority as keyof typeof priorityLabels],
+          ...product.feeItems.map((fee) => fee.label),
+          ...product.accessRoles.map((role) => getRoleLabel(role)),
+        ]
+          .join(" ")
+          .toLowerCase()
+          .includes(query),
+      )
+    : allProducts;
+
+  return (
+    <div className="ld-page">
+      <ProductFormEffects focusTargetId="create-product-name" />
+
+      <section className="ld-page-header">
+        <div>
+          <div className="ld-page-meta">
+            <span className="ld-chip">
+              <Compass className="size-3.5" />
+              Live product list
+            </span>
+          </div>
+          <h2 className="ld-title mt-4">Products</h2>
+          <p className="ld-subtitle mt-3">
+            Manage each offer, who it is for, what it costs, when it expires, and which teams can work or share it.
+          </p>
+          {query ? <p className="ld-note mt-3">Showing results for “{params.q}”.</p> : null}
+        </div>
+      </section>
+
+      <section className="grid gap-3 md:grid-cols-3">
+        <div className="ld-stat-card">
+          <div className="ld-stat-label">Visible products</div>
+          <div className="mt-3 flex items-center justify-between gap-3">
+            <div className="text-2xl font-semibold text-white">{products.length}</div>
+            <span className="tone-calm rounded-full px-3 py-1 text-sm font-semibold">Now</span>
+          </div>
+        </div>
+        <div className="ld-stat-card">
+          <div className="ld-stat-label">Live right now</div>
+          <div className="mt-3 flex items-center justify-between gap-3">
+            <div className="text-2xl font-semibold text-white">{liveCount}</div>
+            <span className="tone-success rounded-full px-3 py-1 text-sm font-semibold">Live</span>
+          </div>
+        </div>
+        <div className="ld-stat-card">
+          <div className="ld-stat-label">Needs attention</div>
+          <div className="mt-3 flex items-center justify-between gap-3">
+            <div className="text-2xl font-semibold text-white">{draftCount}</div>
+            <span className="tone-warning rounded-full px-3 py-1 text-sm font-semibold">
+              {affiliateReadyCount} affiliate-ready
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <section className="grid gap-5 xl:grid-cols-[1.12fr_0.88fr]">
+        <div className="ld-glass-card ld-panel">
+          <div className="ld-panel-header">
+            <div>
+              <div className="ld-kicker">Visible products</div>
+              <h3 className="ld-panel-title mt-2">Catalogue list</h3>
+            </div>
+            <div className="ld-chip">{products.length} records</div>
+          </div>
+
+          <div className="ld-card-list mt-5">
+            {products.length ? (
+              products.map((product) => (
+                <Link key={product.id} href={`/products/${product.id}`} className="ld-item-card ld-product-card">
+                <div className="ld-product-card-main min-w-0">
+                  <div className="flex flex-wrap gap-2">
+                    <span className="ld-chip">{product.route}</span>
+                    <span className="ld-chip">{statusLabels[product.status]}</span>
+                    <span className="ld-chip">{priorityLabels[product.priority]}</span>
+                    {product.category.toLowerCase() !== product.route.toLowerCase() ? (
+                      <span className="ld-chip">{product.category}</span>
+                    ) : null}
+                  </div>
+
+                  <div>
+                    <h3 className="text-[1.55rem] font-semibold text-white">
+                      {product.name}
+                    </h3>
+                    <p className="mt-2 max-w-2xl line-clamp-3 text-sm leading-6 text-[var(--ld-color-muted)]">
+                      {product.summary}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {product.accessRoles.map((role) => (
+                      <span key={role} className="rounded-full bg-black/18 px-3 py-1 text-xs font-medium text-[var(--ld-color-text)]">
+                        {getRoleLabel(role)}
+                      </span>
+                    ))}
+                    {product.feeItems.length ? (
+                      <span className="rounded-full bg-black/18 px-3 py-1 text-xs font-medium text-[var(--ld-color-text)]">
+                        {product.feeItems.length} fee line{product.feeItems.length > 1 ? "s" : ""}
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <div className="inline-flex items-center gap-2 text-sm font-medium text-[var(--ld-color-primary-strong)]">
+                    Open product
+                    <ArrowRight className="size-4" />
+                  </div>
+                </div>
+
+                <div className="ld-product-meta-grid">
+                  <div className="ld-meta-pill">
+                    <div className="ld-meta-title">Price</div>
+                    <div className="ld-meta-value">
+                      {formatCurrencyFromCents(product.priceInCents, product.currency)}
+                    </div>
+                  </div>
+                  <div className="ld-meta-pill">
+                    <div className="ld-meta-title">Team</div>
+                    <div className="ld-meta-value">{product.ownerTeam}</div>
+                  </div>
+                  <div className="ld-meta-pill">
+                    <div className="ld-meta-title">{getFieldLabel("slotsAvailable")}</div>
+                    <div className="ld-meta-value">{product.slotsAvailable ?? "Not set"}</div>
+                  </div>
+                  <div className="ld-meta-pill">
+                    <div className="ld-meta-title">{getFieldLabel("expectedSales")}</div>
+                    <div className="ld-meta-value">
+                      {product.expectedSales
+                        ? `${product.expectedSales}${product.salesStartsAt || product.salesEndsAt ? ` · ${formatDateRangeLabel(product.salesStartsAt, product.salesEndsAt)}` : ""}`
+                        : "Not set"}
+                    </div>
+                  </div>
+                  <div className="ld-meta-pill lg:col-span-2">
+                    <div className="ld-meta-title">Expiry</div>
+                    <div
+                      className={`mt-2 inline-flex rounded-full px-3 py-1 text-sm font-semibold ${
+                        getExpiryTone(product.expiresAt) === "danger"
+                          ? "tone-danger"
+                          : getExpiryTone(product.expiresAt) === "warning"
+                            ? "tone-warning"
+                            : "tone-calm"
+                      }`}
+                    >
+                      {formatDateLabel(product.expiresAt)}
+                    </div>
+                    <div className="mt-2 text-sm text-[var(--ld-color-muted)]">
+                      {formatExpiryCountdown(product.expiresAt)}
+                    </div>
+                  </div>
+                </div>
+                </Link>
+              ))
+            ) : (
+              <div className="ld-empty-state">
+                {query ? "No products matched this search." : canEdit ? "No products yet. Create your first real product with the form beside this list." : "No products are available yet."}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {canEdit ? (
+          <aside id="create-product" className="ld-solid-panel ld-panel self-start xl:sticky xl:top-6">
+            <div className="ld-panel-header">
+              <div>
+                <div className="ld-page-meta">
+                  <span className="ld-chip">
+                    <Plus className="size-3.5" />
+                    Add product
+                  </span>
+                </div>
+                <h3 className="ld-panel-title mt-3">Create a product</h3>
+                <p className="ld-panel-copy mt-2">
+                  Start with the essentials. Add promo assets inside the product once the record is ready.
+                </p>
+              </div>
+            </div>
+
+            {formError ? (
+              <div className="mt-4 rounded-[14px] border border-[rgba(255,122,114,0.22)] bg-[rgba(255,122,114,0.1)] px-4 py-3 text-sm text-[var(--ld-color-danger)]">
+                {formError}
+              </div>
+            ) : null}
+
+            <ValidatedForm action={createProductAction} className="ld-form-grid mt-5" requiredGroups={["accessRoles", "assetAccessRoles"]}>
+              <div className="ld-form-section">
+                <div className="ld-field-group">
+                  <label className="block space-y-2 ld-required-field">
+                    <span className="ld-label-row">
+                      <span className="ld-label">Product name</span>
+                      <span className="ld-required-text">Required</span>
+                    </span>
+                    <input id="create-product-name" required name="name" className="ld-input" placeholder="Corporate travel retainer" />
+                    <span className="ld-required-note">Required</span>
+                  </label>
+
+                  <div className="ld-form-split">
+                    <label className="block space-y-2">
+                      <span className="ld-label">Category</span>
+                      <select name="category" className="ld-input ld-select">
+                        {categoryOptions.map((item) => (
+                          <option key={item} value={item}>
+                            {item}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <label className="block space-y-2">
+                      <span className="ld-label">{getFieldLabel("route")}</span>
+                      <select name="route" className="ld-input ld-select">
+                        {routeOptions.map((item) => (
+                          <option key={item} value={item}>
+                            {item}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+
+                  <label className="block space-y-2 ld-required-field">
+                    <span className="ld-label-row">
+                      <span className="ld-label">Short summary</span>
+                      <span className="ld-required-text">Required</span>
+                    </span>
+                    <textarea required name="summary" rows={3} className="ld-input ld-textarea" />
+                    <span className="ld-required-note">Required</span>
+                  </label>
+
+                  <label className="block space-y-2 ld-required-field">
+                    <span className="ld-label-row">
+                      <span className="ld-label">{getFieldLabel("pitch")}</span>
+                      <span className="ld-required-text">Required</span>
+                    </span>
+                    <textarea required name="pitch" rows={3} className="ld-input ld-textarea" />
+                    <span className="ld-required-note">Required</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="ld-form-section">
+                <div className="ld-field-group">
+                  <div className="ld-form-split">
+                    <label className="block space-y-2 ld-required-field">
+                      <span className="ld-label-row">
+                        <span className="ld-label">{getFieldLabel("audience")}</span>
+                        <span className="ld-required-text">Required</span>
+                      </span>
+                      <input required name="audience" className="ld-input" placeholder="For example: corporate clients who need travel support" />
+                      <span className="ld-required-note">Required</span>
+                    </label>
+
+                    <label className="block space-y-2 ld-required-field">
+                      <span className="ld-label-row">
+                        <span className="ld-label">Owning team</span>
+                        <span className="ld-required-text">Required</span>
+                      </span>
+                      <input required name="ownerTeam" className="ld-input" placeholder="Travel Desk" />
+                      <span className="ld-required-note">Required</span>
+                    </label>
+                  </div>
+
+                  <div className="space-y-2" data-required-group="accessRoles">
+                    <div className="ld-label-row">
+                      <span className="ld-label">Who should have access to this product?</span>
+                      <span className="ld-required-text">Choose at least one</span>
+                    </div>
+                    <div className="ld-check-grid">
+                      {PRODUCT_ACCESS_ROLES.map((role) => (
+                        <label key={role} className="ld-check-tile">
+                          <input
+                            type="checkbox"
+                            name="accessRoles"
+                            value={role}
+                            defaultChecked={!["affiliate", "marketing_manager"].includes(role)}
+                          />
+                          <span className="ld-check-tile-card">
+                            <span className="ld-check-tile-title">{getRoleLabel(role)}</span>
+                            <span className="ld-check-tile-copy">{accessDescriptions[role]}</span>
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                    <p className="ld-note">Choose 1, 2, or all groups that should be able to open this product.</p>
+                    <p className="ld-group-required-note">Select at least one access group.</p>
+                  </div>
+
+                  <div className="ld-form-split ld-form-split-tight">
+                    <label className="block space-y-2">
+                      <span className="ld-label">Status</span>
+                      <select name="status" className="ld-input ld-select">
+                        {PRODUCT_STATUS.map((item) => (
+                          <option key={item} value={item}>
+                            {statusLabels[item]}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="block space-y-2">
+                      <span className="ld-label">Priority</span>
+                      <select name="priority" className="ld-input ld-select" defaultValue="normal">
+                        {PRODUCT_PRIORITY.map((item) => (
+                          <option key={item} value={item}>
+                            {priorityLabels[item]}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+
+                  <div className="space-y-2" data-required-group="assetAccessRoles">
+                    <div className="ld-label-row">
+                      <span className="ld-label">Who can see assets for this product?</span>
+                      <span className="ld-required-text">Choose at least one</span>
+                    </div>
+                    <div className="ld-check-grid">
+                      {PRODUCT_ACCESS_ROLES.map((role) => (
+                        <label key={role} className="ld-check-tile">
+                          <input
+                            type="checkbox"
+                            name="assetAccessRoles"
+                            value={role}
+                            defaultChecked={role === "marketing_manager" || role === "sales_manager"}
+                          />
+                          <span className="ld-check-tile-card">
+                            <span className="ld-check-tile-title">{getRoleLabel(role)}</span>
+                            <span className="ld-check-tile-copy">
+                              {role === "affiliate"
+                                ? "Lets affiliates download approved promo material."
+                                : role === "viewer"
+                                  ? "Lets view-only users open shared files."
+                                  : `Lets ${getRoleLabel(role).toLowerCase()} open and use approved assets.`}
+                            </span>
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                    <p className="ld-note">Choose 1, 2, or all groups that should be able to use this product&apos;s files.</p>
+                    <p className="ld-group-required-note">Select at least one asset access group.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="ld-form-section">
+                <div className="ld-field-group">
+                  <div className="space-y-2">
+                    <span className="ld-label">Currency</span>
+                    <div className="ld-segmented">
+                      {currencyOptions.map((currency) => (
+                        <label key={currency} className="ld-segmented-option">
+                          <input type="radio" name="currency" value={currency} defaultChecked={currency === defaultCurrency} />
+                          <span>{currencyLabels[currency as keyof typeof currencyLabels] ?? currency}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="ld-mini-stat-grid">
+                    <label className="block space-y-2">
+                      <span className="ld-label">Headline price</span>
+                      <input name="price" type="number" step="0.01" min="0" className="ld-input" />
+                      <span className="ld-note">Use this for the main price you want shown first.</span>
+                    </label>
+                    <DateField
+                      name="expiresAt"
+                      label="Expiry date"
+                      helperText="Choose the day this offer should stop showing as current."
+                    />
+                    <label className="block space-y-2">
+                      <span className="ld-label">{getFieldLabel("slotsAvailable")}</span>
+                      <input name="slotsAvailable" type="number" min="0" step="1" className="ld-input" placeholder="For example: 30 places or visa slots" />
+                      <span className="ld-note">Use this for the number of places you can actually sell.</span>
+                    </label>
+                    <label className="block space-y-2">
+                      <span className="ld-label">{getFieldLabel("expectedSales")}</span>
+                      <input name="expectedSales" type="number" min="0" step="1" className="ld-input" placeholder="For example: 18 expected sales" />
+                      <span className="ld-note">Add the number you expect to sell during the sales window below.</span>
+                    </label>
+                  </div>
+
+                  <DateRangeFields
+                    startName="salesStartsAt"
+                    endName="salesEndsAt"
+                    startLabel="Sales start"
+                    endLabel="Sales end"
+                    helperText="Set the period you want the expected sales number to cover."
+                  />
+
+                  <ProductFeesField />
+                </div>
+              </div>
+
+              <div className="ld-form-section">
+                <label className="block space-y-2">
+                  <span className="ld-label">Notes</span>
+                  <textarea name="notes" rows={4} className="ld-input ld-textarea" />
+                </label>
+              </div>
+
+              <button
+                type="submit"
+                className="ld-glass-button inline-flex w-full items-center justify-center rounded-[16px] px-4 py-3 text-sm font-semibold transition hover:brightness-110"
+              >
+                Create product
+              </button>
+            </ValidatedForm>
+          </aside>
+        ) : null}
+      </section>
+    </div>
+  );
+}

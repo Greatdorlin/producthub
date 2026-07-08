@@ -1,0 +1,90 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1782989665662,
+      "tag": "0000_workable_the_renegades",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1783011833692,
+      "tag": "0001_peaceful_sentinels",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1783013337914,
+      "tag": "0002_green_joseph",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1783185396992,
+      "tag": "0003_aberrant_raider",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1783231005062,
+      "tag": "0004_open_white_tiger",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1783288109590,
+      "tag": "0005_amused_gabe_jones",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1783290096342,
+      "tag": "0006_lean_roughhouse",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1783410324870,
+      "tag": "0007_polite_nico_minoru",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1783411452154,
+      "tag": "0008_faithful_killmonger",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1783413587723,
+      "tag": "0009_demonic_leper_queen",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1783508032588,
+      "tag": "0010_complex_wendell_vaughn",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1783545500000,
+      "tag": "0011_producthub_custom_fields",
+      "breakpoints": true
+    }
+  ]
+}

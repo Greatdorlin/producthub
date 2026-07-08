@@ -1,0 +1,1 @@
+ALTER TABLE "products" ADD COLUMN "fee_items" jsonb DEFAULT '[]'::jsonb NOT NULL;

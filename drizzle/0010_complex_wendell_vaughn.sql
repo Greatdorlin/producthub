@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "denied_permissions" text[] DEFAULT ARRAY[]::text[] NOT NULL;
