@@ -1,24 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  --background: #07111f;
-  --foreground: #f7fbff;
-  --ld-color-primary: #2563eb;
-  --ld-color-primary-strong: #6ea1ff;
-  --ld-color-accent: #f7bd55;
-  --ld-color-accent-soft: #ffd88a;
-  --ld-color-background: #07111f;
-  --ld-color-background-soft: #111c2d;
-  --ld-color-background-deep: #050b14;
-  --ld-color-surface: rgba(17, 28, 45, 0.92);
-  --ld-color-surface-strong: rgba(9, 17, 30, 0.98);
+  --background: #151515;
+  --foreground: #f8fafc;
+  --ld-color-primary: #4f46e5;
+  --ld-color-primary-strong: #818cf8;
+  --ld-color-accent: #14b8a6;
+  --ld-color-accent-soft: #99f6e4;
+  --ld-color-background: #151515;
+  --ld-color-background-soft: #242428;
+  --ld-color-background-deep: #0d0d0f;
+  --ld-color-surface: #1f1f23;
+  --ld-color-surface-strong: #17171a;
   --ld-color-card: rgba(255, 255, 255, 0.055);
   --ld-color-card-strong: rgba(255, 255, 255, 0.09);
   --ld-color-card-border: rgba(255, 255, 255, 0.12);
-  --ld-color-sidebar: rgba(7, 17, 31, 0.98);
-  --ld-color-sidebar-active: rgba(37, 99, 235, 0.24);
-  --ld-color-text: #f7fbff;
-  --ld-color-muted: rgba(226, 235, 245, 0.7);
+  --ld-color-sidebar: #17171a;
+  --ld-color-sidebar-active: rgba(79, 70, 229, 0.24);
+  --ld-color-text: #f8fafc;
+  --ld-color-muted: #a1a1aa;
   --ld-color-danger: #ff7a72;
   --ld-color-warning: #f7bd55;
   --ld-color-success: #67d6a3;
@@ -29,8 +29,8 @@
   --ld-glass-border-opacity: 0.12;
   --ld-glass-highlight-opacity: 0.08;
   --ld-glass-shadow-opacity: 0;
-  --ld-background-image: #07111f;
-  --ld-background-overlay: rgba(7, 17, 31, 0);
+  --ld-background-image: #151515;
+  --ld-background-overlay: rgba(21, 21, 21, 0);
   --ld-background-overlay-opacity: 1;
   --ld-background-blur: 0px;
   --ld-background-position: center;
@@ -47,18 +47,18 @@
   --ld-shadow-card: none;
   --ld-shadow-glass: none;
   --ld-shadow-floating: none;
-  --ld-gradient-hero: rgba(29, 48, 78, 0.92);
-  --ld-gradient-panel: rgba(17, 28, 45, 0.92);
+  --ld-gradient-hero: linear-gradient(135deg, rgba(79, 70, 229, 0.18), rgba(31, 31, 35, 0.96));
+  --ld-gradient-panel: #1f1f23;
   --color-cream: rgba(255, 255, 255, 0.08);
-  --color-navy: #08172b;
-  --color-navy-soft: #74a4ff;
-  --color-gold: #f7bd55;
-  --color-gold-soft: #ffd88a;
+  --color-navy: #17171a;
+  --color-navy-soft: #818cf8;
+  --color-gold: #14b8a6;
+  --color-gold-soft: #99f6e4;
   --color-ink: #f7fbff;
   --color-muted: rgba(226, 235, 245, 0.67);
   --color-border: rgba(255, 255, 255, 0.14);
   --color-success: #67d6a3;
-  --color-warning: #f7bd55;
+  --color-warning: #f59e0b;
   --color-danger: #ff7a72;
 }
 
@@ -135,15 +135,15 @@ a {
 .ld-glass-input,
 .ld-glass-button,
 .ld-floating-control {
-  border: 1px solid rgba(255, 255, 255, var(--ld-glass-border-opacity));
-  background: rgba(17, 28, 45, calc(var(--ld-glass-opacity)));
+  border: 1px solid var(--ld-color-card-border);
+  background: color-mix(in srgb, var(--ld-color-surface) 88%, transparent);
   box-shadow: var(--ld-shadow-glass);
   backdrop-filter: blur(var(--ld-glass-blur)) saturate(var(--ld-glass-saturation));
   -webkit-backdrop-filter: blur(var(--ld-glass-blur)) saturate(var(--ld-glass-saturation));
 }
 
 .ld-glass-soft {
-  background: rgba(255, 255, 255, 0.055);
+  background: color-mix(in srgb, var(--ld-color-surface) 72%, transparent);
 }
 
 .ld-glass-vibrant {
@@ -153,8 +153,8 @@ a {
 
 .ld-glass-bold,
 .ld-solid-panel {
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(9, 17, 30, 0.96);
+  border: 1px solid var(--ld-color-card-border);
+  background: var(--ld-color-surface-strong);
   box-shadow: none;
 }
 
@@ -163,7 +163,7 @@ a {
 }
 
 .ld-glass-topbar {
-  background: rgba(9, 17, 30, 0.94);
+  background: color-mix(in srgb, var(--ld-color-surface) 94%, transparent);
 }
 
 .ld-glass-card,
@@ -172,7 +172,7 @@ a {
 }
 
 .ld-glass-input {
-  background: rgba(4, 13, 26, 0.7);
+  background: color-mix(in srgb, var(--ld-color-background-deep) 70%, transparent);
 }
 
 .ld-glass-button {
@@ -181,8 +181,8 @@ a {
 }
 
 .ld-secondary-button {
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--ld-color-card-border);
+  background: color-mix(in srgb, var(--ld-color-surface) 82%, white 6%);
   color: var(--ld-color-text);
   transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
 }
@@ -198,14 +198,14 @@ a {
 }
 
 .ld-glass-active {
-  border-color: rgba(110, 161, 255, 0.42);
+  border-color: color-mix(in srgb, var(--ld-color-primary) 50%, white 8%);
   background: var(--ld-color-sidebar-active);
   box-shadow: none;
 }
 
 .ld-readable-table {
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(7, 18, 34, 0.9);
+  border: 1px solid var(--ld-color-card-border);
+  background: color-mix(in srgb, var(--ld-color-surface) 90%, black);
 }
 
 .ld-luminous-border {
@@ -228,8 +228,8 @@ a {
 .ld-input {
   width: 100%;
   border-radius: var(--ld-control-radius);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(4, 13, 26, 0.78);
+  border: 1px solid var(--ld-color-card-border);
+  background: color-mix(in srgb, var(--ld-color-background-deep) 78%, transparent);
   min-height: 44px;
   padding: 0.72rem 0.9rem;
   color: var(--ld-color-text);
@@ -243,13 +243,13 @@ a {
 }
 
 .ld-input:focus {
-  border-color: rgba(116, 164, 255, 0.58);
-  box-shadow: 0 0 0 4px rgba(47, 109, 246, 0.16);
+  border-color: color-mix(in srgb, var(--ld-color-primary) 62%, white);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--ld-color-primary) 18%, transparent);
   transform: none;
 }
 
 .ld-label {
-  color: rgba(247, 251, 255, 0.88);
+  color: var(--ld-color-text);
   font-size: 0.8125rem;
   font-weight: 600;
 }

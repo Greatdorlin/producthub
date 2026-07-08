@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { CSSProperties } from "react";
 import {
   Boxes,
   ChevronRight,
@@ -36,10 +37,45 @@ type AppShellProps = {
   branding: {
     brandName: string;
     logoUrl: string | null;
+    industryTemplate: string;
+    primaryColor: string;
+    accentColor: string;
+    pageBackground: string;
+    surfaceColor: string;
+    textColor: string;
+    mutedTextColor: string;
   };
   topSlot: React.ReactNode;
   children: React.ReactNode;
 };
+
+type WorkspaceThemeStyle = CSSProperties & Record<`--${string}`, string>;
+
+function buildThemeStyle(branding: AppShellProps["branding"]): WorkspaceThemeStyle {
+  return {
+    "--background": branding.pageBackground,
+    "--foreground": branding.textColor,
+    "--ld-color-primary": branding.primaryColor,
+    "--ld-color-primary-strong": `color-mix(in srgb, ${branding.primaryColor} 68%, white)`,
+    "--ld-color-accent": branding.accentColor,
+    "--ld-color-accent-soft": `color-mix(in srgb, ${branding.accentColor} 28%, white)`,
+    "--ld-color-background": branding.pageBackground,
+    "--ld-color-background-soft": `color-mix(in srgb, ${branding.pageBackground} 76%, white)`,
+    "--ld-color-background-deep": `color-mix(in srgb, ${branding.pageBackground} 82%, black)`,
+    "--ld-color-surface": branding.surfaceColor,
+    "--ld-color-surface-strong": `color-mix(in srgb, ${branding.surfaceColor} 88%, black)`,
+    "--ld-color-card": `color-mix(in srgb, ${branding.surfaceColor} 82%, white)`,
+    "--ld-color-card-strong": `color-mix(in srgb, ${branding.surfaceColor} 72%, white)`,
+    "--ld-color-card-border": `color-mix(in srgb, ${branding.textColor} 16%, transparent)`,
+    "--ld-color-sidebar": `color-mix(in srgb, ${branding.surfaceColor} 84%, black)`,
+    "--ld-color-sidebar-active": `color-mix(in srgb, ${branding.primaryColor} 26%, ${branding.surfaceColor})`,
+    "--ld-color-text": branding.textColor,
+    "--ld-color-muted": branding.mutedTextColor,
+    "--ld-background-image": branding.pageBackground,
+    "--ld-gradient-hero": `linear-gradient(135deg, color-mix(in srgb, ${branding.primaryColor} 20%, ${branding.surfaceColor}), ${branding.surfaceColor})`,
+    "--ld-gradient-panel": branding.surfaceColor,
+  };
+}
 
 function BrandMark({ branding }: { branding: AppShellProps["branding"] }) {
   return (
@@ -116,9 +152,10 @@ function ProfileEntry({
 
 export function AppShell({ user, branding, topSlot, children }: AppShellProps) {
   const pathname = usePathname();
+  const themeStyle = buildThemeStyle(branding);
 
   return (
-    <div className="ld-app-background">
+    <div className="ld-app-background" style={themeStyle}>
       <div className="ld-shell-grid relative z-10 mx-auto grid min-h-screen max-w-[var(--ld-page-max-width)] grid-cols-1 gap-3 px-3 py-3 lg:grid-cols-[260px_minmax(0,1fr)] lg:px-4 lg:py-4">
         <aside className="ld-glass-sidebar ld-shell-sidebar relative overflow-hidden rounded-[14px] px-4 py-5 text-white">
           <div className="ld-shell-sidebar-inner relative flex h-full flex-col">
@@ -127,8 +164,8 @@ export function AppShell({ user, branding, topSlot, children }: AppShellProps) {
                 <div className="min-w-0">
                   <BrandMark branding={branding} />
                   <div className="mt-3">
-                    <div className="text-xl font-semibold text-white">Product Hub</div>
-                    <div className="text-xs text-white/52">Private catalogue</div>
+                    <div className="text-xl font-semibold text-white">{branding.brandName}</div>
+                    <div className="text-xs text-white/52">Self-hosted product workspace</div>
                   </div>
                 </div>
 
@@ -140,10 +177,10 @@ export function AppShell({ user, branding, topSlot, children }: AppShellProps) {
 
                 <div className="mt-5">
                   <h1 className="text-[2rem] font-semibold text-white">
-                    Product Hub
+                    {branding.brandName}
                   </h1>
                   <p className="mt-1 text-sm text-white/58">
-                    Private catalogue.
+                    Self-hosted product workspace.
                   </p>
                 </div>
               </div>

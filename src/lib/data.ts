@@ -18,6 +18,13 @@ export const DEFAULT_WORKSPACE_SETTINGS = {
   brandName: siteConfig.brandName,
   logoUrl: null as string | null,
   logoStoragePath: null as string | null,
+  industryTemplate: siteConfig.industryTemplate,
+  primaryColor: "#4f46e5",
+  accentColor: "#14b8a6",
+  pageBackground: "#151515",
+  surfaceColor: "#1f1f23",
+  textColor: "#f8fafc",
+  mutedTextColor: "#a1a1aa",
 };
 
 type ProductAccessShape = Pick<ProductRecord, "status" | "accessRoles">;
@@ -138,6 +145,13 @@ export async function getWorkspaceSettings() {
       brandName: workspaceSettings.brandName,
       logoUrl: workspaceSettings.logoUrl,
       logoStoragePath: workspaceSettings.logoStoragePath,
+      industryTemplate: workspaceSettings.industryTemplate,
+      primaryColor: workspaceSettings.primaryColor,
+      accentColor: workspaceSettings.accentColor,
+      pageBackground: workspaceSettings.pageBackground,
+      surfaceColor: workspaceSettings.surfaceColor,
+      textColor: workspaceSettings.textColor,
+      mutedTextColor: workspaceSettings.mutedTextColor,
     })
     .from(workspaceSettings)
     .where(eq(workspaceSettings.id, DEFAULT_WORKSPACE_SETTINGS.id))

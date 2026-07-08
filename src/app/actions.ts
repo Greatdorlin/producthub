@@ -54,6 +54,7 @@ import {
 import { getDb } from "@/lib/db/client";
 import { productAssets, products, users } from "@/lib/db/schema";
 import { createWorkspaceBackupSnapshot } from "@/lib/backups";
+import { getWorkspaceSettings } from "@/lib/data";
 import { deriveAssetVisibilityFromRoles } from "@/lib/product-access";
 import { createId, slugify } from "@/lib/utils";
 
@@ -155,8 +156,9 @@ function buildSalesPeriodSummary(start: Date | null, end: Date | null) {
   return startLabel ? `From ${startLabel}` : `Until ${endLabel}`;
 }
 
-function getAllowedProductDefaults(existing?: { category?: string; route?: string; currency?: string }) {
-  const preset = getIndustryPreset();
+async function getAllowedProductDefaults(existing?: { category?: string; route?: string; currency?: string }) {
+  const settings = await getWorkspaceSettings();
+  const preset = getIndustryPreset(settings.industryTemplate);
 
   return {
     categories: new Set([
@@ -171,7 +173,7 @@ function getAllowedProductDefaults(existing?: { category?: string; route?: strin
     ].filter(Boolean)),
     currencies: new Set([
       existing?.currency,
-      getDefaultCurrency(),
+      getDefaultCurrency(settings.industryTemplate),
       preset.productDefaults.currency,
       ...CURRENCY_OPTIONS,
     ].filter(Boolean).map((currency) => String(currency).toUpperCase())),
@@ -445,6 +447,7 @@ export async function createWorkspaceBackupAction() {
 export async function createProductAction(formData: FormData) {
   const actor = await requirePermission("products:edit");
   const db = getDb();
+  const workspaceSettings = await getWorkspaceSettings();
 
   const name = String(formData.get("name") ?? "").trim();
   const category = String(formData.get("category") ?? "").trim();
@@ -467,7 +470,7 @@ export async function createProductAction(formData: FormData) {
     .filter((value): value is (typeof PRODUCT_ACCESS_ROLES)[number] =>
       PRODUCT_ACCESS_ROLES.includes(value as (typeof PRODUCT_ACCESS_ROLES)[number]),
     );
-  const currency = String(formData.get("currency") ?? getDefaultCurrency()).trim().toUpperCase();
+  const currency = String(formData.get("currency") ?? getDefaultCurrency(workspaceSettings.industryTemplate)).trim().toUpperCase();
   const notes = String(formData.get("notes") ?? "").trim();
   const priceInCents = getOptionalPrice(formData.get("price"));
   const feeItems = getFeeItems(formData);
@@ -479,7 +482,7 @@ export async function createProductAction(formData: FormData) {
   const expiresAt = getOptionalDate(formData.get("expiresAt"));
   const visibility = deriveAssetVisibilityFromRoles(assetAccessRoles);
 
-  const allowedDefaults = getAllowedProductDefaults();
+  const allowedDefaults = await getAllowedProductDefaults();
 
   if (
     !name ||
@@ -606,7 +609,7 @@ export async function updateProductAction(formData: FormData) {
   const expiresAt = getOptionalDate(formData.get("expiresAt"));
   const visibility = deriveAssetVisibilityFromRoles(assetAccessRoles);
 
-  const allowedDefaults = getAllowedProductDefaults({
+  const allowedDefaults = await getAllowedProductDefaults({
     category: existing.category,
     route: existing.route,
     currency: existing.currency,

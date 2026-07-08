@@ -42,6 +42,13 @@ export default async function ProductAppLayout({
       branding={{
         brandName: workspaceSettings.brandName,
         logoUrl: workspaceSettings.logoUrl,
+        industryTemplate: workspaceSettings.industryTemplate,
+        primaryColor: workspaceSettings.primaryColor,
+        accentColor: workspaceSettings.accentColor,
+        pageBackground: workspaceSettings.pageBackground,
+        surfaceColor: workspaceSettings.surfaceColor,
+        textColor: workspaceSettings.textColor,
+        mutedTextColor: workspaceSettings.mutedTextColor,
       }}
       topSlot={
         <header className="ld-glass-topbar ld-topbar rounded-[14px] px-4 py-3">
@@ -49,7 +56,7 @@ export default async function ProductAppLayout({
             <div className="hidden lg:block">
               <p className="ld-kicker">Private workspace</p>
               <h1 className="mt-1 text-xl font-semibold text-white">
-                Product Hub
+                {workspaceSettings.brandName}
               </h1>
               <p className="mt-1 text-sm text-[var(--ld-color-muted)]">
                 Products, pricing, assets, and access.
@@ -69,11 +76,14 @@ export default async function ProductAppLayout({
                   effectiveUserRole={user.role}
                   isPreviewing={user.isPreviewing}
                   candidates={previewCandidates}
+                  industryTemplate={workspaceSettings.industryTemplate}
                 />
               ) : null}
 
               <div className="ld-topbar-controls flex flex-wrap items-center gap-2 xl:justify-end">
-                <div className="ld-topbar-role hidden md:inline-flex">{getRoleLabel(user.role)}</div>
+                <div className="ld-topbar-role hidden md:inline-flex">
+                  {getRoleLabel(user.role, workspaceSettings.industryTemplate)}
+                </div>
 
                 {canEditProducts ? (
                   <Link

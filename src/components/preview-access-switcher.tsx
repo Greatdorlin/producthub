@@ -18,6 +18,7 @@ type PreviewAccessSwitcherProps = {
   effectiveUserRole: ProductRole;
   isPreviewing: boolean;
   candidates: PreviewCandidate[];
+  industryTemplate?: string;
 };
 
 export function PreviewAccessSwitcher({
@@ -29,6 +30,7 @@ export function PreviewAccessSwitcher({
   effectiveUserRole,
   isPreviewing,
   candidates,
+  industryTemplate,
 }: PreviewAccessSwitcherProps) {
   if (!candidates.length) {
     return null;
@@ -46,8 +48,8 @@ export function PreviewAccessSwitcher({
           </div>
           <div className="ld-preview-subtitle">
             {isPreviewing
-              ? `${getRoleLabel(effectiveUserRole)} view`
-              : `${actualUserName} · ${getRoleLabel(actualUserRole)}`}
+              ? `${getRoleLabel(effectiveUserRole, industryTemplate)} view`
+              : `${actualUserName} · ${getRoleLabel(actualUserRole, industryTemplate)}`}
           </div>
         </div>
       </div>
@@ -63,7 +65,7 @@ export function PreviewAccessSwitcher({
             <option value={actualUserId}>My account</option>
             {candidates.map((candidate) => (
               <option key={candidate.id} value={candidate.id}>
-                {candidate.name} · {getRoleLabel(candidate.role)}
+                {candidate.name} · {getRoleLabel(candidate.role, industryTemplate)}
               </option>
             ))}
           </select>

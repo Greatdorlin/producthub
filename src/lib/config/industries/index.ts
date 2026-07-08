@@ -26,17 +26,17 @@ export function getIndustryPreset(template = siteConfig.industryTemplate) {
   return presets[template] ?? genericPreset;
 }
 
-export function getRoleLabel(role: string) {
-  const preset = getIndustryPreset();
+export function getRoleLabel(role: string, template = siteConfig.industryTemplate) {
+  const preset = getIndustryPreset(template);
   return preset.roleLabels[role as ProductRole] ?? role;
 }
 
-export function getFieldLabel(columnName: string) {
-  const preset = getIndustryPreset();
+export function getFieldLabel(columnName: string, template = siteConfig.industryTemplate) {
+  const preset = getIndustryPreset(template);
   return preset.fieldLabels[columnName] ?? columnName;
 }
 
-export function getDefaultCurrency() {
-  const preset = getIndustryPreset();
+export function getDefaultCurrency(template = siteConfig.industryTemplate) {
+  const preset = getIndustryPreset(template);
   return siteConfig.defaultCurrency || preset.productDefaults.currency || "USD";
 }

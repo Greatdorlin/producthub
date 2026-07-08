@@ -7,13 +7,26 @@ import { SESSION_COOKIE } from "@/lib/auth/server";
 import { getDb } from "@/lib/db/client";
 import { workspaceSettings } from "@/lib/db/schema";
 import { DEFAULT_WORKSPACE_SETTINGS } from "@/lib/data";
+import { presets } from "@/lib/config/industries";
+import { eq } from "drizzle-orm";
 
 const ALLOWED_LOGO_TYPES = new Set(["image/png", "image/jpeg", "image/webp"]);
 const MAX_LOGO_BYTES = 2 * 1024 * 1024;
+const HEX_COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
 
 function safeFileName(fileName: string) {
   const cleaned = fileName.toLowerCase().replace(/[^a-z0-9._-]/g, "-");
   return cleaned.replace(/-+/g, "-").slice(0, 80) || "logo";
+}
+
+function getString(formData: FormData, key: string, fallback: string) {
+  const value = String(formData.get(key) ?? "").trim();
+  return value || fallback;
+}
+
+function getColor(formData: FormData, key: string, fallback: string) {
+  const value = getString(formData, key, fallback);
+  return HEX_COLOR_PATTERN.test(value) ? value : fallback;
 }
 
 export async function GET(request: NextRequest) {
@@ -35,15 +48,32 @@ export async function POST(request: NextRequest) {
   const formData = await request.formData();
   const removeLogo = String(formData.get("removeLogo") ?? "") === "on";
   const file = formData.get("logo");
+  const db = getDb();
+  const [existingSettings] = await db
+    .select()
+    .from(workspaceSettings)
+    .where(eq(workspaceSettings.id, DEFAULT_WORKSPACE_SETTINGS.id))
+    .limit(1);
+  const currentSettings = existingSettings ?? DEFAULT_WORKSPACE_SETTINGS;
+  const brandName = getString(formData, "brandName", currentSettings.brandName);
+  const requestedTemplate = getString(formData, "industryTemplate", currentSettings.industryTemplate);
+  const industryTemplate = presets[requestedTemplate] ? requestedTemplate : "generic";
+  const primaryColor = getColor(formData, "primaryColor", currentSettings.primaryColor);
+  const accentColor = getColor(formData, "accentColor", currentSettings.accentColor);
+  const pageBackground = getColor(formData, "pageBackground", currentSettings.pageBackground);
+  const surfaceColor = getColor(formData, "surfaceColor", currentSettings.surfaceColor);
+  const textColor = getColor(formData, "textColor", currentSettings.textColor);
+  const mutedTextColor = getColor(formData, "mutedTextColor", currentSettings.mutedTextColor);
 
-  let logoUrl: string | null = null;
-  let logoStoragePath: string | null = null;
-  let changeType: "removed" | "uploaded" = "removed";
+  let logoUrl = currentSettings.logoUrl;
+  let logoStoragePath = currentSettings.logoStoragePath;
+  let changeType: "removed" | "uploaded" | "unchanged" = "unchanged";
 
-  if (!removeLogo) {
-    if (!(file instanceof File) || file.size === 0) {
-      return NextResponse.redirect(new URL("/settings/branding?error=missing-logo", request.url));
-    }
+  if (removeLogo) {
+    logoUrl = null;
+    logoStoragePath = null;
+    changeType = "removed";
+  } else if (file instanceof File && file.size > 0) {
 
     if (!ALLOWED_LOGO_TYPES.has(file.type) || file.size > MAX_LOGO_BYTES) {
       return NextResponse.redirect(new URL("/settings/branding?error=invalid-logo", request.url));
@@ -67,24 +97,38 @@ export async function POST(request: NextRequest) {
     changeType = "uploaded";
   }
 
-  const db = getDb();
   const now = new Date();
 
   await db
     .insert(workspaceSettings)
     .values({
       id: DEFAULT_WORKSPACE_SETTINGS.id,
-      brandName: DEFAULT_WORKSPACE_SETTINGS.brandName,
+      brandName,
       logoUrl,
       logoStoragePath,
+      industryTemplate,
+      primaryColor,
+      accentColor,
+      pageBackground,
+      surfaceColor,
+      textColor,
+      mutedTextColor,
       updatedBy: user.userId,
       updatedAt: now,
     })
     .onConflictDoUpdate({
       target: workspaceSettings.id,
       set: {
+        brandName,
         logoUrl,
         logoStoragePath,
+        industryTemplate,
+        primaryColor,
+        accentColor,
+        pageBackground,
+        surfaceColor,
+        textColor,
+        mutedTextColor,
         updatedBy: user.userId,
         updatedAt: now,
       },
@@ -95,7 +139,13 @@ export async function POST(request: NextRequest) {
     action: "workspace.branding.updated",
     entityType: "workspace_settings",
     entityId: DEFAULT_WORKSPACE_SETTINGS.id,
-    details: { changeType, logoStoragePath },
+    details: {
+      changeType,
+      brandName,
+      industryTemplate,
+      logoStoragePath,
+      theme: { primaryColor, accentColor, pageBackground, surfaceColor, textColor, mutedTextColor },
+    },
   });
 
   return NextResponse.redirect(new URL("/settings/branding?saved=1", request.url));

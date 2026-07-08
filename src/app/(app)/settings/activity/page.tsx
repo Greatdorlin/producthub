@@ -1,6 +1,6 @@
 import { requirePermission } from "@/lib/auth/server";
 import { getFieldLabel } from "@/lib/config/industries";
-import { getActivityFeed } from "@/lib/data";
+import { getActivityFeed, getWorkspaceSettings } from "@/lib/data";
 import { formatDateLabel } from "@/lib/utils";
 
 const entityLabels: Record<string, string> = {
@@ -39,9 +39,9 @@ function formatAction(action: string) {
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
-function formatDetailKey(key: string) {
+function formatDetailKey(key: string, industryTemplate: string) {
   if (["route", "audience", "pitch", "slotsAvailable", "expectedSales"].includes(key)) {
-    return getFieldLabel(key);
+    return getFieldLabel(key, industryTemplate);
   }
 
   return detailLabels[key] ?? key.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/\b\w/g, (letter) => letter.toUpperCase());
@@ -73,7 +73,10 @@ function renderDetailValue(value: unknown) {
 
 export default async function ActivitySettingsPage() {
   await requirePermission("activity:view");
-  const entries = await getActivityFeed();
+  const [entries, workspaceSettings] = await Promise.all([
+    getActivityFeed(),
+    getWorkspaceSettings(),
+  ]);
 
   return (
     <section className="ld-glass-card ld-panel">
@@ -109,7 +112,7 @@ export default async function ActivitySettingsPage() {
                 <div className="ld-activity-detail-grid">
                   {Object.entries(entry.details).map(([key, value]) => (
                     <div key={key} className="ld-activity-detail-card">
-                      <div className="ld-stat-label">{formatDetailKey(key)}</div>
+                      <div className="ld-stat-label">{formatDetailKey(key, workspaceSettings.industryTemplate)}</div>
                       <div className="mt-2 break-words text-sm text-[var(--ld-color-text)]">
                         {renderDetailValue(value)}
                       </div>

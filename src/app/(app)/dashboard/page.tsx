@@ -5,16 +5,17 @@ import { PreviewAccessSwitcher } from "@/components/preview-access-switcher";
 import { requirePermission } from "@/lib/auth/server";
 import { getRoleLabel } from "@/lib/config/industries";
 import { priorityLabels, productAccessLabels, statusLabels } from "@/lib/constants";
-import { getDashboardData, getPeopleData } from "@/lib/data";
+import { getDashboardData, getPeopleData, getWorkspaceSettings } from "@/lib/data";
 import { formatCurrencyFromCents, formatDateLabel, formatExpiryCountdown, getExpiryTone } from "@/lib/utils";
 
 export default async function DashboardPage() {
   const viewer = await requirePermission("dashboard:view");
   const canPreviewUsers =
     viewer.actualPermissions.includes("people:view") || viewer.actualPermissions.includes("people:manage");
-  const [data, people] = await Promise.all([
+  const [data, people, workspaceSettings] = await Promise.all([
     getDashboardData(viewer),
     canPreviewUsers ? getPeopleData() : Promise.resolve([]),
+    getWorkspaceSettings(),
   ]);
   const canOpenSettings = viewer.permissions.includes("people:view") || viewer.permissions.includes("activity:view");
   const canEditProducts = viewer.permissions.includes("products:edit");
@@ -48,7 +49,9 @@ export default async function DashboardPage() {
                 Daily control
               </span>
               <span className="ld-chip">
-                {viewer.isPreviewing ? `Viewing ${getRoleLabel(viewer.role)}` : `Master ${getRoleLabel(viewer.actualRole)} view`}
+                {viewer.isPreviewing
+                  ? `Viewing ${getRoleLabel(viewer.role, workspaceSettings.industryTemplate)}`
+                  : `Master ${getRoleLabel(viewer.actualRole, workspaceSettings.industryTemplate)} view`}
               </span>
             </div>
             <h2 className="ld-title mt-4">Product control.</h2>
@@ -97,6 +100,7 @@ export default async function DashboardPage() {
               effectiveUserRole={viewer.role}
               isPreviewing={viewer.isPreviewing}
               candidates={previewCandidates}
+              industryTemplate={workspaceSettings.industryTemplate}
             />
           </div>
         </section>

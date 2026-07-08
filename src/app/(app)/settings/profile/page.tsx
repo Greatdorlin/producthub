@@ -6,6 +6,7 @@ import { changePasswordAction, disableMfaAction, enableMfaAction, regenerateReco
 import { AsyncRedirectForm } from "@/components/async-redirect-form";
 import { buildTotpOtpAuthUrl, encryptMfaSecret, generateTotpSecret, MFA_RECOVERY_CODES_COOKIE, requireActualSession } from "@/lib/auth/server";
 import { getRoleLabel } from "@/lib/config/industries";
+import { getWorkspaceSettings } from "@/lib/data";
 import { getDb } from "@/lib/db/client";
 import { users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
@@ -50,7 +51,12 @@ export default async function ProfileSettingsPage({
     mfaRecovery?: string;
   }>;
 }) {
-  const [user, params, store] = await Promise.all([requireActualSession(), searchParams, cookies()]);
+  const [user, params, store, workspaceSettings] = await Promise.all([
+    requireActualSession(),
+    searchParams,
+    cookies(),
+    getWorkspaceSettings(),
+  ]);
   const db = getDb();
   const [securityUser] = await db
     .select({
@@ -126,7 +132,9 @@ export default async function ProfileSettingsPage({
 
               <div className="min-w-0">
                 <div className="text-xl font-semibold text-white">{user.name}</div>
-                <div className="mt-1 text-sm text-[var(--ld-color-muted)]">{getRoleLabel(user.role)}</div>
+                <div className="mt-1 text-sm text-[var(--ld-color-muted)]">
+                  {getRoleLabel(user.role, workspaceSettings.industryTemplate)}
+                </div>
                 <div className="mt-3 break-all text-sm text-[var(--ld-color-muted)]">{user.email}</div>
               </div>
             </div>

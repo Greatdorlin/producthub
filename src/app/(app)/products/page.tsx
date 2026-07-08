@@ -20,7 +20,7 @@ import {
   ROUTE_OPTIONS,
   statusLabels,
 } from "@/lib/constants";
-import { getVisibleProducts } from "@/lib/data";
+import { getVisibleProducts, getWorkspaceSettings } from "@/lib/data";
 import { formatCurrencyFromCents, formatDateLabel, formatDateRangeLabel, formatExpiryCountdown, getExpiryTone } from "@/lib/utils";
 
 const accessDescriptions: Record<(typeof PRODUCT_ACCESS_ROLES)[number], string> = {
@@ -38,18 +38,21 @@ type ProductsPageProps = {
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
   const viewer = await requirePermission("products:view");
-  const allProducts = await getVisibleProducts(viewer);
+  const [allProducts, workspaceSettings] = await Promise.all([
+    getVisibleProducts(viewer),
+    getWorkspaceSettings(),
+  ]);
   const params = await searchParams;
   const query = params.q?.trim().toLowerCase() ?? "";
   const canEdit = viewer.permissions.includes("products:edit");
-  const industryPreset = getIndustryPreset();
+  const industryPreset = getIndustryPreset(workspaceSettings.industryTemplate);
   const categoryOptions = industryPreset.productDefaults.categories.length
     ? industryPreset.productDefaults.categories
     : [...CATEGORY_OPTIONS];
   const routeOptions = industryPreset.productDefaults.routes.length
     ? industryPreset.productDefaults.routes
     : [...ROUTE_OPTIONS];
-  const defaultCurrency = getDefaultCurrency();
+  const defaultCurrency = getDefaultCurrency(workspaceSettings.industryTemplate);
   const currencyOptions = Array.from(new Set([defaultCurrency, ...CURRENCY_OPTIONS]));
   const liveCount = allProducts.filter((product) => product.status === "active").length;
   const draftCount = allProducts.filter((product) => product.status === "draft").length;
@@ -73,7 +76,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
           product.audience,
           priorityLabels[product.priority as keyof typeof priorityLabels],
           ...product.feeItems.map((fee) => fee.label),
-          ...product.accessRoles.map((role) => getRoleLabel(role)),
+          ...product.accessRoles.map((role) => getRoleLabel(role, workspaceSettings.industryTemplate)),
         ]
           .join(" ")
           .toLowerCase()
@@ -163,7 +166,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                   <div className="flex flex-wrap gap-2">
                     {product.accessRoles.map((role) => (
                       <span key={role} className="rounded-full bg-black/18 px-3 py-1 text-xs font-medium text-[var(--ld-color-text)]">
-                        {getRoleLabel(role)}
+                        {getRoleLabel(role, workspaceSettings.industryTemplate)}
                       </span>
                     ))}
                     {product.feeItems.length ? (
@@ -191,11 +194,11 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                     <div className="ld-meta-value">{product.ownerTeam}</div>
                   </div>
                   <div className="ld-meta-pill">
-                    <div className="ld-meta-title">{getFieldLabel("slotsAvailable")}</div>
+                    <div className="ld-meta-title">{getFieldLabel("slotsAvailable", workspaceSettings.industryTemplate)}</div>
                     <div className="ld-meta-value">{product.slotsAvailable ?? "Not set"}</div>
                   </div>
                   <div className="ld-meta-pill">
-                    <div className="ld-meta-title">{getFieldLabel("expectedSales")}</div>
+                    <div className="ld-meta-title">{getFieldLabel("expectedSales", workspaceSettings.industryTemplate)}</div>
                     <div className="ld-meta-value">
                       {product.expectedSales
                         ? `${product.expectedSales}${product.salesStartsAt || product.salesEndsAt ? ` · ${formatDateRangeLabel(product.salesStartsAt, product.salesEndsAt)}` : ""}`
@@ -278,7 +281,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                     </label>
 
                     <label className="block space-y-2">
-                      <span className="ld-label">{getFieldLabel("route")}</span>
+                      <span className="ld-label">{getFieldLabel("route", workspaceSettings.industryTemplate)}</span>
                       <select name="route" className="ld-input ld-select">
                         {routeOptions.map((item) => (
                           <option key={item} value={item}>
@@ -300,7 +303,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
                   <label className="block space-y-2 ld-required-field">
                     <span className="ld-label-row">
-                      <span className="ld-label">{getFieldLabel("pitch")}</span>
+                      <span className="ld-label">{getFieldLabel("pitch", workspaceSettings.industryTemplate)}</span>
                       <span className="ld-required-text">Required</span>
                     </span>
                     <textarea required name="pitch" rows={3} className="ld-input ld-textarea" />
@@ -314,7 +317,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                   <div className="ld-form-split">
                     <label className="block space-y-2 ld-required-field">
                       <span className="ld-label-row">
-                        <span className="ld-label">{getFieldLabel("audience")}</span>
+                        <span className="ld-label">{getFieldLabel("audience", workspaceSettings.industryTemplate)}</span>
                         <span className="ld-required-text">Required</span>
                       </span>
                       <input required name="audience" className="ld-input" placeholder="For example: corporate clients who need travel support" />
@@ -346,7 +349,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                             defaultChecked={!["affiliate", "marketing_manager"].includes(role)}
                           />
                           <span className="ld-check-tile-card">
-                            <span className="ld-check-tile-title">{getRoleLabel(role)}</span>
+                            <span className="ld-check-tile-title">{getRoleLabel(role, workspaceSettings.industryTemplate)}</span>
                             <span className="ld-check-tile-copy">{accessDescriptions[role]}</span>
                           </span>
                         </label>
@@ -394,13 +397,13 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                             defaultChecked={role === "marketing_manager" || role === "sales_manager"}
                           />
                           <span className="ld-check-tile-card">
-                            <span className="ld-check-tile-title">{getRoleLabel(role)}</span>
+                            <span className="ld-check-tile-title">{getRoleLabel(role, workspaceSettings.industryTemplate)}</span>
                             <span className="ld-check-tile-copy">
                               {role === "affiliate"
                                 ? "Lets affiliates download approved promo material."
                                 : role === "viewer"
                                   ? "Lets view-only users open shared files."
-                                  : `Lets ${getRoleLabel(role).toLowerCase()} open and use approved assets.`}
+                                  : `Lets ${getRoleLabel(role, workspaceSettings.industryTemplate).toLowerCase()} open and use approved assets.`}
                             </span>
                           </span>
                         </label>
@@ -438,12 +441,12 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                       helperText="Choose the day this offer should stop showing as current."
                     />
                     <label className="block space-y-2">
-                      <span className="ld-label">{getFieldLabel("slotsAvailable")}</span>
+                      <span className="ld-label">{getFieldLabel("slotsAvailable", workspaceSettings.industryTemplate)}</span>
                       <input name="slotsAvailable" type="number" min="0" step="1" className="ld-input" placeholder="For example: 30 places or visa slots" />
                       <span className="ld-note">Use this for the number of places you can actually sell.</span>
                     </label>
                     <label className="block space-y-2">
-                      <span className="ld-label">{getFieldLabel("expectedSales")}</span>
+                      <span className="ld-label">{getFieldLabel("expectedSales", workspaceSettings.industryTemplate)}</span>
                       <input name="expectedSales" type="number" min="0" step="1" className="ld-input" placeholder="For example: 18 expected sales" />
                       <span className="ld-note">Add the number you expect to sell during the sales window below.</span>
                     </label>

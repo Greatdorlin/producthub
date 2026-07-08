@@ -2,7 +2,7 @@ import { createUserAction, toggleUserStatusAction, updateUserAccessAction } from
 import { requirePermission } from "@/lib/auth/server";
 import { getRoleLabel } from "@/lib/config/industries";
 import { PERMISSIONS, PRODUCT_ROLES, permissionLabels } from "@/lib/constants";
-import { getPeopleData } from "@/lib/data";
+import { getPeopleData, getWorkspaceSettings } from "@/lib/data";
 import { formatDateLabel } from "@/lib/utils";
 
 type AccessSettingsPageProps = {
@@ -11,7 +11,10 @@ type AccessSettingsPageProps = {
 
 export default async function AccessSettingsPage({ searchParams }: AccessSettingsPageProps) {
   const viewer = await requirePermission("people:view");
-  const people = await getPeopleData();
+  const [people, workspaceSettings] = await Promise.all([
+    getPeopleData(),
+    getWorkspaceSettings(),
+  ]);
   const params = await searchParams;
   const canManage = viewer.permissions.includes("people:manage");
   const activePeople = people.filter((person) => person.isActive).length;
@@ -74,7 +77,7 @@ export default async function AccessSettingsPage({ searchParams }: AccessSetting
                       </span>
                     </div>
                     <div className="mt-2 text-sm text-[var(--ld-color-muted)]">
-                      {person.email} · {getRoleLabel(person.role)}
+                      {person.email} · {getRoleLabel(person.role, workspaceSettings.industryTemplate)}
                     </div>
                     <div className="mt-1 text-sm text-[var(--ld-color-muted)]">
                       Last login {person.lastLoginAt ? formatDateLabel(person.lastLoginAt) : "Not yet"}
@@ -144,7 +147,7 @@ export default async function AccessSettingsPage({ searchParams }: AccessSetting
                           <select name="role" defaultValue={person.role} className="ld-input ld-select">
                             {PRODUCT_ROLES.map((role) => (
                               <option key={role} value={role}>
-                                {getRoleLabel(role)}
+                                {getRoleLabel(role, workspaceSettings.industryTemplate)}
                               </option>
                             ))}
                           </select>
@@ -231,7 +234,7 @@ export default async function AccessSettingsPage({ searchParams }: AccessSetting
                   <select name="role" className="ld-input ld-select">
                     {PRODUCT_ROLES.map((role) => (
                       <option key={role} value={role}>
-                        {getRoleLabel(role)}
+                        {getRoleLabel(role, workspaceSettings.industryTemplate)}
                       </option>
                     ))}
                   </select>

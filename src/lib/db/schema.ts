@@ -125,6 +125,13 @@ export const workspaceSettings = pgTable("workspace_settings", {
   brandName: text("brand_name").notNull().default("ProductHub"),
   logoUrl: text("logo_url"),
   logoStoragePath: text("logo_storage_path"),
+  industryTemplate: text("industry_template").notNull().default("generic"),
+  primaryColor: text("primary_color").notNull().default("#4f46e5"),
+  accentColor: text("accent_color").notNull().default("#14b8a6"),
+  pageBackground: text("page_background").notNull().default("#151515"),
+  surfaceColor: text("surface_color").notNull().default("#1f1f23"),
+  textColor: text("text_color").notNull().default("#f8fafc"),
+  mutedTextColor: text("muted_text_color").notNull().default("#a1a1aa"),
   updatedBy: text("updated_by").references(() => users.id),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
