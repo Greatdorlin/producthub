@@ -3,6 +3,7 @@ import { RotateCcw, Save } from "lucide-react";
 import { AsyncRedirectForm } from "@/components/async-redirect-form";
 import { BrandThemePresets } from "@/components/brand-theme-presets";
 import { chipClassName } from "@/components/chip";
+import { FieldLabel } from "@/components/field-label";
 import { requirePermission } from "@/lib/auth/server";
 import { getIndustryPreset, presets } from "@/lib/config/industries";
 import { getWorkspaceSettings } from "@/lib/data";
@@ -65,12 +66,12 @@ export default async function BrandingSettingsPage({
           <div className="ld-form-section">
             <div className="ld-field-group">
               <label className="grid gap-2">
-                <span className="ld-label">Brand name</span>
+                <FieldLabel label="Brand name" info="Shown in the sidebar, login screen, and browser metadata." />
                 <input className="ld-input" name="brandName" defaultValue={settings.brandName} maxLength={80} />
               </label>
 
               <label className="grid gap-2">
-                <span className="ld-label">Industry preset</span>
+                <FieldLabel label="Industry preset" info="Changes role labels, field labels, default routes, categories, and currency." />
                 <select name="industryTemplate" className="ld-input ld-select" defaultValue={settings.industryTemplate}>
                   {Object.values(presets).map((preset) => (
                     <option key={preset.id} value={preset.id}>
@@ -78,9 +79,6 @@ export default async function BrandingSettingsPage({
                     </option>
                   ))}
                 </select>
-                <span className="ld-note">
-                  Presets change role labels, product field labels, route options, categories, and currency defaults.
-                </span>
               </label>
             </div>
           </div>
@@ -97,7 +95,7 @@ export default async function BrandingSettingsPage({
           <div className="ld-form-section">
             <div className="grid gap-4">
               <label className="grid gap-2">
-                <span className="ld-label">Upload logo</span>
+                <FieldLabel label="Upload logo" info="Optional PNG, JPG, or WebP. Keep it under 2 MB." />
                 <input
                   className="ld-input file:mr-3 file:rounded-full file:border-0 file:bg-[var(--ld-color-primary)] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white"
                   type="file"
@@ -105,8 +103,6 @@ export default async function BrandingSettingsPage({
                   accept="image/png,image/jpeg,image/webp"
                 />
               </label>
-
-              <p className="ld-note">PNG, JPG, or WebP. Keep it under 2 MB.</p>
 
               {settings.logoUrl ? (
                 <label className="ld-check-tile">

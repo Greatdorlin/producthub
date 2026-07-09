@@ -19,7 +19,7 @@ import type { Permission } from "@/lib/constants";
 const shellLinks = [
   { href: "/dashboard#content-start", label: "Overview", icon: LayoutDashboard, permissions: ["dashboard:view"] },
   { href: "/products#content-start", label: "Products", icon: Boxes, permissions: ["products:view"] },
-  { href: "/library#content-start", label: "Asset Library", icon: FolderKanban, permissions: ["assets:view"] },
+  { href: "/library#assets", label: "Asset Library", icon: FolderKanban, permissions: ["assets:view"] },
   { href: "/settings#content-start", label: "Settings", icon: Settings, permissions: ["dashboard:view"] },
 ] satisfies Array<{
   href: string;

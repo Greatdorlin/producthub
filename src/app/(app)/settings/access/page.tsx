@@ -1,5 +1,6 @@
 import { createUserAction, toggleUserStatusAction, updateUserAccessAction } from "@/app/actions";
 import { chipClassName } from "@/components/chip";
+import { FieldLabel } from "@/components/field-label";
 import { requirePermission } from "@/lib/auth/server";
 import { getRoleLabel } from "@/lib/config/industries";
 import { PERMISSIONS, PRODUCT_ROLES, permissionLabels } from "@/lib/constants";
@@ -139,12 +140,12 @@ export default async function AccessSettingsPage({ searchParams }: AccessSetting
                     <div className="ld-form-section">
                       <div className="ld-field-group">
                         <label className="block space-y-2">
-                          <span className="ld-label">Full name</span>
+                          <FieldLabel label="Full name" required />
                           <input required name="name" defaultValue={person.name} className="ld-input" />
                         </label>
 
                         <label className="block space-y-2">
-                          <span className="ld-label">Base role</span>
+                          <FieldLabel label="Base role" />
                           <select name="role" defaultValue={person.role} className="ld-input ld-select">
                             {PRODUCT_ROLES.map((role) => (
                               <option key={role} value={role}>
@@ -154,7 +155,7 @@ export default async function AccessSettingsPage({ searchParams }: AccessSetting
                           </select>
                         </label>
 
-                        <p className="ld-note">Use the switches below to decide exactly what this person can do.</p>
+                        <FieldLabel label="Permission switches" info="Use the switches below to decide exactly what this person can do." />
                       </div>
                     </div>
 
@@ -219,19 +220,19 @@ export default async function AccessSettingsPage({ searchParams }: AccessSetting
             <div className="ld-form-section">
               <div className="ld-field-group">
                 <label className="block space-y-2">
-                  <span className="ld-label">Full name</span>
+                  <FieldLabel label="Full name" required />
                   <input required name="name" className="ld-input" />
                 </label>
                 <label className="block space-y-2">
-                  <span className="ld-label">Email</span>
+                  <FieldLabel label="Email" required />
                   <input required type="email" name="email" className="ld-input" />
                 </label>
                 <label className="block space-y-2">
-                  <span className="ld-label">Temporary password</span>
+                  <FieldLabel label="Temporary password" required info="Use at least 12 characters with uppercase, lowercase, and a number." />
                   <input required type="password" name="password" className="ld-input" />
                 </label>
                 <label className="block space-y-2">
-                  <span className="ld-label">Role</span>
+                  <FieldLabel label="Role" />
                   <select name="role" className="ld-input ld-select">
                     {PRODUCT_ROLES.map((role) => (
                       <option key={role} value={role}>

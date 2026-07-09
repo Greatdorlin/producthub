@@ -5,6 +5,7 @@ import { createProductAction } from "@/app/actions";
 import { chipClassName, priorityChipTone, statusChipTone } from "@/components/chip";
 import { DateField } from "@/components/date-field";
 import { DateRangeFields } from "@/components/date-range-fields";
+import { FieldLabel } from "@/components/field-label";
 import { ProductFormEffects } from "@/components/product-form-effects";
 import { ProductFeesField } from "@/components/product-fees-field";
 import { ValidatedForm } from "@/components/validated-form";
@@ -102,9 +103,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
             </span>
           </div>
           <h2 className="ld-title mt-4">Products</h2>
-          <p className="ld-subtitle mt-3">
-            Manage each offer, who it is for, what it costs, when it expires, and which teams can work or share it.
-          </p>
+          <p className="ld-subtitle mt-3">Manage offers, pricing, access, and assets.</p>
           {query ? <p className="ld-note mt-3">Showing results for “{params.q}”.</p> : null}
           {formError ? (
             <div className="mt-4 rounded-[14px] border border-[rgba(255,122,114,0.22)] bg-[rgba(255,122,114,0.1)] px-4 py-3 text-sm text-[var(--ld-color-danger)]">
@@ -264,17 +263,14 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
               <div className="ld-form-section">
                 <div className="ld-field-group">
                   <label className="block space-y-2 ld-required-field">
-                    <span className="ld-label-row">
-                      <span className="ld-label">Product name</span>
-                      <span className="ld-required-text">Required</span>
-                    </span>
+                    <FieldLabel label="Product name" required info="Use the buyer-facing name people will search for." />
                     <input id="create-product-name" required name="name" className="ld-input" placeholder="Corporate travel retainer" />
                     <span className="ld-required-note">Required</span>
                   </label>
 
                   <div className="ld-form-split">
                     <label className="block space-y-2">
-                      <span className="ld-label">Category</span>
+                      <FieldLabel label="Category" />
                       <select name="category" className="ld-input ld-select">
                         {categoryOptions.map((item) => (
                           <option key={item} value={item}>
@@ -285,7 +281,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                     </label>
 
                     <label className="block space-y-2">
-                      <span className="ld-label">{getFieldLabel("route", workspaceSettings.industryTemplate)}</span>
+                      <FieldLabel label={getFieldLabel("route", workspaceSettings.industryTemplate)} />
                       <select name="route" className="ld-input ld-select">
                         {routeOptions.map((item) => (
                           <option key={item} value={item}>
@@ -297,19 +293,13 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                   </div>
 
                   <label className="block space-y-2 ld-required-field">
-                    <span className="ld-label-row">
-                      <span className="ld-label">Short summary</span>
-                      <span className="ld-required-text">Required</span>
-                    </span>
+                    <FieldLabel label="Short summary" required info="One or two lines shown on product cards." />
                     <textarea required name="summary" rows={3} className="ld-input ld-textarea" />
                     <span className="ld-required-note">Required</span>
                   </label>
 
                   <label className="block space-y-2 ld-required-field">
-                    <span className="ld-label-row">
-                      <span className="ld-label">{getFieldLabel("pitch", workspaceSettings.industryTemplate)}</span>
-                      <span className="ld-required-text">Required</span>
-                    </span>
+                    <FieldLabel label={getFieldLabel("pitch", workspaceSettings.industryTemplate)} required info="The sales-ready explanation for this product." />
                     <textarea required name="pitch" rows={3} className="ld-input ld-textarea" />
                     <span className="ld-required-note">Required</span>
                   </label>
@@ -320,29 +310,20 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                 <div className="ld-field-group">
                   <div className="ld-form-split">
                     <label className="block space-y-2 ld-required-field">
-                      <span className="ld-label-row">
-                        <span className="ld-label">{getFieldLabel("audience", workspaceSettings.industryTemplate)}</span>
-                        <span className="ld-required-text">Required</span>
-                      </span>
+                      <FieldLabel label={getFieldLabel("audience", workspaceSettings.industryTemplate)} required info="Who this product is for." />
                       <input required name="audience" className="ld-input" placeholder="For example: corporate clients who need travel support" />
                       <span className="ld-required-note">Required</span>
                     </label>
 
                     <label className="block space-y-2 ld-required-field">
-                      <span className="ld-label-row">
-                        <span className="ld-label">Owning team</span>
-                        <span className="ld-required-text">Required</span>
-                      </span>
+                      <FieldLabel label="Owning team" required info="The team responsible for keeping this product current." />
                       <input required name="ownerTeam" className="ld-input" placeholder="Travel Desk" />
                       <span className="ld-required-note">Required</span>
                     </label>
                   </div>
 
                   <div className="space-y-2" data-required-group="accessRoles">
-                    <div className="ld-label-row">
-                      <span className="ld-label">Who should have access to this product?</span>
-                      <span className="ld-required-text">Choose at least one</span>
-                    </div>
+                    <FieldLabel label="Who should have access?" required info="Choose at least one group that can open this product." />
                     <div className="ld-check-grid">
                       {PRODUCT_ACCESS_ROLES.map((role) => (
                         <label key={role} className="ld-check-tile">
@@ -359,13 +340,12 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                         </label>
                       ))}
                     </div>
-                    <p className="ld-note">Choose 1, 2, or all groups that should be able to open this product.</p>
                     <p className="ld-group-required-note">Select at least one access group.</p>
                   </div>
 
                   <div className="ld-form-split ld-form-split-tight">
                     <label className="block space-y-2">
-                      <span className="ld-label">Status</span>
+                      <FieldLabel label="Status" />
                       <select name="status" className="ld-input ld-select">
                         {PRODUCT_STATUS.map((item) => (
                           <option key={item} value={item}>
@@ -375,7 +355,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                       </select>
                     </label>
                     <label className="block space-y-2">
-                      <span className="ld-label">Priority</span>
+                      <FieldLabel label="Priority" />
                       <select name="priority" className="ld-input ld-select" defaultValue="normal">
                         {PRODUCT_PRIORITY.map((item) => (
                           <option key={item} value={item}>
@@ -387,10 +367,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                   </div>
 
                   <div className="space-y-2" data-required-group="assetAccessRoles">
-                    <div className="ld-label-row">
-                      <span className="ld-label">Who can see assets for this product?</span>
-                      <span className="ld-required-text">Choose at least one</span>
-                    </div>
+                    <FieldLabel label="Who can see assets?" required info="Choose at least one group that can use this product's files." />
                     <div className="ld-check-grid">
                       {PRODUCT_ACCESS_ROLES.map((role) => (
                         <label key={role} className="ld-check-tile">
@@ -413,7 +390,6 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                         </label>
                       ))}
                     </div>
-                    <p className="ld-note">Choose 1, 2, or all groups that should be able to use this product&apos;s files.</p>
                     <p className="ld-group-required-note">Select at least one asset access group.</p>
                   </div>
                 </div>
@@ -422,7 +398,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
               <div className="ld-form-section">
                 <div className="ld-field-group">
                   <div className="space-y-2">
-                    <span className="ld-label">Currency</span>
+                    <FieldLabel label="Currency" />
                     <div className="ld-segmented">
                       {currencyOptions.map((currency) => (
                         <label key={currency} className="ld-segmented-option">
@@ -435,9 +411,8 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
                   <div className="ld-mini-stat-grid">
                     <label className="block space-y-2">
-                      <span className="ld-label">Headline price</span>
+                      <FieldLabel label="Headline price" info="Optional main price shown first on the product." />
                       <input name="price" type="number" step="0.01" min="0" className="ld-input" />
-                      <span className="ld-note">Use this for the main price you want shown first.</span>
                     </label>
                     <DateField
                       name="expiresAt"
@@ -445,14 +420,12 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                       helperText="Choose the day this offer should stop showing as current."
                     />
                     <label className="block space-y-2">
-                      <span className="ld-label">{getFieldLabel("slotsAvailable", workspaceSettings.industryTemplate)}</span>
+                      <FieldLabel label={getFieldLabel("slotsAvailable", workspaceSettings.industryTemplate)} info="Optional capacity or quantity available." />
                       <input name="slotsAvailable" type="number" min="0" step="1" className="ld-input" placeholder="For example: 30 places or visa slots" />
-                      <span className="ld-note">Use this for the number of places you can actually sell.</span>
                     </label>
                     <label className="block space-y-2">
-                      <span className="ld-label">{getFieldLabel("expectedSales", workspaceSettings.industryTemplate)}</span>
+                      <FieldLabel label={getFieldLabel("expectedSales", workspaceSettings.industryTemplate)} info="Optional target for the sales window." />
                       <input name="expectedSales" type="number" min="0" step="1" className="ld-input" placeholder="For example: 18 expected sales" />
-                      <span className="ld-note">Add the number you expect to sell during the sales window below.</span>
                     </label>
                   </div>
 
@@ -470,7 +443,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
               <div className="ld-form-section">
                 <label className="block space-y-2">
-                  <span className="ld-label">Notes</span>
+                  <FieldLabel label="Notes" />
                   <textarea name="notes" rows={4} className="ld-input ld-textarea" />
                 </label>
               </div>

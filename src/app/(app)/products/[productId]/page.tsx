@@ -12,6 +12,7 @@ import { chipClassName, priorityChipTone, statusChipTone } from "@/components/ch
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { DateField } from "@/components/date-field";
 import { DateRangeFields } from "@/components/date-range-fields";
+import { FieldLabel } from "@/components/field-label";
 import { ProductFeesField } from "@/components/product-fees-field";
 import { ProductSuccessBanner } from "@/components/product-success-banner";
 import { AsyncRedirectForm } from "@/components/async-redirect-form";
@@ -337,17 +338,14 @@ export default async function ProductDetailPage({
               <div className="ld-form-section">
                 <div className="ld-field-group">
                   <label className="block space-y-2 ld-required-field">
-                    <span className="ld-label-row">
-                      <span className="ld-label">Product name</span>
-                      <span className="ld-required-text">Required</span>
-                    </span>
+                    <FieldLabel label="Product name" required info="Use the buyer-facing name people will search for." />
                     <input defaultValue={product.name} required name="name" className="ld-input" />
                     <span className="ld-required-note">Required</span>
                   </label>
 
                   <div className="ld-form-split">
                     <label className="block space-y-2">
-                      <span className="ld-label">Category</span>
+                      <FieldLabel label="Category" />
                       <select name="category" defaultValue={product.category} className="ld-input ld-select">
                         {categoryOptions.map((item) => (
                           <option key={item} value={item}>
@@ -357,7 +355,7 @@ export default async function ProductDetailPage({
                       </select>
                     </label>
                     <label className="block space-y-2">
-                      <span className="ld-label">{getFieldLabel("route", workspaceSettings.industryTemplate)}</span>
+                      <FieldLabel label={getFieldLabel("route", workspaceSettings.industryTemplate)} />
                       <select name="route" defaultValue={product.route} className="ld-input ld-select">
                         {routeOptions.map((item) => (
                           <option key={item} value={item}>
@@ -369,19 +367,13 @@ export default async function ProductDetailPage({
                   </div>
 
                   <label className="block space-y-2 ld-required-field">
-                    <span className="ld-label-row">
-                      <span className="ld-label">Short summary</span>
-                      <span className="ld-required-text">Required</span>
-                    </span>
+                    <FieldLabel label="Short summary" required info="One or two lines shown on product cards." />
                     <textarea defaultValue={product.summary} required name="summary" rows={3} className="ld-input ld-textarea" />
                     <span className="ld-required-note">Required</span>
                   </label>
 
                   <label className="block space-y-2 ld-required-field">
-                    <span className="ld-label-row">
-                      <span className="ld-label">{getFieldLabel("pitch", workspaceSettings.industryTemplate)}</span>
-                      <span className="ld-required-text">Required</span>
-                    </span>
+                    <FieldLabel label={getFieldLabel("pitch", workspaceSettings.industryTemplate)} required info="The sales-ready explanation for this product." />
                     <textarea defaultValue={product.pitch} required name="pitch" rows={3} className="ld-input ld-textarea" />
                     <span className="ld-required-note">Required</span>
                   </label>
@@ -392,28 +384,19 @@ export default async function ProductDetailPage({
                 <div className="ld-field-group">
                   <div className="ld-form-split">
                     <label className="block space-y-2 ld-required-field">
-                      <span className="ld-label-row">
-                        <span className="ld-label">{getFieldLabel("audience", workspaceSettings.industryTemplate)}</span>
-                        <span className="ld-required-text">Required</span>
-                      </span>
+                      <FieldLabel label={getFieldLabel("audience", workspaceSettings.industryTemplate)} required info="Who this product is for." />
                       <input defaultValue={product.audience} required name="audience" className="ld-input" placeholder="For example: families, students, or corporate travellers" />
                       <span className="ld-required-note">Required</span>
                     </label>
                     <label className="block space-y-2 ld-required-field">
-                      <span className="ld-label-row">
-                        <span className="ld-label">Owning team</span>
-                        <span className="ld-required-text">Required</span>
-                      </span>
+                      <FieldLabel label="Owning team" required info="The team responsible for keeping this product current." />
                       <input defaultValue={product.ownerTeam} required name="ownerTeam" className="ld-input" />
                       <span className="ld-required-note">Required</span>
                     </label>
                   </div>
 
                   <div className="space-y-2" data-required-group="accessRoles">
-                    <div className="ld-label-row">
-                      <span className="ld-label">Who should have access to this product?</span>
-                      <span className="ld-required-text">Choose at least one</span>
-                    </div>
+                    <FieldLabel label="Who should have access?" required info="Choose at least one group that can open this product." />
                     <div className="ld-check-grid">
                       {PRODUCT_ACCESS_ROLES.map((role) => (
                         <label key={role} className="ld-check-tile">
@@ -430,13 +413,12 @@ export default async function ProductDetailPage({
                         </label>
                       ))}
                     </div>
-                    <p className="ld-note">Choose 1, 2, or all groups that should be able to open this product.</p>
                     <p className="ld-group-required-note">Select at least one access group.</p>
                   </div>
 
                   <div className="ld-form-split">
                     <label className="block space-y-2">
-                      <span className="ld-label">Status</span>
+                      <FieldLabel label="Status" />
                       <select name="status" defaultValue={product.status} className="ld-input ld-select">
                         {PRODUCT_STATUS.map((item) => (
                           <option key={item} value={item}>
@@ -446,7 +428,7 @@ export default async function ProductDetailPage({
                       </select>
                     </label>
                     <label className="block space-y-2">
-                      <span className="ld-label">Priority</span>
+                      <FieldLabel label="Priority" />
                       <select name="priority" defaultValue={product.priority} className="ld-input ld-select">
                         {PRODUCT_PRIORITY.map((item) => (
                           <option key={item} value={item}>
@@ -458,10 +440,7 @@ export default async function ProductDetailPage({
                   </div>
 
                   <div className="space-y-2" data-required-group="assetAccessRoles">
-                    <div className="ld-label-row">
-                      <span className="ld-label">Who can see assets for this product?</span>
-                      <span className="ld-required-text">Choose at least one</span>
-                    </div>
+                    <FieldLabel label="Who can see assets?" required info="Choose at least one group that can use this product's files." />
                     <div className="ld-check-grid">
                       {PRODUCT_ACCESS_ROLES.map((role) => (
                         <label key={role} className="ld-check-tile">
@@ -484,7 +463,6 @@ export default async function ProductDetailPage({
                         </label>
                       ))}
                     </div>
-                    <p className="ld-note">Choose 1, 2, or all groups that should be able to open product assets in the library.</p>
                     <p className="ld-group-required-note">Select at least one asset access group.</p>
                   </div>
                 </div>
@@ -493,7 +471,7 @@ export default async function ProductDetailPage({
               <div className="ld-form-section">
                 <div className="ld-field-group">
                   <div className="space-y-2">
-                    <span className="ld-label">Currency</span>
+                    <FieldLabel label="Currency" />
                     <div className="ld-segmented">
                       {currencyOptions.map((currency) => (
                         <label key={currency} className="ld-segmented-option">
@@ -506,7 +484,7 @@ export default async function ProductDetailPage({
 
                   <div className="ld-mini-stat-grid">
                     <label className="block space-y-2">
-                      <span className="ld-label">Headline price</span>
+                      <FieldLabel label="Headline price" info="Optional main price shown first on the product." />
                       <input
                         defaultValue={product.priceInCents ? String(product.priceInCents / 100) : ""}
                         name="price"
@@ -523,7 +501,7 @@ export default async function ProductDetailPage({
                       helperText="Choose the day this offer should stop showing as current."
                     />
                     <label className="block space-y-2">
-                      <span className="ld-label">{getFieldLabel("slotsAvailable", workspaceSettings.industryTemplate)}</span>
+                      <FieldLabel label={getFieldLabel("slotsAvailable", workspaceSettings.industryTemplate)} info="Optional capacity or quantity available." />
                       <input
                         defaultValue={product.slotsAvailable ?? ""}
                         name="slotsAvailable"
@@ -533,10 +511,9 @@ export default async function ProductDetailPage({
                         className="ld-input"
                         placeholder="For example: 30 places or visa slots"
                       />
-                      <span className="ld-note">Use this for the number of places you can actually sell.</span>
                     </label>
                     <label className="block space-y-2">
-                      <span className="ld-label">{getFieldLabel("expectedSales", workspaceSettings.industryTemplate)}</span>
+                      <FieldLabel label={getFieldLabel("expectedSales", workspaceSettings.industryTemplate)} info="Optional target for the sales window." />
                       <input
                         defaultValue={product.expectedSales ?? ""}
                         name="expectedSales"
@@ -546,7 +523,6 @@ export default async function ProductDetailPage({
                         className="ld-input"
                         placeholder="For example: 18 expected sales"
                       />
-                      <span className="ld-note">Add the number you expect to sell during the sales window below.</span>
                     </label>
                   </div>
 
@@ -563,7 +539,7 @@ export default async function ProductDetailPage({
                   <ProductFeesField initialItems={product.feeItems} />
 
                   <label className="block space-y-2">
-                    <span className="ld-label">Notes</span>
+                    <FieldLabel label="Notes" />
                     <textarea defaultValue={product.notes} name="notes" rows={4} className="ld-input ld-textarea" />
                   </label>
                 </div>
@@ -744,17 +720,14 @@ export default async function ProductDetailPage({
               <div className="ld-form-section">
                 <div className="ld-field-group">
                   <label className="block space-y-2 ld-required-field">
-                    <span className="ld-label-row">
-                      <span className="ld-label">Asset label</span>
-                      <span className="ld-required-text">Required</span>
-                    </span>
+                    <FieldLabel label="Asset label" required info="Use a clear name like Promo flyer or Sales deck." />
                     <input required name="label" className="ld-input" />
                     <span className="ld-required-note">Required</span>
                   </label>
 
                   <div className="ld-form-split">
                     <label className="block space-y-2">
-                      <span className="ld-label">Kind</span>
+                      <FieldLabel label="Kind" />
                       <select name="kind" className="ld-input ld-select">
                         {ASSET_KIND.map((item) => (
                           <option key={item} value={item}>
@@ -764,7 +737,7 @@ export default async function ProductDetailPage({
                       </select>
                     </label>
                     <label className="block space-y-2">
-                      <span className="ld-label">Who can use this asset?</span>
+                      <FieldLabel label="Who can use this asset?" />
                       <select name="visibility" className="ld-input ld-select">
                         {allowedAssetVisibility.map((item) => (
                           <option key={item} value={item}>
@@ -776,17 +749,17 @@ export default async function ProductDetailPage({
                   </div>
 
                   <label className="block space-y-2">
-                    <span className="ld-label">External asset link</span>
+                    <FieldLabel label="External asset link" info="Optional if you upload a file below." />
                     <input name="externalUrl" type="url" placeholder="https://real-asset-link..." className="ld-input" />
                   </label>
 
                   <label className="block space-y-2">
-                    <span className="ld-label">Upload file</span>
+                    <FieldLabel label="Upload file" info="Optional if you paste an external link above." />
                     <input name="file" type="file" className="ld-input" />
                   </label>
 
                   <label className="block space-y-2">
-                    <span className="ld-label">Description</span>
+                    <FieldLabel label="Description" />
                     <textarea name="altText" rows={3} className="ld-input ld-textarea" />
                   </label>
                 </div>

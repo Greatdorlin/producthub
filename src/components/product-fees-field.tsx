@@ -3,6 +3,8 @@
 import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 
+import { FieldLabel } from "@/components/field-label";
+
 type FeeItem = {
   label: string;
   amount: string;
@@ -31,10 +33,10 @@ export function ProductFeesField({
     <div className="space-y-3">
       <div className="ld-fee-toolbar">
         <div className="min-w-0">
-          <div className="ld-label">Fee breakdown</div>
-          <p className="mt-2 text-sm text-[var(--ld-color-muted)]">
-            Add each fee line separately, for example tuition deposit, visa filing fee, or service charge.
-          </p>
+          <FieldLabel
+            label="Fee breakdown"
+            info="Add separate fee lines only when buyers need to see itemized costs."
+          />
         </div>
 
         <button
@@ -51,7 +53,7 @@ export function ProductFeesField({
         {items.map((item, index) => (
           <div key={index} className="ld-form-split">
             <label className="block space-y-2">
-              <span className="ld-sublabel">Fee name</span>
+              <FieldLabel label="Fee name" />
               <input
                 name="feeLabel"
                 value={item.label}
@@ -69,7 +71,7 @@ export function ProductFeesField({
 
             <div className="flex items-end gap-2">
               <label className="block flex-1 space-y-2">
-                <span className="ld-sublabel">Amount</span>
+                <FieldLabel label="Amount" />
                 <input
                   name="feeAmount"
                   type="number"

@@ -3,6 +3,8 @@
 import { CalendarRange } from "lucide-react";
 import { useRef } from "react";
 
+import { FieldLabel } from "@/components/field-label";
+
 type DateRangeFieldsProps = {
   startName: string;
   endName: string;
@@ -27,10 +29,10 @@ export function DateRangeFields({
 
   return (
     <div className="space-y-2">
-      <div className="ld-label">Sales window</div>
+      <FieldLabel label="Sales window" info={helperText} />
       <div className="ld-date-range-grid">
         <label className="block space-y-2">
-          <span className="ld-sublabel">{startLabel}</span>
+          <FieldLabel label={startLabel} />
           <span className="ld-date-shell">
             <CalendarRange className="ld-date-icon size-4" />
             <input
@@ -45,7 +47,7 @@ export function DateRangeFields({
         </label>
 
         <label className="block space-y-2">
-          <span className="ld-sublabel">{endLabel}</span>
+          <FieldLabel label={endLabel} />
           <span className="ld-date-shell">
             <CalendarRange className="ld-date-icon size-4" />
             <input
@@ -59,7 +61,6 @@ export function DateRangeFields({
           </span>
         </label>
       </div>
-      {helperText ? <p className="ld-note">{helperText}</p> : null}
     </div>
   );
 }

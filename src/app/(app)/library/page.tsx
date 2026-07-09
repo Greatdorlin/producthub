@@ -5,6 +5,7 @@ import { AssetUploadAccessFields } from "@/components/asset-upload-access-fields
 import { AsyncRedirectForm } from "@/components/async-redirect-form";
 import { chipClassName, statusChipTone } from "@/components/chip";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
+import { FieldLabel } from "@/components/field-label";
 import { requirePermission } from "@/lib/auth/server";
 import { ASSET_KIND, type ProductAccessRole, statusLabels } from "@/lib/constants";
 import { getLibraryAssets, getVisibleProducts } from "@/lib/data";
@@ -73,9 +74,7 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
             <span className={chipClassName("category")}>Grouped by product</span>
           </div>
           <h2 className="ld-title mt-4">Asset Library</h2>
-          <p className="ld-subtitle mt-3">
-            Open each product and see the real files and links already approved for marketing, sales, partnerships, or affiliates.
-          </p>
+          <p className="ld-subtitle mt-3">Browse approved files and links by product.</p>
           {query ? <p className="ld-note mt-3">Showing asset results for “{params.q}”.</p> : null}
           {params.error ? (
             <div className="mt-4 rounded-[14px] border border-[rgba(255,122,114,0.22)] bg-[rgba(255,122,114,0.1)] px-4 py-3 text-sm text-[var(--ld-color-danger)]">
@@ -85,7 +84,7 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
         </div>
       </section>
 
-      <section className={`grid gap-5 ${canShowAssetForm ? "xl:grid-cols-[1fr_0.94fr]" : ""}`}>
+      <section id="assets" className={`grid scroll-mt-4 gap-5 ${canShowAssetForm ? "xl:grid-cols-[1fr_0.94fr]" : ""}`}>
         <div className="grid gap-5">
           {productGroups.length ? (
             productGroups.map((group) => (
@@ -197,9 +196,7 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
               </span>
             </div>
             <h3 className="ld-panel-title mt-3">Upload or link a real asset</h3>
-            <p className="ld-panel-copy mt-2">
-              Select the product, then either upload the file directly or paste the real asset link. Both options are supported.
-            </p>
+            <p className="ld-panel-copy mt-2">Add a file or paste a link.</p>
 
             <AsyncRedirectForm action="/api/assets" method="post" encType="multipart/form-data" className="ld-form-grid mt-5">
               <input type="hidden" name="returnTo" value="/library" />
@@ -217,16 +214,13 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
                   />
 
                   <label className="block space-y-2 ld-required-field">
-                    <span className="ld-label-row">
-                      <span className="ld-label">Asset label</span>
-                      <span className="ld-required-text">Required</span>
-                    </span>
+                    <FieldLabel label="Asset label" required info="Use a clear name like Promo flyer or Sales deck." />
                     <input required name="label" className="ld-input" placeholder="Instagram reel, promo flyer, motion graphic" />
                     <span className="ld-required-note">Required</span>
                   </label>
 
                   <label className="block space-y-2">
-                    <span className="ld-label">Kind</span>
+                    <FieldLabel label="Kind" />
                     <select name="kind" className="ld-input ld-select">
                       {ASSET_KIND.map((item) => (
                         <option key={item} value={item}>
@@ -237,17 +231,17 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
                   </label>
 
                   <label className="block space-y-2">
-                    <span className="ld-label">External asset link</span>
+                    <FieldLabel label="External asset link" info="Optional if you upload a file below." />
                     <input name="externalUrl" type="url" placeholder="https://real-asset-link..." className="ld-input" />
                   </label>
 
                   <label className="block space-y-2">
-                    <span className="ld-label">Upload file</span>
+                    <FieldLabel label="Upload file" info="Optional if you paste an external link above." />
                     <input name="file" type="file" className="ld-input" />
                   </label>
 
                   <label className="block space-y-2">
-                    <span className="ld-label">Description</span>
+                    <FieldLabel label="Description" />
                     <textarea name="altText" rows={3} className="ld-input ld-textarea" />
                   </label>
                 </div>

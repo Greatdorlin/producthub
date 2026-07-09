@@ -7,6 +7,7 @@ export const SESSION_COOKIE = "flyconnect_product_hub_session";
 export const PREVIEW_USER_COOKIE = "flyconnect_product_hub_preview_user";
 export const PENDING_MFA_COOKIE = "flyconnect_product_hub_pending_mfa";
 export const MFA_RECOVERY_CODES_COOKIE = "flyconnect_product_hub_recovery_codes";
+export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 
 export type SessionPayload = {
   userId: string;
@@ -75,7 +76,7 @@ export async function createSessionCookie(payload: SessionPayload) {
     sameSite: "strict",
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    maxAge: 60 * 60 * 24 * 7,
+    maxAge: SESSION_MAX_AGE_SECONDS,
   });
 }
 

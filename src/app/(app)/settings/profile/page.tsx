@@ -5,6 +5,7 @@ import QRCode from "qrcode";
 import { changePasswordAction, disableMfaAction, enableMfaAction, regenerateRecoveryCodesAction, updateProfileIdentityAction } from "@/app/actions";
 import { AsyncRedirectForm } from "@/components/async-redirect-form";
 import { chipClassName } from "@/components/chip";
+import { FieldLabel } from "@/components/field-label";
 import { buildTotpOtpAuthUrl, encryptMfaSecret, generateTotpSecret, MFA_RECOVERY_CODES_COOKIE, requireActualSession } from "@/lib/auth/server";
 import { getRoleLabel } from "@/lib/config/industries";
 import { getWorkspaceSettings } from "@/lib/data";
@@ -146,9 +147,8 @@ export default async function ProfileSettingsPage({
 
             <form action={updateProfileIdentityAction} className="grid gap-4">
               <div className="grid gap-2">
-                <span className="ld-label">Display name</span>
+                <FieldLabel label="Display name" required info="This is the name people will see across the workspace." />
                 <input name="name" defaultValue={user.name} required className="ld-input" />
-                <span className="ld-note">This is the name people will see across the workspace.</span>
               </div>
 
               {nameMessage ? (
@@ -174,7 +174,7 @@ export default async function ProfileSettingsPage({
           >
             <div className="grid gap-4">
               <label className="grid gap-2">
-                <span className="ld-label">Upload profile picture</span>
+                <FieldLabel label="Upload profile picture" info="Optional PNG, JPG, or WebP. Keep it under 2 MB." />
                 <input
                   className="ld-input ld-file-input file:mr-3 file:rounded-full file:border-0 file:bg-[var(--ld-color-primary)] file:px-4 file:py-2.5 file:text-sm file:font-semibold file:text-white"
                   type="file"
@@ -182,8 +182,6 @@ export default async function ProfileSettingsPage({
                   accept="image/png,image/jpeg,image/webp"
                 />
               </label>
-
-              <p className="ld-note">PNG, JPG, or WebP. Keep it under 2 MB.</p>
 
               {user.avatarUrl ? (
                 <label className="ld-check-tile">
@@ -241,18 +239,17 @@ export default async function ProfileSettingsPage({
           <div className="ld-form-section">
             <div className="ld-field-group">
               <label className="block space-y-2">
-                <span className="ld-label">Current password</span>
+                <FieldLabel label="Current password" required />
                 <input name="currentPassword" type="password" className="ld-input" autoComplete="current-password" required />
               </label>
 
               <label className="block space-y-2">
-                <span className="ld-label">New password</span>
+                <FieldLabel label="New password" required info="Use at least 12 characters with uppercase, lowercase, and a number." />
                 <input name="nextPassword" type="password" className="ld-input" autoComplete="new-password" required />
-                <span className="ld-note">Use at least 12 characters with uppercase, lowercase, and a number.</span>
               </label>
 
               <label className="block space-y-2">
-                <span className="ld-label">Confirm new password</span>
+                <FieldLabel label="Confirm new password" required />
                 <input name="confirmPassword" type="password" className="ld-input" autoComplete="new-password" required />
               </label>
             </div>
@@ -358,12 +355,12 @@ export default async function ProfileSettingsPage({
                 <input type="hidden" name="secretPayload" value={secretPayload} />
                 <div className="ld-field-group">
                   <label className="block space-y-2">
-                    <span className="ld-label">Current password</span>
+                    <FieldLabel label="Current password" required />
                     <input name="currentPassword" type="password" className="ld-input" autoComplete="current-password" required />
                   </label>
 
                   <label className="block space-y-2">
-                    <span className="ld-label">Code from your authenticator app</span>
+                    <FieldLabel label="Code from your authenticator app" required />
                     <input name="token" type="text" inputMode="numeric" className="ld-input" placeholder="123456" required />
                   </label>
 
@@ -381,14 +378,14 @@ export default async function ProfileSettingsPage({
                 <form action={regenerateRecoveryCodesAction} method="post" className="ld-form-section">
                   <div className="ld-field-group">
                     <div>
-                      <div className="ld-label">Recovery codes</div>
+                      <FieldLabel label="Recovery codes" info="Each code works once if you lose access to your authenticator app." />
                       <p className="mt-2 text-sm text-[var(--ld-color-muted)]">
                         Keep these offline. Each code works once if you lose access to your authenticator app.
                       </p>
                     </div>
 
                     <label className="block space-y-2">
-                      <span className="ld-label">Current password</span>
+                      <FieldLabel label="Current password" required />
                       <input name="currentPassword" type="password" className="ld-input" autoComplete="current-password" required />
                     </label>
 
@@ -404,19 +401,19 @@ export default async function ProfileSettingsPage({
                 <form action={disableMfaAction} method="post" className="ld-form-section">
                   <div className="ld-field-group">
                     <div>
-                      <div className="ld-label">Turn off two-step verification</div>
+                      <FieldLabel label="Turn off two-step verification" info="Confirm with your password and a fresh authenticator code." />
                       <p className="mt-2 text-sm text-[var(--ld-color-muted)]">
                         Confirm with your password and a fresh authenticator code before removing this protection.
                       </p>
                     </div>
 
                     <label className="block space-y-2">
-                      <span className="ld-label">Current password</span>
+                      <FieldLabel label="Current password" required />
                       <input name="currentPassword" type="password" className="ld-input" autoComplete="current-password" required />
                     </label>
 
                     <label className="block space-y-2">
-                      <span className="ld-label">Authenticator code</span>
+                      <FieldLabel label="Authenticator code" required />
                       <input name="token" type="text" inputMode="numeric" className="ld-input" placeholder="123456" required />
                     </label>
 

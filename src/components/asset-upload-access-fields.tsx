@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { FieldLabel } from "@/components/field-label";
 import { assetVisibilityLabels, type ProductVisibility } from "@/lib/constants";
 
 type AssetUploadAccessFieldsProps = {
@@ -28,7 +29,7 @@ export function AssetUploadAccessFields({
   return (
     <>
       <label className="block space-y-2">
-        <span className="ld-label">Product</span>
+        <FieldLabel label="Product" required info="Pick the product this file or link belongs to." />
         <select
           name="productId"
           className="ld-input ld-select"
@@ -57,7 +58,7 @@ export function AssetUploadAccessFields({
       </label>
 
       <label className="block space-y-2">
-        <span className="ld-label">Who can use this asset?</span>
+        <FieldLabel label="Who can use this asset?" info="Sharing options update automatically based on the product you pick." />
         <select
           name="visibility"
           className="ld-input ld-select"
@@ -77,9 +78,6 @@ export function AssetUploadAccessFields({
             ))
           )}
         </select>
-        <span className="ld-note">
-          Sharing options update automatically based on the product you pick.
-        </span>
       </label>
     </>
   );

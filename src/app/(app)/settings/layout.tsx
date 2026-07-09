@@ -15,9 +15,7 @@ export default async function SettingsLayout({
             <span className={chipClassName("accent")}>Settings</span>
           </div>
           <h2 className="ld-title mt-4">Workspace settings</h2>
-          <p className="ld-subtitle mt-3">
-            Manage profile, branding, access, backups, and activity.
-          </p>
+          <p className="ld-subtitle mt-3">Profile, branding, access, backups, and activity.</p>
         </div>
       </section>
 

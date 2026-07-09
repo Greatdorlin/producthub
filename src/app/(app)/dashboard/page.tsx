@@ -56,9 +56,7 @@ export default async function DashboardPage() {
               </span>
             </div>
             <h2 className="ld-title mt-4">Product control.</h2>
-            <p className="ld-subtitle mt-3">
-              Track live offers, expiry pressure, assets, and the products that need attention.
-            </p>
+            <p className="ld-subtitle mt-3">Track offers, assets, and expiry pressure.</p>
           </div>
 
           <div className="ld-stat-grid w-full xl:max-w-[620px]">
