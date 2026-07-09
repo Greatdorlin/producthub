@@ -1,6 +1,6 @@
 # Commercial License Agreement
 
-Copyright (c) 2025 [Your Name]
+Copyright (c) 2026 Product Hub
 
 ## Grant of License
 
@@ -22,5 +22,3 @@ You may NOT:
 ## Disclaimer
 
 This software is provided "as is" without warranty of any kind.
-
-For licensing questions: [your-email@example.com]
