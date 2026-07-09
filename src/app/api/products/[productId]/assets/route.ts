@@ -12,6 +12,19 @@ import { productAssets, products } from "@/lib/db/schema";
 import { getAllowedAssetVisibility } from "@/lib/product-access";
 import { createId } from "@/lib/utils";
 
+function isValidExternalUrl(value: string) {
+  if (!value) {
+    return true;
+  }
+
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ productId: string }> },
@@ -28,8 +41,12 @@ export async function POST(
   const user = await getSessionUserFromToken(token);
   const { productId } = await context.params;
 
-  if (!user || !user.permissions.includes("assets:manage")) {
+  if (!user) {
     return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  if (!user.permissions.includes("assets:manage")) {
+    return NextResponse.redirect(new URL(`/products/${productId}?error=not-allowed`, request.url));
   }
 
   const db = getDb();
@@ -61,6 +78,10 @@ export async function POST(
     return NextResponse.redirect(new URL(`/products/${productId}?error=asset-label`, request.url));
   }
 
+  if (!isValidExternalUrl(externalUrl)) {
+    return NextResponse.redirect(new URL(`/products/${productId}?error=asset-url`, request.url));
+  }
+
   let assetUrl = externalUrl;
   let storagePath: string | null = null;
 
@@ -69,14 +90,18 @@ export async function POST(
       return NextResponse.redirect(new URL(`/products/${productId}?error=blob-token`, request.url));
     }
 
-    const blob = await put(
-      `product-assets/${productId}/${Date.now()}-${file.name}`,
-      file,
-      { access: "public" },
-    );
+    try {
+      const blob = await put(
+        `product-assets/${productId}/${Date.now()}-${file.name}`,
+        file,
+        { access: "public" },
+      );
 
-    assetUrl = blob.url;
-    storagePath = blob.pathname;
+      assetUrl = blob.url;
+      storagePath = blob.pathname;
+    } catch {
+      return NextResponse.redirect(new URL(`/products/${productId}?error=upload-failed`, request.url));
+    }
   }
 
   if (!assetUrl) {

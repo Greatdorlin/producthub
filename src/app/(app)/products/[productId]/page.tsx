@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { Archive, ExternalLink, Film, ImageIcon, Link2, Presentation, Trash2, Upload } from "lucide-react";
 
 import {
@@ -76,13 +76,14 @@ export default async function ProductDetailPage({
   const pageState = await searchParams;
 
   if (!details) {
-    notFound();
+    redirect("/products?error=not-found");
   }
 
   const { product, assets } = details;
   const canEdit = viewer.permissions.includes("products:edit");
   const canManageAssets = viewer.permissions.includes("assets:manage");
   const canManageLifecycle = viewer.permissions.includes("products:publish");
+  const canDeleteProducts = viewer.permissions.includes("products:delete");
   const allowedAssetVisibility = getAllowedAssetVisibility(product.assetAccessRoles as ProductAccessRole[]);
   const industryPreset = getIndustryPreset(workspaceSettings.industryTemplate);
   const categoryOptions = Array.from(new Set([
@@ -107,12 +108,20 @@ export default async function ProductDetailPage({
   const assetError =
     pageState.error === "asset-invalid" || pageState.error === "asset-label"
       ? "Check the asset details before saving."
+      : pageState.error === "asset-not-found"
+        ? "That asset has already been removed."
+      : pageState.error === "not-allowed"
+        ? "You do not have permission to upload or manage assets."
       : pageState.error === "asset-visibility"
       ? "That sharing level is wider than this product allows."
       : pageState.error === "asset-url"
         ? "Add a real file or a real asset link before saving."
         : pageState.error === "blob-token"
           ? "Asset storage is not configured."
+          : pageState.error === "upload-failed"
+            ? "The file could not be uploaded. Try again or use an external asset link."
+            : pageState.error === "request-failed"
+              ? "The upload could not be completed. Check your connection and try again."
           : null;
   const lifecycleChoices = [
     product.status !== "active" ? { label: "Move live", value: "active" } : null,
@@ -164,7 +173,7 @@ export default async function ProductDetailPage({
               </div>
             ) : null}
 
-            {canManageLifecycle && expiryDays !== null && expiryDays < 0 ? (
+            {(canManageLifecycle || canDeleteProducts) && expiryDays !== null && expiryDays < 0 ? (
               <div className="ld-expired-banner mt-5">
                 <div className="min-w-0">
                   <div className="text-sm font-semibold text-white">This product has expired.</div>
@@ -188,16 +197,18 @@ export default async function ProductDetailPage({
                     </form>
                   ) : null}
 
-                  <form action={deleteProductAction}>
-                    <input type="hidden" name="productId" value={product.id} />
-                    <ConfirmSubmitButton
-                      className="ld-danger-button inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
-                      confirmMessage={`Delete ${product.name}? This will also remove its attached assets.`}
-                    >
-                      <Trash2 className="size-4" />
-                      Delete
-                    </ConfirmSubmitButton>
-                  </form>
+                  {canDeleteProducts ? (
+                    <form action={deleteProductAction}>
+                      <input type="hidden" name="productId" value={product.id} />
+                      <ConfirmSubmitButton
+                        className="ld-danger-button inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
+                        confirmMessage={`Delete ${product.name}? This will also remove its attached assets.`}
+                      >
+                        <Trash2 className="size-4" />
+                        Delete
+                      </ConfirmSubmitButton>
+                    </form>
+                  ) : null}
                 </div>
               </div>
             ) : null}
@@ -565,7 +576,7 @@ export default async function ProductDetailPage({
               </button>
             </ValidatedForm>
 
-            {canManageLifecycle ? (
+            {canDeleteProducts ? (
               <div className="ld-danger-zone mt-5">
                 <div>
                   <div className="text-sm font-semibold text-white">Delete this product</div>
@@ -589,7 +600,7 @@ export default async function ProductDetailPage({
           </div>
         ) : null}
 
-        {!canEdit && canManageLifecycle ? (
+        {!canEdit && (canManageLifecycle || canDeleteProducts) ? (
           <div className="ld-solid-panel ld-panel">
             <div className="ld-kicker">Product control</div>
             <h3 className="ld-panel-title mt-2">Archive or remove</h3>
@@ -597,22 +608,25 @@ export default async function ProductDetailPage({
               Use these controls when the product should leave the live catalogue or be removed fully.
             </p>
 
-            <div className="ld-detail-actions mt-5">
-              {lifecycleChoices.map((choice) => (
-                <form key={choice.value} action={updateProductLifecycleAction}>
-                  <input type="hidden" name="productId" value={product.id} />
-                  <input type="hidden" name="status" value={choice.value} />
-                  <button
-                    type="submit"
-                    className="ld-secondary-button inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
-                  >
-                    <Archive className="size-4" />
-                    {choice.label}
-                  </button>
-                </form>
-              ))}
-            </div>
+            {canManageLifecycle ? (
+              <div className="ld-detail-actions mt-5">
+                {lifecycleChoices.map((choice) => (
+                  <form key={choice.value} action={updateProductLifecycleAction}>
+                    <input type="hidden" name="productId" value={product.id} />
+                    <input type="hidden" name="status" value={choice.value} />
+                    <button
+                      type="submit"
+                      className="ld-secondary-button inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
+                    >
+                      <Archive className="size-4" />
+                      {choice.label}
+                    </button>
+                  </form>
+                ))}
+              </div>
+            ) : null}
 
+            {canDeleteProducts ? (
             <div className="ld-danger-zone mt-5">
               <div>
                 <div className="text-sm font-semibold text-white">Delete this product</div>
@@ -632,6 +646,7 @@ export default async function ProductDetailPage({
                 </ConfirmSubmitButton>
               </form>
             </div>
+            ) : null}
           </div>
         ) : null}
       </section>

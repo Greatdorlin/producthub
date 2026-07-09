@@ -14,6 +14,18 @@ type LibraryPageProps = {
   searchParams: Promise<{ q?: string; error?: string }>;
 };
 
+const libraryErrorCopy: Record<string, string> = {
+  "asset-invalid": "Choose a product, add a label, and select a valid asset type and access level.",
+  "asset-url": "Add either a valid http/https link or upload a file.",
+  "asset-not-found": "That asset has already been removed.",
+  "asset-visibility": "That asset access level is wider than the selected product allows.",
+  "blob-token": "File upload storage is not configured. Use an external link or configure file storage.",
+  "not-allowed": "You do not have permission to upload or manage assets.",
+  "product-not-found": "That product is no longer available. Choose another product before uploading.",
+  "request-failed": "The upload could not be completed. Check your connection and try again.",
+  "upload-failed": "The file could not be uploaded. Try again or use an external asset link.",
+};
+
 export default async function LibraryPage({ searchParams }: LibraryPageProps) {
   const viewer = await requirePermission("assets:view");
   const assets = await getLibraryAssets(viewer);
@@ -64,6 +76,11 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
             Open each product and see the real files and links already approved for marketing, sales, partnerships, or affiliates.
           </p>
           {query ? <p className="ld-note mt-3">Showing asset results for “{params.q}”.</p> : null}
+          {params.error ? (
+            <div className="mt-4 rounded-[14px] border border-[rgba(255,122,114,0.22)] bg-[rgba(255,122,114,0.1)] px-4 py-3 text-sm text-[var(--ld-color-danger)]">
+              {libraryErrorCopy[params.error] ?? "Check the asset details and make sure you added either a file or a valid link."}
+            </div>
+          ) : null}
         </div>
       </section>
 
@@ -182,12 +199,6 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
             <p className="ld-panel-copy mt-2">
               Select the product, then either upload the file directly or paste the real asset link. Both options are supported.
             </p>
-
-            {params.error ? (
-              <div className="mt-4 rounded-[14px] border border-[rgba(255,122,114,0.22)] bg-[rgba(255,122,114,0.1)] px-4 py-3 text-sm text-[var(--ld-color-danger)]">
-                Check the asset details and make sure you added either a file or a valid link.
-              </div>
-            ) : null}
 
             <AsyncRedirectForm action="/api/assets" method="post" encType="multipart/form-data" className="ld-form-grid mt-5">
               <input type="hidden" name="returnTo" value="/library" />

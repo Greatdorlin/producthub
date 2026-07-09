@@ -203,6 +203,13 @@ function getSafeRedirectPath(value: FormDataEntryValue | null, fallback: string)
   return path.startsWith("/") ? path : fallback;
 }
 
+function addQueryParam(path: string, key: string, value: string) {
+  const [pathname, search = ""] = path.split("?");
+  const params = new URLSearchParams(search);
+  params.set(key, value);
+  return `${pathname}?${params.toString()}`;
+}
+
 export async function loginAction(formData: FormData) {
   const email = normalizeEmail(formData.get("email"));
   const password = String(formData.get("password") ?? "");
@@ -755,7 +762,7 @@ export async function updateProductLifecycleAction(formData: FormData) {
 }
 
 export async function deleteProductAction(formData: FormData) {
-  const actor = await requirePermission("products:publish");
+  const actor = await requirePermission("products:delete");
   const db = getDb();
   const productId = String(formData.get("productId") ?? "");
 
@@ -1285,7 +1292,7 @@ export async function deleteAssetAction(formData: FormData) {
   const returnTo = getSafeRedirectPath(formData.get("returnTo"), "/library");
 
   if (!assetId) {
-    redirect(returnTo);
+    redirect(addQueryParam(returnTo, "error", "asset-invalid"));
   }
 
   const [asset] = await db
@@ -1302,7 +1309,7 @@ export async function deleteAssetAction(formData: FormData) {
     .limit(1);
 
   if (!asset) {
-    redirect(returnTo);
+    redirect(addQueryParam(returnTo, "error", "asset-not-found"));
   }
 
   await db.delete(productAssets).where(eq(productAssets.id, assetId));

@@ -62,6 +62,10 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
       ? "Sales start must be before sales end."
       : params.error === "price-permission"
         ? "You do not have permission to change pricing."
+        : params.error === "not-found"
+          ? "That product is no longer available."
+          : params.error === "invalid-status"
+            ? "Choose a valid product status."
         : params.error
           ? "Check the required fields before creating the product."
           : null;
@@ -101,6 +105,11 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
             Manage each offer, who it is for, what it costs, when it expires, and which teams can work or share it.
           </p>
           {query ? <p className="ld-note mt-3">Showing results for “{params.q}”.</p> : null}
+          {formError ? (
+            <div className="mt-4 rounded-[14px] border border-[rgba(255,122,114,0.22)] bg-[rgba(255,122,114,0.1)] px-4 py-3 text-sm text-[var(--ld-color-danger)]">
+              {formError}
+            </div>
+          ) : null}
         </div>
       </section>
 
@@ -249,12 +258,6 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                 </p>
               </div>
             </div>
-
-            {formError ? (
-              <div className="mt-4 rounded-[14px] border border-[rgba(255,122,114,0.22)] bg-[rgba(255,122,114,0.1)] px-4 py-3 text-sm text-[var(--ld-color-danger)]">
-                {formError}
-              </div>
-            ) : null}
 
             <ValidatedForm action={createProductAction} className="ld-form-grid mt-5" requiredGroups={["accessRoles", "assetAccessRoles"]}>
               <div className="ld-form-section">

@@ -16,10 +16,10 @@ import {
 import type { Permission } from "@/lib/constants";
 
 const shellLinks = [
-  { href: "/dashboard", label: "Overview", icon: LayoutDashboard, permissions: ["dashboard:view"] },
-  { href: "/products", label: "Products", icon: Boxes, permissions: ["products:view"] },
-  { href: "/library", label: "Asset Library", icon: FolderKanban, permissions: ["assets:view"] },
-  { href: "/settings", label: "Settings", icon: Settings, permissions: ["dashboard:view"] },
+  { href: "/dashboard#content-start", label: "Overview", icon: LayoutDashboard, permissions: ["dashboard:view"] },
+  { href: "/products#content-start", label: "Products", icon: Boxes, permissions: ["products:view"] },
+  { href: "/library#content-start", label: "Asset Library", icon: FolderKanban, permissions: ["assets:view"] },
+  { href: "/settings#content-start", label: "Settings", icon: Settings, permissions: ["dashboard:view"] },
 ] satisfies Array<{
   href: string;
   label: string;
@@ -190,17 +190,14 @@ export function AppShell({ user, branding, topSlot, children }: AppShellProps) {
               {shellLinks
                 .filter((link) => link.permissions.some((permission) => user.permissions.includes(permission)))
                 .map((link) => {
-                  const resolvedHref =
-                    link.href === "/products" && user.permissions.includes("products:edit")
-                      ? "/products#create-product"
-                      : link.href;
-                  const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
+                  const linkPath = link.href.split("#")[0];
+                  const active = pathname === linkPath || pathname.startsWith(`${linkPath}/`);
                   const Icon = link.icon;
 
                   return (
                     <Link
                       key={link.href}
-                      href={resolvedHref}
+                      href={link.href}
                       className={`group flex min-w-[144px] items-center justify-between rounded-[12px] border px-3 py-3 transition lg:mb-2 lg:min-w-0 ${
                         active
                           ? "ld-glass-active"
@@ -227,7 +224,7 @@ export function AppShell({ user, branding, topSlot, children }: AppShellProps) {
 
         <div className="flex min-h-screen flex-col gap-4">
           {topSlot}
-          <main className="ld-main-surface flex-1">
+          <main id="content-start" className="ld-main-surface flex-1 scroll-mt-4">
             {children}
           </main>
         </div>

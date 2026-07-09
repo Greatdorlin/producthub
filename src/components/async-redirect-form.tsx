@@ -38,6 +38,11 @@ export function AsyncRedirectForm({
       const targetUrl = response.url ? new URL(response.url) : new URL(window.location.href);
       router.replace(`${targetUrl.pathname}${targetUrl.search}${targetUrl.hash}`);
       router.refresh();
+    } catch {
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.set("error", "request-failed");
+      router.replace(`${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`);
+      router.refresh();
     } finally {
       setPending(false);
     }

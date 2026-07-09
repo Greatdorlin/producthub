@@ -12,6 +12,26 @@ import { productAssets, products } from "@/lib/db/schema";
 import { getAllowedAssetVisibility } from "@/lib/product-access";
 import { createId } from "@/lib/utils";
 
+function isValidExternalUrl(value: string) {
+  if (!value) {
+    return true;
+  }
+
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+function withError(path: string, error: string) {
+  const [pathname, search = ""] = path.split("?");
+  const params = new URLSearchParams(search);
+  params.set("error", error);
+  return `${pathname}?${params.toString()}`;
+}
+
 export async function GET(request: NextRequest) {
   return NextResponse.redirect(new URL("/library", request.url));
 }
@@ -20,8 +40,12 @@ export async function POST(request: NextRequest) {
   const token = request.cookies.get(SESSION_COOKIE)?.value;
   const user = await getSessionUserFromToken(token);
 
-  if (!user || !user.permissions.includes("assets:manage")) {
+  if (!user) {
     return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  if (!user.permissions.includes("assets:manage")) {
+    return NextResponse.redirect(new URL("/library?error=not-allowed", request.url));
   }
 
   const formData = await request.formData();
@@ -36,13 +60,17 @@ export async function POST(request: NextRequest) {
 
   const redirectBase = returnTo.startsWith("/") ? returnTo : `/products/${productId}`;
 
+  if (!isValidExternalUrl(externalUrl)) {
+    return NextResponse.redirect(new URL(withError(redirectBase, "asset-url"), request.url));
+  }
+
   if (
     !productId ||
     !label ||
     !ASSET_KIND.includes(kind as (typeof ASSET_KIND)[number]) ||
     !PRODUCT_VISIBILITY.includes(visibility as (typeof PRODUCT_VISIBILITY)[number])
   ) {
-    return NextResponse.redirect(new URL(`${redirectBase}?error=asset-invalid`, request.url));
+    return NextResponse.redirect(new URL(withError(redirectBase, "asset-invalid"), request.url));
   }
 
   const db = getDb();
@@ -53,7 +81,7 @@ export async function POST(request: NextRequest) {
     .limit(1);
 
   if (!product) {
-    return NextResponse.redirect(new URL(`/products?error=not-found`, request.url));
+    return NextResponse.redirect(new URL(`/library?error=product-not-found`, request.url));
   }
 
   const allowedVisibility = getAllowedAssetVisibility(product.assetAccessRoles as ProductAccessRole[]);
@@ -63,23 +91,27 @@ export async function POST(request: NextRequest) {
 
   if (file instanceof File && file.size > 0) {
     if (!process.env.BLOB_READ_WRITE_TOKEN) {
-      return NextResponse.redirect(new URL(`${redirectBase}?error=blob-token`, request.url));
+      return NextResponse.redirect(new URL(withError(redirectBase, "blob-token"), request.url));
     }
 
-    const blob = await put(`product-assets/${productId}/${Date.now()}-${file.name}`, file, {
-      access: "public",
-    });
+    try {
+      const blob = await put(`product-assets/${productId}/${Date.now()}-${file.name}`, file, {
+        access: "public",
+      });
 
-    assetUrl = blob.url;
-    storagePath = blob.pathname;
+      assetUrl = blob.url;
+      storagePath = blob.pathname;
+    } catch {
+      return NextResponse.redirect(new URL(withError(redirectBase, "upload-failed"), request.url));
+    }
   }
 
   if (!assetUrl) {
-    return NextResponse.redirect(new URL(`${redirectBase}?error=asset-url`, request.url));
+    return NextResponse.redirect(new URL(withError(redirectBase, "asset-url"), request.url));
   }
 
   if (!allowedVisibility.includes(visibility as (typeof PRODUCT_VISIBILITY)[number])) {
-    return NextResponse.redirect(new URL(`${redirectBase}?error=asset-visibility`, request.url));
+    return NextResponse.redirect(new URL(withError(redirectBase, "asset-visibility"), request.url));
   }
 
   const assetId = createId("asset");
@@ -109,5 +141,8 @@ export async function POST(request: NextRequest) {
     reason: "asset-created",
   });
 
-  return NextResponse.redirect(new URL(`${redirectBase}?asset=1`, request.url));
+  const [pathname, search = ""] = redirectBase.split("?");
+  const params = new URLSearchParams(search);
+  params.set("asset", "1");
+  return NextResponse.redirect(new URL(`${pathname}?${params.toString()}`, request.url));
 }
