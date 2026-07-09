@@ -44,7 +44,7 @@ export function BrandThemePresets({
   return (
     <>
       <div
-        className="ld-form-section overflow-hidden"
+        className="overflow-hidden rounded-[14px] border p-4"
         style={{
           background: selectedTheme.pageBackground,
           borderColor: `${selectedTheme.mutedTextColor}33`,
@@ -123,7 +123,7 @@ export function BrandThemePresets({
         </div>
       </div>
 
-      <div className="ld-form-section">
+      <div className="mt-5">
         <input type="hidden" name="themePreset" value={themePresetId} />
         <input type="hidden" name="fontPreset" value={fontPresetId} />
         {colorKeys.map((key) => (
@@ -153,8 +153,8 @@ export function BrandThemePresets({
                 type="button"
                 className={`group grid gap-3 rounded-[12px] border p-3 text-left transition ${
                   active
-                    ? "border-[var(--ld-color-primary)] bg-white/[0.1]"
-                    : "border-white/10 bg-black/12 hover:border-white/22 hover:bg-white/[0.06]"
+                    ? "border-[var(--ld-color-primary)] bg-white/[0.09]"
+                    : "border-white/10 bg-white/[0.035] hover:border-white/22 hover:bg-white/[0.06]"
                 }`}
                 onClick={() => setThemePresetId(preset.id)}
               >
@@ -195,7 +195,7 @@ export function BrandThemePresets({
           })}
         </div>
 
-        <div className="mt-6">
+        <div className="mt-6 border-t border-white/10 pt-5">
           <div className="ld-kicker">Font style</div>
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
             {brandFontPresets.map((font) => {
@@ -207,8 +207,8 @@ export function BrandThemePresets({
                   type="button"
                   className={`rounded-[12px] border p-3 text-left transition ${
                     active
-                      ? "border-[var(--ld-color-primary)] bg-white/[0.1]"
-                      : "border-white/10 bg-black/12 hover:border-white/22 hover:bg-white/[0.06]"
+                      ? "border-[var(--ld-color-primary)] bg-white/[0.09]"
+                      : "border-white/10 bg-white/[0.035] hover:border-white/22 hover:bg-white/[0.06]"
                   }`}
                   style={{ fontFamily: font.stack }}
                   onClick={() => setFontPresetId(font.id)}

@@ -27,8 +27,8 @@ export default async function BrandingSettingsPage({
   const activePreset = getIndustryPreset(settings.industryTemplate);
 
   return (
-    <section className="grid gap-5 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-      <div className="ld-solid-panel ld-panel self-start xl:sticky xl:top-6">
+    <section className="grid gap-5 xl:grid-cols-[minmax(280px,0.72fr)_minmax(0,1.28fr)]">
+      <div className="self-start xl:sticky xl:top-6">
         <div className="ld-panel-header">
           <div>
             <p className="ld-kicker">Workspace identity</p>
@@ -47,7 +47,7 @@ export default async function BrandingSettingsPage({
         ) : null}
       </div>
 
-      <div className="ld-glass-card ld-panel">
+      <div className="ld-panel">
         <div className="ld-panel-header">
           <div>
             <p className="ld-kicker">Controls</p>

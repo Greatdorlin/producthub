@@ -52,7 +52,7 @@ export default async function ProductAppLayout({
         fontFamily: workspaceSettings.fontFamily,
       }}
       topSlot={
-        <header className="ld-glass-topbar ld-topbar rounded-[14px] px-4 py-3">
+        <header className="ld-topbar px-1 py-1">
           <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
             <div className="hidden lg:block">
               <p className="ld-kicker">Private workspace</p>

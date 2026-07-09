@@ -169,7 +169,7 @@ a {
 
 .ld-glass-card,
 .ld-glass-panel {
-  background: var(--ld-gradient-panel);
+  background: color-mix(in srgb, var(--ld-color-surface) 92%, transparent);
 }
 
 .ld-glass-input {
@@ -448,7 +448,7 @@ a {
 
 .ld-panel {
   border-radius: 14px;
-  padding: 1.1rem;
+  padding: 1.25rem;
 }
 
 .ld-panel-header {
@@ -457,6 +457,16 @@ a {
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
+}
+
+.ld-page > .ld-glass-card,
+.ld-page > .ld-solid-panel,
+.ld-page > .ld-glass-panel,
+.ld-page > .ld-panel,
+section > .ld-glass-card,
+section > .ld-solid-panel,
+section > .ld-glass-panel {
+  border-color: color-mix(in srgb, var(--ld-color-text) 9%, transparent);
 }
 
 .ld-panel-title {
@@ -478,13 +488,13 @@ a {
 
 .ld-dashboard-grid {
   display: grid;
-  gap: 1.25rem;
+  gap: 1rem;
 }
 
 .ld-stat-card {
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid color-mix(in srgb, var(--ld-color-text) 9%, transparent);
+  background: color-mix(in srgb, var(--ld-color-surface) 78%, white 4%);
   padding: 1rem;
 }
 
@@ -572,15 +582,15 @@ a {
 
 .ld-item-card {
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid color-mix(in srgb, var(--ld-color-text) 9%, transparent);
+  background: color-mix(in srgb, var(--ld-color-surface) 80%, white 4%);
   padding: 1rem;
   transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
 }
 
 .ld-item-card:hover {
-  border-color: rgba(255, 255, 255, 0.18);
-  background: rgba(255, 255, 255, 0.075);
+  border-color: color-mix(in srgb, var(--ld-color-primary) 24%, var(--ld-color-text) 10%);
+  background: color-mix(in srgb, var(--ld-color-surface) 74%, white 7%);
   transform: none;
 }
 
@@ -601,7 +611,7 @@ a {
 
 .ld-form-grid {
   display: grid;
-  gap: 1rem;
+  gap: 0.9rem;
 }
 
 .ld-form-grid[data-pending="true"] {
@@ -627,8 +637,8 @@ a {
 
 .ld-form-section {
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid color-mix(in srgb, var(--ld-color-text) 8%, transparent);
+  background: color-mix(in srgb, var(--ld-color-surface) 70%, transparent);
   padding: 1rem;
 }
 
@@ -673,7 +683,7 @@ a {
 
 .ld-product-card {
   display: grid;
-  gap: 1.25rem;
+  gap: 1rem;
 }
 
 .ld-product-card-main {
@@ -865,8 +875,8 @@ a {
 
 .ld-hero-card {
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid color-mix(in srgb, var(--ld-color-text) 9%, transparent);
+  background: color-mix(in srgb, var(--ld-color-surface) 78%, white 4%);
   padding: 1rem;
 }
 
@@ -893,22 +903,22 @@ a {
 
 .ld-main-surface {
   min-width: 0;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, var(--ld-glass-border-opacity));
-  background: var(--ld-gradient-panel);
-  padding: 1.5rem;
-  box-shadow: var(--ld-shadow-glass);
-  backdrop-filter: blur(var(--ld-glass-blur)) saturate(var(--ld-glass-saturation));
-  -webkit-backdrop-filter: blur(var(--ld-glass-blur)) saturate(var(--ld-glass-saturation));
+  border-radius: 0;
+  border: 0;
+  background: transparent;
+  padding: 0.25rem 0 1rem;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .ld-settings-tabs {
   display: flex;
   gap: 0.5rem;
   overflow-x: auto;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(9, 17, 30, 0.76);
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--ld-color-text) 8%, transparent);
+  background: color-mix(in srgb, var(--ld-color-surface) 80%, transparent);
   padding: 0.35rem;
   scrollbar-width: none;
 }
@@ -1031,6 +1041,10 @@ a {
   color: var(--ld-color-muted);
   font-size: 0.82rem;
   font-weight: 600;
+}
+
+.ld-topbar {
+  color: var(--ld-color-text);
 }
 
 .ld-logout-form {

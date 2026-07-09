@@ -158,7 +158,7 @@ export function AppShell({ user, branding, topSlot, children }: AppShellProps) {
 
   return (
     <div className="ld-app-background" style={themeStyle}>
-      <div className="ld-shell-grid relative z-10 mx-auto grid min-h-screen max-w-[var(--ld-page-max-width)] grid-cols-1 gap-3 px-3 py-3 lg:grid-cols-[260px_minmax(0,1fr)] lg:px-4 lg:py-4">
+      <div className="ld-shell-grid relative z-10 mx-auto grid min-h-screen max-w-[var(--ld-page-max-width)] grid-cols-1 gap-4 px-3 py-3 lg:grid-cols-[260px_minmax(0,1fr)] lg:px-5 lg:py-5">
         <aside className="ld-glass-sidebar ld-shell-sidebar relative overflow-hidden rounded-[14px] px-4 py-5 text-white">
           <div className="ld-shell-sidebar-inner relative flex h-full flex-col">
             <div className="ld-shell-brand space-y-5">
@@ -224,7 +224,7 @@ export function AppShell({ user, branding, topSlot, children }: AppShellProps) {
           </div>
         </aside>
 
-        <div className="flex min-h-screen flex-col gap-4">
+        <div className="flex min-h-screen flex-col gap-5">
           {topSlot}
           <main id="content-start" className="ld-main-surface flex-1 scroll-mt-4">
             {children}
