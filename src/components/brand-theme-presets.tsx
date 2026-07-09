@@ -3,6 +3,7 @@
 import { Check, Palette, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
 
+import { chipClassName } from "@/components/chip";
 import {
   brandFontPresets,
   brandThemePresets,
@@ -137,7 +138,7 @@ export function BrandThemePresets({
               Choose a complete visual preset. These are tuned for the dashboard, forms, cards, and navigation.
             </p>
           </div>
-          <span className="ld-chip">
+          <span className={chipClassName("accent")}>
             <Sparkles className="size-3.5" />
             Instant preview
           </span>

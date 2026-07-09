@@ -8,6 +8,7 @@ import {
   updateProductAction,
   updateProductLifecycleAction,
 } from "@/app/actions";
+import { chipClassName, priorityChipTone, statusChipTone } from "@/components/chip";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { DateField } from "@/components/date-field";
 import { DateRangeFields } from "@/components/date-range-fields";
@@ -139,17 +140,17 @@ export default async function ProductDetailPage({
         <div className="ld-hero-grid">
           <div>
             <div className="ld-page-meta">
-              <span className="ld-chip">{product.route}</span>
-              <span className="ld-chip">{statusLabels[product.status]}</span>
-              <span className="ld-chip">{priorityLabels[product.priority]}</span>
-              <span className="ld-chip">{product.category}</span>
+              <span className={chipClassName("route")}>{product.route}</span>
+              <span className={chipClassName(statusChipTone(product.status))}>{statusLabels[product.status]}</span>
+              <span className={chipClassName(priorityChipTone(product.priority))}>{priorityLabels[product.priority]}</span>
+              <span className={chipClassName("category")}>{product.category}</span>
             </div>
             <h2 className="ld-title mt-4">{product.name}</h2>
             <p className="ld-subtitle mt-3">{product.summary}</p>
 
             <div className="mt-5 flex flex-wrap gap-2">
               {product.accessRoles.map((role) => (
-                <span key={role} className="rounded-full bg-black/18 px-3 py-1 text-xs font-medium text-white">
+                <span key={role} className={chipClassName("access", "text-xs normal-case")}>
                   {getRoleLabel(role, workspaceSettings.industryTemplate)}
                 </span>
               ))}
@@ -718,7 +719,7 @@ export default async function ProductDetailPage({
         {canManageAssets ? (
           <div className="ld-solid-panel ld-panel">
             <div className="ld-page-meta">
-              <span className="ld-chip">
+              <span className={chipClassName("accent")}>
                 <Upload className="size-3.5" />
                 Attach asset
               </span>

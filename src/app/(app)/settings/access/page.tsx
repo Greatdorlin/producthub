@@ -1,4 +1,5 @@
 import { createUserAction, toggleUserStatusAction, updateUserAccessAction } from "@/app/actions";
+import { chipClassName } from "@/components/chip";
 import { requirePermission } from "@/lib/auth/server";
 import { getRoleLabel } from "@/lib/config/industries";
 import { PERMISSIONS, PRODUCT_ROLES, permissionLabels } from "@/lib/constants";
@@ -44,9 +45,9 @@ export default async function AccessSettingsPage({ searchParams }: AccessSetting
             <h3 className="ld-panel-title mt-2">Product Hub seats</h3>
           </div>
           <div className="ld-page-meta">
-            <span className="ld-chip">{activePeople} active</span>
-            <span className="ld-chip">{people.length} total</span>
-            {params.saved ? <span className="ld-chip text-[var(--ld-color-success)]">Updated</span> : null}
+            <span className={chipClassName("success")}>{activePeople} active</span>
+            <span className={chipClassName("count")}>{people.length} total</span>
+            {params.saved ? <span className={chipClassName("success")}>Updated</span> : null}
           </div>
         </div>
 

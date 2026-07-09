@@ -1,3 +1,4 @@
+import { chipClassName } from "@/components/chip";
 import { requirePermission } from "@/lib/auth/server";
 import { getFieldLabel } from "@/lib/config/industries";
 import { getActivityFeed, getWorkspaceSettings } from "@/lib/data";
@@ -85,7 +86,7 @@ export default async function ActivitySettingsPage() {
           <div className="ld-kicker">Audit log</div>
           <h3 className="ld-panel-title mt-2">Activity</h3>
         </div>
-        <span className="ld-chip">{entries.length} records</span>
+        <span className={chipClassName("count")}>{entries.length} records</span>
       </div>
 
       {entries.length ? (
@@ -103,7 +104,7 @@ export default async function ActivitySettingsPage() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="ld-chip">{entityLabels[entry.entityType] ?? entry.entityType}</span>
+                  <span className={chipClassName("info")}>{entityLabels[entry.entityType] ?? entry.entityType}</span>
                   <span className="ld-activity-time">{formatDateLabel(entry.createdAt)}</span>
                 </div>
               </div>

@@ -1,3 +1,4 @@
+import { chipClassName } from "@/components/chip";
 import { SettingsTabs } from "@/components/settings-tabs";
 import { requireSession } from "@/lib/auth/server";
 
@@ -11,7 +12,7 @@ export default async function SettingsLayout({
       <section className="ld-page-header">
         <div>
           <div className="ld-page-meta">
-            <span className="ld-chip">Settings</span>
+            <span className={chipClassName("accent")}>Settings</span>
           </div>
           <h2 className="ld-title mt-4">Workspace settings</h2>
           <p className="ld-subtitle mt-3">

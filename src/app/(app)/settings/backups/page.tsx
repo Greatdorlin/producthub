@@ -1,6 +1,7 @@
 import { Clock3, Database, Download, ShieldCheck } from "lucide-react";
 
 import { createWorkspaceBackupAction } from "@/app/actions";
+import { chipClassName } from "@/components/chip";
 import { requirePermission } from "@/lib/auth/server";
 import { getWorkspaceBackupSnapshots } from "@/lib/data";
 import { formatDateLabel } from "@/lib/utils";
@@ -45,7 +46,7 @@ export default async function BackupsSettingsPage({
             Create restore-ready backups of products, assets, workspace settings, and user access metadata.
           </p>
         </div>
-        {saved ? <span className="ld-chip text-[var(--ld-color-success)]">Backup saved</span> : null}
+        {saved ? <span className={chipClassName("success")}>Backup saved</span> : null}
       </div>
 
       {message ? (
@@ -57,11 +58,11 @@ export default async function BackupsSettingsPage({
       <div className="ld-backup-hero mt-6">
         <div className="ld-backup-overview">
           <div className="ld-page-meta">
-            <span className="ld-chip">
+            <span className={chipClassName(snapshotData.configured ? "success" : "warning")}>
               <ShieldCheck className="size-3.5" />
               {snapshotData.configured ? "Storage ready" : "Storage needs setup"}
             </span>
-            <span className="ld-chip">
+            <span className={chipClassName("info")}>
               <Clock3 className="size-3.5" />
               {latestBackup?.uploadedAt ? `Latest ${formatDateLabel(latestBackup.uploadedAt)}` : "No snapshot yet"}
             </span>
@@ -140,7 +141,7 @@ export default async function BackupsSettingsPage({
               <div className="ld-kicker">Available backups</div>
               <h4 className="ld-panel-title mt-2">Recent snapshots</h4>
             </div>
-            <div className="ld-chip">{snapshotData.backups.length} files</div>
+            <div className={chipClassName("count")}>{snapshotData.backups.length} files</div>
           </div>
 
           {!snapshotData.configured ? (

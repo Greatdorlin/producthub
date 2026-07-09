@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Boxes, Clock3, FolderKanban, Settings, Target } from "lucide-react";
 
+import { chipClassName, priorityChipTone, statusChipTone } from "@/components/chip";
 import { PreviewAccessSwitcher } from "@/components/preview-access-switcher";
 import { requirePermission } from "@/lib/auth/server";
 import { getRoleLabel } from "@/lib/config/industries";
@@ -44,11 +45,11 @@ export default async function DashboardPage() {
         <div className="ld-page-header">
           <div>
             <div className="ld-page-meta">
-              <span className="ld-chip">
+              <span className={chipClassName("accent")}>
                 <Target className="size-3.5" />
                 Daily control
               </span>
-              <span className="ld-chip">
+              <span className={chipClassName("info")}>
                 {viewer.isPreviewing
                   ? `Viewing ${getRoleLabel(viewer.role, workspaceSettings.industryTemplate)}`
                   : `Master ${getRoleLabel(viewer.actualRole, workspaceSettings.industryTemplate)} view`}
@@ -151,7 +152,7 @@ export default async function DashboardPage() {
               <div className="ld-kicker">Catalogue health</div>
               <h3 className="ld-panel-title mt-2">Status mix</h3>
             </div>
-            <span className="ld-chip">{data.stats.products} products</span>
+            <span className={chipClassName("count")}>{data.stats.products} products</span>
           </div>
 
           <div className="ld-health-grid mt-5">
@@ -208,10 +209,10 @@ export default async function DashboardPage() {
             {data.products.map((product) => (
               <Link key={product.id} href={`/products/${product.id}`} className="ld-item-card">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="ld-chip">{product.route}</span>
-                <span className="ld-chip">{statusLabels[product.status]}</span>
-                <span className="ld-chip">{priorityLabels[product.priority]}</span>
-                {product.feeItems.length ? <span className="ld-chip">{product.feeItems.length} fees</span> : null}
+                <span className={chipClassName("route")}>{product.route}</span>
+                <span className={chipClassName(statusChipTone(product.status))}>{statusLabels[product.status]}</span>
+                <span className={chipClassName(priorityChipTone(product.priority))}>{priorityLabels[product.priority]}</span>
+                {product.feeItems.length ? <span className={chipClassName("count")}>{product.feeItems.length} fees</span> : null}
               </div>
 
               <h4 className="mt-4 text-lg font-semibold text-white">{product.name}</h4>
@@ -243,7 +244,7 @@ export default async function DashboardPage() {
 
               <div className="mt-4 flex flex-wrap gap-2">
                 {product.accessRoles.map((role) => (
-                  <span key={role} className="rounded-full bg-black/18 px-3 py-1 text-xs font-medium text-[var(--ld-color-text)]">
+                  <span key={role} className={chipClassName("access", "text-xs normal-case")}>
                     {productAccessLabels[role as keyof typeof productAccessLabels]}
                   </span>
                 ))}

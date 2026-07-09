@@ -3,6 +3,7 @@ import { ExternalLink, Film, ImageIcon, Presentation, ScrollText, Trash2, Upload
 import { deleteAssetAction } from "@/app/actions";
 import { AssetUploadAccessFields } from "@/components/asset-upload-access-fields";
 import { AsyncRedirectForm } from "@/components/async-redirect-form";
+import { chipClassName, statusChipTone } from "@/components/chip";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { requirePermission } from "@/lib/auth/server";
 import { ASSET_KIND, type ProductAccessRole, statusLabels } from "@/lib/constants";
@@ -68,8 +69,8 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
       <section className="ld-page-header">
         <div>
           <div className="ld-page-meta">
-            <span className="ld-chip">Shared assets</span>
-            <span className="ld-chip">Grouped by product</span>
+            <span className={chipClassName("asset")}>Shared assets</span>
+            <span className={chipClassName("category")}>Grouped by product</span>
           </div>
           <h2 className="ld-title mt-4">Asset Library</h2>
           <p className="ld-subtitle mt-3">
@@ -92,9 +93,9 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
                 <div className="ld-panel-header">
                   <div>
                     <div className="ld-page-meta">
-                      <span className="ld-chip">{statusLabels[group.productStatus as keyof typeof statusLabels]}</span>
-                      <span className="ld-chip">{group.route}</span>
-                      <span className="ld-chip">{group.assets.length} assets</span>
+                      <span className={chipClassName(statusChipTone(group.productStatus))}>{statusLabels[group.productStatus as keyof typeof statusLabels]}</span>
+                      <span className={chipClassName("route")}>{group.route}</span>
+                      <span className={chipClassName("count")}>{group.assets.length} assets</span>
                     </div>
                     <h3 className="ld-panel-title mt-3">{group.productName}</h3>
                     <p className="mt-2 text-sm text-[var(--ld-color-muted)]">{group.ownerTeam}</p>
@@ -123,13 +124,13 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
                               <div className="min-w-0">
                                 <div className="text-base font-semibold text-white">{asset.label}</div>
                                 <div className="mt-2 flex flex-wrap gap-2">
-                                  <span className="rounded-full bg-black/18 px-2.5 py-1 text-xs text-[var(--ld-color-muted)]">
+                                  <span className={chipClassName("asset", "text-xs normal-case")}>
                                     {asset.kind}
                                   </span>
-                                  <span className="rounded-full bg-black/18 px-2.5 py-1 text-xs text-[var(--ld-color-muted)]">
+                                  <span className={chipClassName("access", "text-xs normal-case")}>
                                     {asset.visibility === "internal" ? "Managers only" : asset.visibility === "team" ? "Team access" : "Affiliate access"}
                                   </span>
-                                  <span className="rounded-full bg-black/18 px-2.5 py-1 text-xs text-[var(--ld-color-muted)]">
+                                  <span className={chipClassName("count", "text-xs normal-case")}>
                                     {formatDateLabel(asset.createdAt)}
                                   </span>
                                 </div>
@@ -190,7 +191,7 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
         {canShowAssetForm ? (
           <aside className="ld-solid-panel ld-panel self-start xl:sticky xl:top-6">
             <div className="ld-page-meta">
-              <span className="ld-chip">
+              <span className={chipClassName("accent")}>
                 <Upload className="size-3.5" />
                 Add asset
               </span>

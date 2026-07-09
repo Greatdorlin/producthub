@@ -4,6 +4,7 @@ import QRCode from "qrcode";
 
 import { changePasswordAction, disableMfaAction, enableMfaAction, regenerateRecoveryCodesAction, updateProfileIdentityAction } from "@/app/actions";
 import { AsyncRedirectForm } from "@/components/async-redirect-form";
+import { chipClassName } from "@/components/chip";
 import { buildTotpOtpAuthUrl, encryptMfaSecret, generateTotpSecret, MFA_RECOVERY_CODES_COOKIE, requireActualSession } from "@/lib/auth/server";
 import { getRoleLabel } from "@/lib/config/industries";
 import { getWorkspaceSettings } from "@/lib/data";
@@ -104,7 +105,7 @@ export default async function ProfileSettingsPage({
             </p>
           </div>
           {params.saved ? (
-            <span className="ld-chip text-[var(--ld-color-success)]">Saved</span>
+            <span className={chipClassName("success")}>Saved</span>
           ) : null}
         </div>
 
@@ -221,9 +222,9 @@ export default async function ProfileSettingsPage({
             </p>
           </div>
           {params.passwordSaved ? (
-            <span className="ld-chip text-[var(--ld-color-success)]">Updated</span>
+            <span className={chipClassName("success")}>Updated</span>
           ) : (
-            <span className="ld-chip">
+            <span className={chipClassName("info")}>
               <ShieldCheck className="size-3.5" />
               Protected
             </span>
@@ -277,12 +278,12 @@ export default async function ProfileSettingsPage({
             </p>
           </div>
           {securityUser?.mfaEnabled ? (
-            <span className="ld-chip text-[var(--ld-color-success)]">
+            <span className={chipClassName("success")}>
               <ShieldCheck className="size-3.5" />
               Active
             </span>
           ) : (
-            <span className="ld-chip">
+            <span className={chipClassName("neutral")}>
               <ShieldOff className="size-3.5" />
               Not active
             </span>
@@ -318,7 +319,7 @@ export default async function ProfileSettingsPage({
             <div className="ld-brand-preview-card px-5 py-5">
               {securityUser?.mfaEnabled ? (
                 <div className="w-full space-y-4">
-                  <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/8 px-3 py-1.5 text-xs font-semibold text-[var(--ld-color-primary-strong)]">
+                  <div className={chipClassName("success", "text-xs normal-case")}>
                     <ShieldCheck className="size-3.5" />
                     Sign-in protected
                   </div>
@@ -334,7 +335,7 @@ export default async function ProfileSettingsPage({
                 </div>
               ) : (
                 <div className="w-full space-y-4">
-                  <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/8 px-3 py-1.5 text-xs font-semibold text-[var(--ld-color-primary-strong)]">
+                  <div className={chipClassName("info", "text-xs normal-case")}>
                     <Smartphone className="size-3.5" />
                     Scan to connect
                   </div>

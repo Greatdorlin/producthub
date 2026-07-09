@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Compass, Plus } from "lucide-react";
 
 import { createProductAction } from "@/app/actions";
+import { chipClassName, priorityChipTone, statusChipTone } from "@/components/chip";
 import { DateField } from "@/components/date-field";
 import { DateRangeFields } from "@/components/date-range-fields";
 import { ProductFormEffects } from "@/components/product-form-effects";
@@ -95,7 +96,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
       <section className="ld-page-header">
         <div>
           <div className="ld-page-meta">
-            <span className="ld-chip">
+            <span className={chipClassName("accent")}>
               <Compass className="size-3.5" />
               Live product list
             </span>
@@ -146,7 +147,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
               <div className="ld-kicker">Visible products</div>
               <h3 className="ld-panel-title mt-2">Catalogue list</h3>
             </div>
-            <div className="ld-chip">{products.length} records</div>
+            <div className={chipClassName("count")}>{products.length} records</div>
           </div>
 
           <div className="ld-card-list mt-5">
@@ -155,11 +156,11 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                 <Link key={product.id} href={`/products/${product.id}`} className="ld-item-card ld-product-card">
                 <div className="ld-product-card-main min-w-0">
                   <div className="flex flex-wrap gap-2">
-                    <span className="ld-chip">{product.route}</span>
-                    <span className="ld-chip">{statusLabels[product.status]}</span>
-                    <span className="ld-chip">{priorityLabels[product.priority]}</span>
+                    <span className={chipClassName("route")}>{product.route}</span>
+                    <span className={chipClassName(statusChipTone(product.status))}>{statusLabels[product.status]}</span>
+                    <span className={chipClassName(priorityChipTone(product.priority))}>{priorityLabels[product.priority]}</span>
                     {product.category.toLowerCase() !== product.route.toLowerCase() ? (
-                      <span className="ld-chip">{product.category}</span>
+                      <span className={chipClassName("category")}>{product.category}</span>
                     ) : null}
                   </div>
 
@@ -174,12 +175,12 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
                   <div className="flex flex-wrap gap-2">
                     {product.accessRoles.map((role) => (
-                      <span key={role} className="rounded-full bg-black/18 px-3 py-1 text-xs font-medium text-[var(--ld-color-text)]">
+                      <span key={role} className={chipClassName("access", "text-xs normal-case")}>
                         {getRoleLabel(role, workspaceSettings.industryTemplate)}
                       </span>
                     ))}
                     {product.feeItems.length ? (
-                      <span className="rounded-full bg-black/18 px-3 py-1 text-xs font-medium text-[var(--ld-color-text)]">
+                      <span className={chipClassName("count", "text-xs normal-case")}>
                         {product.feeItems.length} fee line{product.feeItems.length > 1 ? "s" : ""}
                       </span>
                     ) : null}
@@ -247,7 +248,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
             <div className="ld-panel-header">
               <div>
                 <div className="ld-page-meta">
-                  <span className="ld-chip">
+                  <span className={chipClassName("accent")}>
                     <Plus className="size-3.5" />
                     Add product
                   </span>

@@ -2,6 +2,7 @@ import { RotateCcw, Save } from "lucide-react";
 
 import { AsyncRedirectForm } from "@/components/async-redirect-form";
 import { BrandThemePresets } from "@/components/brand-theme-presets";
+import { chipClassName } from "@/components/chip";
 import { requirePermission } from "@/lib/auth/server";
 import { getIndustryPreset, presets } from "@/lib/config/industries";
 import { getWorkspaceSettings } from "@/lib/data";
@@ -37,7 +38,7 @@ export default async function BrandingSettingsPage({
               Set the buyer-facing name, vertical preset, and interface colors used across the workspace.
             </p>
           </div>
-          {saved ? <span className="ld-chip text-[var(--ld-color-success)]">Saved</span> : null}
+          {saved ? <span className={chipClassName("success")}>Saved</span> : null}
         </div>
 
         {message ? (
