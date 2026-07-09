@@ -8,11 +8,11 @@ import { getDb } from "@/lib/db/client";
 import { workspaceSettings } from "@/lib/db/schema";
 import { DEFAULT_WORKSPACE_SETTINGS } from "@/lib/data";
 import { presets } from "@/lib/config/industries";
+import { getBrandFontPreset, getBrandThemePreset } from "@/lib/branding/presets";
 import { eq } from "drizzle-orm";
 
 const ALLOWED_LOGO_TYPES = new Set(["image/png", "image/jpeg", "image/webp"]);
 const MAX_LOGO_BYTES = 2 * 1024 * 1024;
-const HEX_COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
 
 function safeFileName(fileName: string) {
   const cleaned = fileName.toLowerCase().replace(/[^a-z0-9._-]/g, "-");
@@ -22,11 +22,6 @@ function safeFileName(fileName: string) {
 function getString(formData: FormData, key: string, fallback: string) {
   const value = String(formData.get(key) ?? "").trim();
   return value || fallback;
-}
-
-function getColor(formData: FormData, key: string, fallback: string) {
-  const value = getString(formData, key, fallback);
-  return HEX_COLOR_PATTERN.test(value) ? value : fallback;
 }
 
 export async function GET(request: NextRequest) {
@@ -58,12 +53,14 @@ export async function POST(request: NextRequest) {
   const brandName = getString(formData, "brandName", currentSettings.brandName);
   const requestedTemplate = getString(formData, "industryTemplate", currentSettings.industryTemplate);
   const industryTemplate = presets[requestedTemplate] ? requestedTemplate : "generic";
-  const primaryColor = getColor(formData, "primaryColor", currentSettings.primaryColor);
-  const accentColor = getColor(formData, "accentColor", currentSettings.accentColor);
-  const pageBackground = getColor(formData, "pageBackground", currentSettings.pageBackground);
-  const surfaceColor = getColor(formData, "surfaceColor", currentSettings.surfaceColor);
-  const textColor = getColor(formData, "textColor", currentSettings.textColor);
-  const mutedTextColor = getColor(formData, "mutedTextColor", currentSettings.mutedTextColor);
+  const themePreset = getBrandThemePreset(getString(formData, "themePreset", currentSettings.themePreset));
+  const fontPreset = getBrandFontPreset(getString(formData, "fontPreset", currentSettings.fontPreset));
+  const primaryColor = themePreset.primaryColor;
+  const accentColor = themePreset.accentColor;
+  const pageBackground = themePreset.pageBackground;
+  const surfaceColor = themePreset.surfaceColor;
+  const textColor = themePreset.textColor;
+  const mutedTextColor = themePreset.mutedTextColor;
 
   let logoUrl = currentSettings.logoUrl;
   let logoStoragePath = currentSettings.logoStoragePath;
@@ -107,6 +104,8 @@ export async function POST(request: NextRequest) {
       logoUrl,
       logoStoragePath,
       industryTemplate,
+      themePreset: themePreset.id,
+      fontPreset: fontPreset.id,
       primaryColor,
       accentColor,
       pageBackground,
@@ -123,6 +122,8 @@ export async function POST(request: NextRequest) {
         logoUrl,
         logoStoragePath,
         industryTemplate,
+        themePreset: themePreset.id,
+        fontPreset: fontPreset.id,
         primaryColor,
         accentColor,
         pageBackground,
@@ -143,6 +144,8 @@ export async function POST(request: NextRequest) {
       changeType,
       brandName,
       industryTemplate,
+      themePreset: themePreset.id,
+      fontPreset: fontPreset.id,
       logoStoragePath,
       theme: { primaryColor, accentColor, pageBackground, surfaceColor, textColor, mutedTextColor },
     },

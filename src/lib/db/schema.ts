@@ -126,6 +126,8 @@ export const workspaceSettings = pgTable("workspace_settings", {
   logoUrl: text("logo_url"),
   logoStoragePath: text("logo_storage_path"),
   industryTemplate: text("industry_template").notNull().default("generic"),
+  themePreset: text("theme_preset").notNull().default("command-graphite"),
+  fontPreset: text("font_preset").notNull().default("system"),
   primaryColor: text("primary_color").notNull().default("#4f46e5"),
   accentColor: text("accent_color").notNull().default("#14b8a6"),
   pageBackground: text("page_background").notNull().default("#151515"),

@@ -1,4 +1,4 @@
-import { Palette, RotateCcw, Save, ShieldCheck, Sparkles } from "lucide-react";
+import { RotateCcw, Save } from "lucide-react";
 
 import { AsyncRedirectForm } from "@/components/async-redirect-form";
 import { BrandThemePresets } from "@/components/brand-theme-presets";
@@ -38,82 +38,6 @@ export default async function BrandingSettingsPage({
             </p>
           </div>
           {saved ? <span className="ld-chip text-[var(--ld-color-success)]">Saved</span> : null}
-        </div>
-
-        <div
-          className="mt-6 overflow-hidden rounded-[14px] border p-4"
-          style={{
-            borderColor: `${settings.mutedTextColor}33`,
-            background: settings.pageBackground,
-            color: settings.textColor,
-          }}
-        >
-          <div className="grid gap-4 md:grid-cols-[160px_minmax(0,1fr)]">
-            <div
-              className="rounded-[12px] p-3"
-              style={{
-                background: settings.surfaceColor,
-                border: `1px solid ${settings.mutedTextColor}22`,
-              }}
-            >
-              <div className="flex items-center gap-2">
-                <div
-                  className="flex size-9 items-center justify-center overflow-hidden rounded-full"
-                  style={{ background: `${settings.accentColor}22`, color: settings.accentColor }}
-                >
-                  {settings.logoUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={settings.logoUrl} alt={`${settings.brandName} logo`} className="h-full w-full object-contain" />
-                  ) : (
-                    <ShieldCheck className="size-5" />
-                  )}
-                </div>
-                <div className="min-w-0 truncate text-sm font-semibold">{settings.brandName}</div>
-              </div>
-              <div className="mt-5 grid gap-2">
-                {["Products", "Assets", "Settings"].map((item, index) => (
-                  <div
-                    key={item}
-                    className="rounded-[10px] px-3 py-2 text-xs font-semibold"
-                    style={{
-                      background: index === 2 ? `${settings.primaryColor}33` : `${settings.mutedTextColor}12`,
-                      color: index === 2 ? settings.textColor : settings.mutedTextColor,
-                    }}
-                  >
-                    {item}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="grid gap-3">
-              <div>
-                <div className="flex items-center gap-2 text-xs font-semibold uppercase" style={{ color: settings.accentColor }}>
-                  <Sparkles className="size-3.5" />
-                  {activePreset.label}
-                </div>
-                <div className="mt-2 text-xl font-semibold">{settings.brandName}</div>
-                <p className="mt-1 text-sm" style={{ color: settings.mutedTextColor }}>
-                  Products, pricing, assets, and role-based access.
-                </p>
-              </div>
-              <div className="grid gap-2 sm:grid-cols-3">
-                {activePreset.productDefaults.categories.slice(0, 3).map((category) => (
-                  <div key={category} className="rounded-[10px] px-3 py-3 text-sm" style={{ background: settings.surfaceColor }}>
-                    {category}
-                  </div>
-                ))}
-              </div>
-              <button
-                type="button"
-                className="inline-flex min-h-10 w-fit items-center gap-2 rounded-full px-4 text-sm font-semibold text-white"
-                style={{ background: settings.primaryColor }}
-              >
-                <Palette className="size-4" />
-                Preview action
-              </button>
-            </div>
-          </div>
         </div>
 
         {message ? (
@@ -161,14 +85,12 @@ export default async function BrandingSettingsPage({
           </div>
 
           <BrandThemePresets
-            initialTheme={{
-              primaryColor: settings.primaryColor,
-              accentColor: settings.accentColor,
-              pageBackground: settings.pageBackground,
-              surfaceColor: settings.surfaceColor,
-              textColor: settings.textColor,
-              mutedTextColor: settings.mutedTextColor,
-            }}
+            brandName={settings.brandName}
+            industryLabel={activePreset.label}
+            categories={activePreset.productDefaults.categories}
+            logoUrl={settings.logoUrl}
+            initialThemePreset={settings.themePreset}
+            initialFontPreset={settings.fontPreset}
           />
 
           <div className="ld-form-section">

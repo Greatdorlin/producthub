@@ -6,6 +6,7 @@ import { getDb } from "@/lib/db/client";
 import { auditLogs, productAssets, products, users, workspaceSettings } from "@/lib/db/schema";
 import type { ProductAccessRole } from "@/lib/constants";
 import { siteConfig } from "@/lib/config/site";
+import { getBrandFontPreset, getBrandThemePreset } from "@/lib/branding/presets";
 import { canUserAccessProductAssets } from "@/lib/product-access";
 import { getDaysToExpiry } from "@/lib/utils";
 export { getWorkspaceBackupSnapshots } from "@/lib/backups";
@@ -19,12 +20,15 @@ export const DEFAULT_WORKSPACE_SETTINGS = {
   logoUrl: null as string | null,
   logoStoragePath: null as string | null,
   industryTemplate: siteConfig.industryTemplate,
-  primaryColor: "#4f46e5",
-  accentColor: "#14b8a6",
-  pageBackground: "#151515",
-  surfaceColor: "#1f1f23",
-  textColor: "#f8fafc",
-  mutedTextColor: "#a1a1aa",
+  themePreset: "command-graphite",
+  fontPreset: "system",
+  primaryColor: getBrandThemePreset("command-graphite").primaryColor,
+  accentColor: getBrandThemePreset("command-graphite").accentColor,
+  pageBackground: getBrandThemePreset("command-graphite").pageBackground,
+  surfaceColor: getBrandThemePreset("command-graphite").surfaceColor,
+  textColor: getBrandThemePreset("command-graphite").textColor,
+  mutedTextColor: getBrandThemePreset("command-graphite").mutedTextColor,
+  fontFamily: getBrandFontPreset("system").stack,
 };
 
 type ProductAccessShape = Pick<ProductRecord, "status" | "accessRoles">;
@@ -146,6 +150,8 @@ export async function getWorkspaceSettings() {
       logoUrl: workspaceSettings.logoUrl,
       logoStoragePath: workspaceSettings.logoStoragePath,
       industryTemplate: workspaceSettings.industryTemplate,
+      themePreset: workspaceSettings.themePreset,
+      fontPreset: workspaceSettings.fontPreset,
       primaryColor: workspaceSettings.primaryColor,
       accentColor: workspaceSettings.accentColor,
       pageBackground: workspaceSettings.pageBackground,
@@ -157,7 +163,14 @@ export async function getWorkspaceSettings() {
     .where(eq(workspaceSettings.id, DEFAULT_WORKSPACE_SETTINGS.id))
     .limit(1);
 
-  return settings ?? DEFAULT_WORKSPACE_SETTINGS;
+  if (!settings) {
+    return DEFAULT_WORKSPACE_SETTINGS;
+  }
+
+  return {
+    ...settings,
+    fontFamily: getBrandFontPreset(settings.fontPreset).stack,
+  };
 }
 
 export async function getVisibleProducts(viewer: AuthenticatedUser) {

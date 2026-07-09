@@ -1,196 +1,231 @@
 "use client";
 
-import { Check } from "lucide-react";
+import { Check, Palette, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
 
-export type BrandTheme = {
-  primaryColor: string;
-  accentColor: string;
-  pageBackground: string;
-  surfaceColor: string;
-  textColor: string;
-  mutedTextColor: string;
-};
-
-type ThemePreset = BrandTheme & {
-  id: string;
-  name: string;
-  description: string;
-};
-
-export const brandThemePresets = [
-  {
-    id: "executive-charcoal",
-    name: "Executive Charcoal",
-    description: "Dark, neutral, and premium for B2B dashboards.",
-    primaryColor: "#4f46e5",
-    accentColor: "#14b8a6",
-    pageBackground: "#151515",
-    surfaceColor: "#1f1f23",
-    textColor: "#f8fafc",
-    mutedTextColor: "#a1a1aa",
-  },
-  {
-    id: "clean-slate",
-    name: "Clean Slate",
-    description: "Light SaaS workspace with calm blue and green accents.",
-    primaryColor: "#2563eb",
-    accentColor: "#16a34a",
-    pageBackground: "#f6f7fb",
-    surfaceColor: "#ffffff",
-    textColor: "#111827",
-    mutedTextColor: "#64748b",
-  },
-  {
-    id: "studio-graphite",
-    name: "Studio Graphite",
-    description: "Modern dark UI with coral highlights for creative teams.",
-    primaryColor: "#e11d48",
-    accentColor: "#f97316",
-    pageBackground: "#18181b",
-    surfaceColor: "#27272a",
-    textColor: "#fafafa",
-    mutedTextColor: "#a1a1aa",
-  },
-  {
-    id: "operator-green",
-    name: "Operator Green",
-    description: "Trustworthy operations palette for sales and service teams.",
-    primaryColor: "#047857",
-    accentColor: "#0ea5e9",
-    pageBackground: "#f1f5f3",
-    surfaceColor: "#ffffff",
-    textColor: "#102018",
-    mutedTextColor: "#607068",
-  },
-  {
-    id: "property-ivory",
-    name: "Property Ivory",
-    description: "Warm, polished palette for real estate and advisory teams.",
-    primaryColor: "#7c3aed",
-    accentColor: "#b45309",
-    pageBackground: "#faf7f2",
-    surfaceColor: "#ffffff",
-    textColor: "#1f1b16",
-    mutedTextColor: "#6f665d",
-  },
-  {
-    id: "academy-blue",
-    name: "Academy Blue",
-    description: "Clear education palette with confident blue and amber.",
-    primaryColor: "#1d4ed8",
-    accentColor: "#d97706",
-    pageBackground: "#f8fafc",
-    surfaceColor: "#ffffff",
-    textColor: "#0f172a",
-    mutedTextColor: "#64748b",
-  },
-] satisfies ThemePreset[];
-
-const colorFields = [
-  ["primaryColor", "Primary action"],
-  ["accentColor", "Accent"],
-  ["pageBackground", "Page background"],
-  ["surfaceColor", "Panels and sidebar"],
-  ["textColor", "Main text"],
-  ["mutedTextColor", "Muted text"],
-] as const;
+import {
+  brandFontPresets,
+  brandThemePresets,
+  getBrandFontPreset,
+  getBrandThemePreset,
+} from "@/lib/branding/presets";
 
 type BrandThemePresetsProps = {
-  initialTheme: BrandTheme;
+  brandName: string;
+  industryLabel: string;
+  categories: string[];
+  logoUrl: string | null;
+  initialThemePreset: string;
+  initialFontPreset: string;
 };
 
-function sameTheme(a: BrandTheme, b: BrandTheme) {
-  return colorFields.every(([key]) => a[key].toLowerCase() === b[key].toLowerCase());
-}
+const colorKeys = [
+  "primaryColor",
+  "accentColor",
+  "pageBackground",
+  "surfaceColor",
+  "textColor",
+  "mutedTextColor",
+] as const;
 
-export function BrandThemePresets({ initialTheme }: BrandThemePresetsProps) {
-  const [theme, setTheme] = useState(initialTheme);
-  const activePresetId = useMemo(
-    () => brandThemePresets.find((preset) => sameTheme(theme, preset))?.id,
-    [theme],
-  );
-
-  function applyTheme(nextTheme: BrandTheme) {
-    setTheme(nextTheme);
-  }
-
-  function updateColor(key: keyof BrandTheme, value: string) {
-    setTheme((currentTheme) => ({
-      ...currentTheme,
-      [key]: value,
-    }));
-  }
+export function BrandThemePresets({
+  brandName,
+  industryLabel,
+  categories,
+  logoUrl,
+  initialThemePreset,
+  initialFontPreset,
+}: BrandThemePresetsProps) {
+  const [themePresetId, setThemePresetId] = useState(initialThemePreset);
+  const [fontPresetId, setFontPresetId] = useState(initialFontPreset);
+  const selectedTheme = useMemo(() => getBrandThemePreset(themePresetId), [themePresetId]);
+  const selectedFont = useMemo(() => getBrandFontPreset(fontPresetId), [fontPresetId]);
 
   return (
-    <div className="ld-form-section">
-      <div className="ld-kicker">Theme presets</div>
-      <div className="mt-4 grid gap-3 lg:grid-cols-2">
-        {brandThemePresets.map((preset) => {
-          const active = activePresetId === preset.id;
+    <>
+      <div
+        className="ld-form-section overflow-hidden"
+        style={{
+          background: selectedTheme.pageBackground,
+          borderColor: `${selectedTheme.mutedTextColor}33`,
+          color: selectedTheme.textColor,
+          fontFamily: selectedFont.stack,
+        }}
+      >
+        <div className="grid gap-4 lg:grid-cols-[180px_minmax(0,1fr)]">
+          <div
+            className="rounded-[12px] p-3"
+            style={{
+              background: selectedTheme.surfaceColor,
+              border: `1px solid ${selectedTheme.mutedTextColor}22`,
+            }}
+          >
+            <div className="flex items-center gap-2">
+              <div
+                className="flex size-9 items-center justify-center overflow-hidden rounded-full"
+                style={{ background: `${selectedTheme.accentColor}22`, color: selectedTheme.accentColor }}
+              >
+                {logoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={logoUrl} alt={`${brandName} logo`} className="h-full w-full object-contain" />
+                ) : (
+                  <Sparkles className="size-5" />
+                )}
+              </div>
+              <div className="min-w-0 truncate text-sm font-semibold">{brandName}</div>
+            </div>
 
-          return (
+            <div className="mt-5 grid gap-2">
+              {["Products", "Assets", "Settings"].map((item, index) => (
+                <div
+                  key={item}
+                  className="rounded-[10px] px-3 py-2 text-xs font-semibold"
+                  style={{
+                    background: index === 2 ? `${selectedTheme.primaryColor}34` : `${selectedTheme.mutedTextColor}14`,
+                    color: index === 2 ? selectedTheme.textColor : selectedTheme.mutedTextColor,
+                  }}
+                >
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid gap-3">
+            <div>
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase" style={{ color: selectedTheme.accentColor }}>
+                <Sparkles className="size-3.5" />
+                {industryLabel}
+              </div>
+              <div className="mt-2 text-xl font-semibold">{brandName}</div>
+              <p className="mt-1 text-sm" style={{ color: selectedTheme.mutedTextColor }}>
+                Products, pricing, assets, and role-based access.
+              </p>
+            </div>
+
+            <div className="grid gap-2 sm:grid-cols-3">
+              {categories.slice(0, 3).map((category) => (
+                <div key={category} className="rounded-[10px] px-3 py-3 text-sm" style={{ background: selectedTheme.surfaceColor }}>
+                  {category}
+                </div>
+              ))}
+            </div>
+
             <button
-              key={preset.id}
               type="button"
-              className={`group grid gap-3 rounded-[12px] border p-3 text-left transition ${
-                active
-                  ? "border-[var(--ld-color-primary)] bg-white/[0.09]"
-                  : "border-white/10 bg-black/12 hover:border-white/20"
-              }`}
-              onClick={() => applyTheme(preset)}
+              className="inline-flex min-h-10 w-fit items-center gap-2 rounded-full px-4 text-sm font-semibold text-white"
+              style={{ background: selectedTheme.primaryColor }}
             >
-              <span className="flex items-start justify-between gap-3">
-                <span>
-                  <span className="block text-sm font-semibold text-white">{preset.name}</span>
-                  <span className="mt-1 block text-xs leading-5 text-[var(--ld-color-muted)]">
-                    {preset.description}
+              <Palette className="size-4" />
+              Preview action
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="ld-form-section">
+        <input type="hidden" name="themePreset" value={themePresetId} />
+        <input type="hidden" name="fontPreset" value={fontPresetId} />
+        {colorKeys.map((key) => (
+          <input key={key} type="hidden" name={key} value={selectedTheme[key]} />
+        ))}
+
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <div className="ld-kicker">Look and feel</div>
+            <p className="mt-2 text-sm text-[var(--ld-color-muted)]">
+              Choose a complete visual preset. These are tuned for the dashboard, forms, cards, and navigation.
+            </p>
+          </div>
+          <span className="ld-chip">
+            <Sparkles className="size-3.5" />
+            Instant preview
+          </span>
+        </div>
+
+        <div className="mt-5 grid gap-3 lg:grid-cols-2">
+          {brandThemePresets.map((preset) => {
+            const active = themePresetId === preset.id;
+
+            return (
+              <button
+                key={preset.id}
+                type="button"
+                className={`group grid gap-3 rounded-[12px] border p-3 text-left transition ${
+                  active
+                    ? "border-[var(--ld-color-primary)] bg-white/[0.1]"
+                    : "border-white/10 bg-black/12 hover:border-white/22 hover:bg-white/[0.06]"
+                }`}
+                onClick={() => setThemePresetId(preset.id)}
+              >
+                <span className="flex items-start justify-between gap-3">
+                  <span>
+                    <span className="block text-sm font-semibold text-white">{preset.name}</span>
+                    <span className="mt-1 block text-xs leading-5 text-[var(--ld-color-muted)]">
+                      {preset.description}
+                    </span>
+                  </span>
+                  {active ? (
+                    <span className="inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-[var(--ld-color-primary)] text-white">
+                      <Check className="size-3.5" />
+                    </span>
+                  ) : null}
+                </span>
+
+                <span
+                  className="grid gap-2 rounded-[10px] border p-2"
+                  style={{
+                    backgroundColor: preset.pageBackground,
+                    borderColor: `${preset.mutedTextColor}33`,
+                    color: preset.textColor,
+                  }}
+                >
+                  <span className="flex gap-1.5">
+                    <span className="h-7 flex-1 rounded-[8px]" style={{ backgroundColor: preset.surfaceColor }} />
+                    <span className="h-7 w-10 rounded-[8px]" style={{ backgroundColor: preset.primaryColor }} />
+                    <span className="h-7 w-10 rounded-[8px]" style={{ backgroundColor: preset.accentColor }} />
+                  </span>
+                  <span className="flex items-center justify-between gap-2 text-[11px] font-semibold">
+                    <span style={{ color: preset.textColor }}>Dashboard ready</span>
+                    <span style={{ color: preset.mutedTextColor }}>Cards, forms, nav</span>
                   </span>
                 </span>
-                {active ? (
-                  <span className="inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-[var(--ld-color-primary)] text-white">
-                    <Check className="size-3.5" />
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="mt-6">
+          <div className="ld-kicker">Font style</div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            {brandFontPresets.map((font) => {
+              const active = fontPresetId === font.id;
+
+              return (
+                <button
+                  key={font.id}
+                  type="button"
+                  className={`rounded-[12px] border p-3 text-left transition ${
+                    active
+                      ? "border-[var(--ld-color-primary)] bg-white/[0.1]"
+                      : "border-white/10 bg-black/12 hover:border-white/22 hover:bg-white/[0.06]"
+                  }`}
+                  style={{ fontFamily: font.stack }}
+                  onClick={() => setFontPresetId(font.id)}
+                >
+                  <span className="flex items-center justify-between gap-2">
+                    <span className="text-sm font-semibold text-white">{font.name}</span>
+                    {active ? <Check className="size-4 text-[var(--ld-color-primary-strong)]" /> : null}
                   </span>
-                ) : null}
-              </span>
-
-              <span className="flex gap-1.5">
-                {colorFields.map(([key]) => (
-                  <span
-                    key={key}
-                    className="h-7 flex-1 rounded-[8px] border border-white/10"
-                    style={{ backgroundColor: preset[key] }}
-                  />
-                ))}
-              </span>
-            </button>
-          );
-        })}
+                  <span className="mt-2 block text-xs leading-5 text-[var(--ld-color-muted)]">
+                    {font.description}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
-
-      <div className="mt-5 grid gap-4 sm:grid-cols-2">
-        {colorFields.map(([name, label]) => (
-          <label key={name} className="grid gap-2">
-            <span className="ld-label">{label}</span>
-            <div className="flex items-center gap-3 rounded-[12px] border border-white/10 bg-black/12 p-2">
-              <input
-                type="color"
-                value={theme[name]}
-                onChange={(event) => updateColor(name, event.target.value)}
-                className="h-10 w-12 shrink-0 cursor-pointer rounded-[10px] border-0 bg-transparent p-0"
-                aria-label={label}
-              />
-              <input
-                name={name}
-                value={theme[name]}
-                onChange={(event) => updateColor(name, event.target.value)}
-                className="ld-input min-h-10"
-                pattern="#[0-9a-fA-F]{6}"
-              />
-            </div>
-          </label>
-        ))}
-      </div>
-    </div>
+    </>
   );
 }

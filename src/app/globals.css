@@ -102,6 +102,7 @@ a {
   overflow: hidden;
   background: var(--ld-color-background);
   color: var(--ld-color-text);
+  font-family: var(--ld-font-family, var(--font-sans));
 }
 
 .ld-background-image,

@@ -49,6 +49,7 @@ export default async function ProductAppLayout({
         surfaceColor: workspaceSettings.surfaceColor,
         textColor: workspaceSettings.textColor,
         mutedTextColor: workspaceSettings.mutedTextColor,
+        fontFamily: workspaceSettings.fontFamily,
       }}
       topSlot={
         <header className="ld-glass-topbar ld-topbar rounded-[14px] px-4 py-3">

@@ -44,6 +44,7 @@ type AppShellProps = {
     surfaceColor: string;
     textColor: string;
     mutedTextColor: string;
+    fontFamily: string;
   };
   topSlot: React.ReactNode;
   children: React.ReactNode;
@@ -71,6 +72,7 @@ function buildThemeStyle(branding: AppShellProps["branding"]): WorkspaceThemeSty
     "--ld-color-sidebar-active": `color-mix(in srgb, ${branding.primaryColor} 26%, ${branding.surfaceColor})`,
     "--ld-color-text": branding.textColor,
     "--ld-color-muted": branding.mutedTextColor,
+    "--ld-font-family": branding.fontFamily,
     "--ld-background-image": branding.pageBackground,
     "--ld-gradient-hero": `linear-gradient(135deg, color-mix(in srgb, ${branding.primaryColor} 20%, ${branding.surfaceColor}), ${branding.surfaceColor})`,
     "--ld-gradient-panel": branding.surfaceColor,
