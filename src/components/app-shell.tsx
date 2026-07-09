@@ -163,13 +163,9 @@ export function AppShell({ user, branding, topSlot, children }: AppShellProps) {
         <aside className="ld-glass-sidebar ld-shell-sidebar relative overflow-hidden rounded-[14px] px-4 py-5 text-white">
           <div className="ld-shell-sidebar-inner relative flex h-full flex-col">
             <div className="ld-shell-brand space-y-5">
-              <div className="flex items-center justify-between gap-3 lg:hidden">
-                <div className="min-w-0">
+              <div className="ld-mobile-brand lg:hidden">
+                <div className="min-w-0 flex-1">
                   <BrandMark branding={branding} />
-                  <div className="mt-3">
-                    <div className="text-xl font-semibold text-white">{branding.brandName}</div>
-                    <div className="text-xs text-white/52">Self-hosted product workspace</div>
-                  </div>
                 </div>
 
                 <ProfileEntry user={user} compact />
@@ -201,7 +197,7 @@ export function AppShell({ user, branding, topSlot, children }: AppShellProps) {
                     <Link
                       key={link.href}
                       href={link.href}
-                      className={`group flex min-w-[144px] items-center justify-between rounded-[12px] border px-3 py-3 transition lg:mb-2 lg:min-w-0 ${
+                      className={`group ld-shell-nav-link flex min-w-[144px] items-center justify-between rounded-[12px] border px-3 py-3 transition lg:mb-2 lg:min-w-0 ${
                         active
                           ? "ld-glass-active"
                           : "border-transparent bg-white/[0.03] text-white/70 hover:border-white/12 hover:bg-white/[0.07] hover:text-white"

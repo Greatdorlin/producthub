@@ -29,15 +29,12 @@ export default async function BrandingSettingsPage({
   const activePreset = getIndustryPreset(settings.industryTemplate);
 
   return (
-    <section className="grid gap-5 xl:grid-cols-[minmax(280px,0.72fr)_minmax(0,1.28fr)]">
-      <div className="self-start xl:sticky xl:top-6">
-        <div className="ld-panel-header">
+    <section className="grid gap-4 xl:grid-cols-[minmax(220px,0.48fr)_minmax(0,1.52fr)]">
+      <div className="self-start xl:sticky xl:top-5">
+        <div className="ld-panel-header rounded-[14px] border border-white/8 bg-white/[0.025] p-4">
           <div>
             <p className="ld-kicker">Workspace identity</p>
             <h3 className="ld-panel-title mt-2">Brand system</h3>
-            <p className="ld-panel-copy mt-2">
-              Set the buyer-facing name, vertical preset, and interface colors used across the workspace.
-            </p>
           </div>
           {saved ? <span className={chipClassName("success")}>Saved</span> : null}
         </div>
@@ -49,19 +46,12 @@ export default async function BrandingSettingsPage({
         ) : null}
       </div>
 
-      <div className="ld-panel">
-        <div className="ld-panel-header">
-          <div>
-            <p className="ld-kicker">Controls</p>
-            <h3 className="ld-panel-title mt-2">Customize this workspace</h3>
-          </div>
-        </div>
-
+      <div className="min-w-0">
         <AsyncRedirectForm
           action="/api/settings/branding"
           method="post"
           encType="multipart/form-data"
-          className="ld-form-grid mt-5"
+          className="ld-form-grid"
         >
           <div className="ld-form-section">
             <div className="ld-field-group">

@@ -45,7 +45,7 @@ export function BrandThemePresets({
   return (
     <>
       <div
-        className="overflow-hidden rounded-[14px] border p-4"
+        className="ld-brand-preview-shell p-3"
         style={{
           background: selectedTheme.pageBackground,
           borderColor: `${selectedTheme.mutedTextColor}33`,
@@ -53,9 +53,9 @@ export function BrandThemePresets({
           fontFamily: selectedFont.stack,
         }}
       >
-        <div className="grid gap-4 lg:grid-cols-[180px_minmax(0,1fr)]">
+        <div className="grid gap-3 md:grid-cols-[160px_minmax(0,1fr)]">
           <div
-            className="rounded-[12px] p-3"
+            className="ld-brand-preview-nav p-3"
             style={{
               background: selectedTheme.surfaceColor,
               border: `1px solid ${selectedTheme.mutedTextColor}22`,
@@ -76,7 +76,7 @@ export function BrandThemePresets({
               <div className="min-w-0 truncate text-sm font-semibold">{brandName}</div>
             </div>
 
-            <div className="mt-5 grid gap-2">
+            <div className="mt-4 grid gap-2">
               {["Products", "Assets", "Settings"].map((item, index) => (
                 <div
                   key={item}
@@ -92,16 +92,13 @@ export function BrandThemePresets({
             </div>
           </div>
 
-          <div className="grid gap-3">
+          <div className="ld-brand-preview-content grid content-between gap-3 rounded-[14px] p-2">
             <div>
               <div className="flex items-center gap-2 text-xs font-semibold uppercase" style={{ color: selectedTheme.accentColor }}>
                 <Sparkles className="size-3.5" />
                 {industryLabel}
               </div>
               <div className="mt-2 text-xl font-semibold">{brandName}</div>
-              <p className="mt-1 text-sm" style={{ color: selectedTheme.mutedTextColor }}>
-                Products, pricing, assets, and role-based access.
-              </p>
             </div>
 
             <div className="grid gap-2 sm:grid-cols-3">
@@ -131,12 +128,9 @@ export function BrandThemePresets({
           <input key={key} type="hidden" name={key} value={selectedTheme[key]} />
         ))}
 
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="ld-kicker">Look and feel</div>
-            <p className="mt-2 text-sm text-[var(--ld-color-muted)]">
-              Choose a complete visual preset. These are tuned for the dashboard, forms, cards, and navigation.
-            </p>
           </div>
           <span className={chipClassName("accent")}>
             <Sparkles className="size-3.5" />
@@ -152,9 +146,9 @@ export function BrandThemePresets({
               <button
                 key={preset.id}
                 type="button"
-                className={`group grid gap-3 rounded-[12px] border p-3 text-left transition ${
+                className={`ld-brand-preset-card group grid gap-3 border p-3 text-left transition ${
                   active
-                    ? "border-[var(--ld-color-primary)] bg-white/[0.09]"
+                    ? "is-active border-[var(--ld-color-primary)] bg-white/[0.09]"
                     : "border-white/10 bg-white/[0.035] hover:border-white/22 hover:bg-white/[0.06]"
                 }`}
                 onClick={() => setThemePresetId(preset.id)}
@@ -174,17 +168,17 @@ export function BrandThemePresets({
                 </span>
 
                 <span
-                  className="grid gap-2 rounded-[10px] border p-2"
+                  className="grid gap-3 rounded-[14px] border p-3"
                   style={{
                     backgroundColor: preset.pageBackground,
                     borderColor: `${preset.mutedTextColor}33`,
                     color: preset.textColor,
                   }}
                 >
-                  <span className="flex gap-1.5">
-                    <span className="h-7 flex-1 rounded-[8px]" style={{ backgroundColor: preset.surfaceColor }} />
-                    <span className="h-7 w-10 rounded-[8px]" style={{ backgroundColor: preset.primaryColor }} />
-                    <span className="h-7 w-10 rounded-[8px]" style={{ backgroundColor: preset.accentColor }} />
+                  <span className="ld-brand-swatch-row">
+                    <span className="ld-brand-swatch ld-brand-swatch-main" style={{ backgroundColor: preset.surfaceColor }} />
+                    <span className="ld-brand-swatch" style={{ backgroundColor: preset.primaryColor }} />
+                    <span className="ld-brand-swatch" style={{ backgroundColor: preset.accentColor }} />
                   </span>
                   <span className="flex items-center justify-between gap-2 text-[11px] font-semibold">
                     <span style={{ color: preset.textColor }}>Dashboard ready</span>
@@ -206,7 +200,7 @@ export function BrandThemePresets({
                 <button
                   key={font.id}
                   type="button"
-                  className={`rounded-[12px] border p-3 text-left transition ${
+                  className={`ld-brand-font-card border p-3 text-left transition ${
                     active
                       ? "border-[var(--ld-color-primary)] bg-white/[0.09]"
                       : "border-white/10 bg-white/[0.035] hover:border-white/22 hover:bg-white/[0.06]"

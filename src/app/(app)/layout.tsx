@@ -52,19 +52,9 @@ export default async function ProductAppLayout({
         fontFamily: workspaceSettings.fontFamily,
       }}
       topSlot={
-        <header className="ld-topbar px-1 py-1">
-          <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-            <div className="hidden lg:block">
-              <p className="ld-kicker">Private workspace</p>
-              <h1 className="mt-1 text-xl font-semibold text-white">
-                {workspaceSettings.brandName}
-              </h1>
-              <p className="mt-1 text-sm text-[var(--ld-color-muted)]">
-                Products, pricing, assets, and access.
-              </p>
-            </div>
-
-            <div className="ld-topbar-actions flex flex-col gap-2 xl:items-end">
+        <header className="ld-topbar">
+          <div className="ld-topbar-inner">
+            <div className="ld-topbar-actions">
               <WorkspaceSearch />
 
               {canPreviewUsers ? (
@@ -81,7 +71,7 @@ export default async function ProductAppLayout({
                 />
               ) : null}
 
-              <div className="ld-topbar-controls flex flex-wrap items-center gap-2 xl:justify-end">
+              <div className="ld-topbar-controls">
                 <div className="ld-topbar-role hidden md:inline-flex">
                   {getRoleLabel(user.role, workspaceSettings.industryTemplate)}
                 </div>

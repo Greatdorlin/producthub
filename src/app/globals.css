@@ -75,6 +75,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -83,6 +84,7 @@ body {
   font-family: var(--font-sans);
   min-height: 100vh;
   line-height: 1.47;
+  overflow-x: hidden;
   overscroll-behavior-y: none;
   -webkit-tap-highlight-color: transparent;
 }
@@ -99,7 +101,7 @@ a {
 .ld-app-background {
   position: relative;
   min-height: 100vh;
-  overflow: hidden;
+  overflow-x: clip;
   background: var(--ld-color-background);
   color: var(--ld-color-text);
   font-family: var(--ld-font-family, var(--font-sans));
@@ -463,7 +465,7 @@ a {
 .ld-page {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.1rem;
   min-width: 0;
 }
 
@@ -490,23 +492,23 @@ a {
 
 .ld-title {
   color: var(--ld-color-text);
-  font-size: clamp(2rem, 3vw, 3.25rem);
+  font-size: clamp(1.7rem, 2.2vw, 2.45rem);
   font-weight: 650;
   letter-spacing: 0;
   line-height: 1.06;
 }
 
 .ld-subtitle {
-  max-width: 56rem;
+  max-width: 42rem;
   color: var(--ld-color-muted);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
 .ld-hero {
   position: relative;
   overflow: hidden;
   border-radius: 14px;
-  padding: 1.35rem;
+  padding: 1.1rem;
 }
 
 .ld-success-wrap {
@@ -593,7 +595,7 @@ a {
 
 .ld-panel {
   border-radius: 14px;
-  padding: 1.25rem;
+  padding: 1rem;
 }
 
 .ld-panel-header {
@@ -616,7 +618,7 @@ section > .ld-glass-panel {
 
 .ld-panel-title {
   color: var(--ld-color-text);
-  font-size: 1.3rem;
+  font-size: 1.12rem;
   font-weight: 650;
   letter-spacing: 0;
 }
@@ -782,9 +784,9 @@ section > .ld-glass-panel {
 
 .ld-form-section {
   border-radius: 12px;
-  border: 1px solid color-mix(in srgb, var(--ld-color-text) 8%, transparent);
-  background: color-mix(in srgb, var(--ld-color-surface) 70%, transparent);
-  padding: 1rem;
+  border: 1px solid color-mix(in srgb, var(--ld-color-text) 7%, transparent);
+  background: color-mix(in srgb, var(--ld-color-surface) 55%, transparent);
+  padding: 0.9rem;
 }
 
 .ld-field-group {
@@ -1080,12 +1082,34 @@ section > .ld-glass-panel {
 }
 
 .ld-shell-sidebar-inner {
-  gap: 1.5rem;
+  gap: 1rem;
+}
+
+.ld-mobile-brand {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
 }
 
 .ld-shell-nav {
   min-width: 0;
   scrollbar-width: none;
+}
+
+.ld-shell-nav-link {
+  min-width: 0;
+}
+
+.ld-shell-nav-link > span {
+  min-width: 0;
+}
+
+.ld-shell-nav-link span span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .ld-shell-nav::-webkit-scrollbar {
@@ -1105,6 +1129,12 @@ section > .ld-glass-panel {
   box-shadow: none;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
+}
+
+.ld-topbar-inner {
+  display: flex;
+  min-width: 0;
+  justify-content: flex-end;
 }
 
 .ld-settings-tabs {
@@ -1151,6 +1181,15 @@ section > .ld-glass-panel {
 }
 
 .ld-topbar-actions {
+  display: flex;
+  width: min(100%, 880px);
+  min-width: 0;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.65rem;
+}
+
+.ld-topbar-actions {
   min-width: 0;
 }
 
@@ -1159,8 +1198,13 @@ section > .ld-glass-panel {
 }
 
 .ld-topbar-controls {
+  display: flex;
+  min-width: 0;
   width: 100%;
-  justify-content: stretch;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.55rem;
 }
 
 .ld-preview-switcher {
@@ -1240,6 +1284,10 @@ section > .ld-glass-panel {
 
 .ld-topbar {
   color: var(--ld-color-text);
+}
+
+.ld-topbar :is(a, button) {
+  min-width: 0;
 }
 
 .ld-logout-form {
@@ -1451,10 +1499,8 @@ section > .ld-glass-panel {
 .ld-brand-preview {
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  background:
-    radial-gradient(circle at 20% 12%, rgba(247, 189, 85, 0.11), transparent 18rem),
-    rgba(4, 13, 26, 0.34);
-  padding: 1rem;
+  background: color-mix(in srgb, var(--ld-color-surface) 70%, transparent);
+  padding: 0.85rem;
 }
 
 .ld-brand-preview-card {
@@ -1465,6 +1511,71 @@ section > .ld-glass-panel {
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.05);
+}
+
+.ld-brand-preview-shell {
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--ld-color-text) 10%, transparent);
+}
+
+.ld-brand-preview-nav {
+  min-width: 0;
+  border-radius: 14px;
+}
+
+.ld-brand-preview-content {
+  min-width: 0;
+}
+
+.ld-brand-preset-card {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.ld-brand-preset-card::after {
+  position: absolute;
+  inset: auto 0 0;
+  height: 1px;
+  content: "";
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--ld-color-primary) 38%, transparent), transparent);
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.ld-brand-preset-card.is-active::after,
+.ld-brand-preset-card:hover::after {
+  opacity: 1;
+}
+
+.ld-brand-swatch-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ld-brand-swatch {
+  display: inline-flex;
+  height: 2.25rem;
+  width: 2.25rem;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 10px 24px rgba(0, 0, 0, 0.22);
+}
+
+.ld-brand-swatch-main {
+  width: 4.6rem;
+  border-radius: 999px;
+}
+
+.ld-brand-font-card {
+  min-width: 0;
+  border-radius: 16px;
 }
 
 .ld-brand-logo-preview {
@@ -1667,11 +1778,12 @@ section > .ld-glass-panel {
 
 @media (max-width: 1023px) {
   .ld-shell-grid {
+    gap: 0.85rem;
     padding-bottom: 1rem;
   }
 
   .ld-shell-sidebar {
-    padding: 1.1rem;
+    padding: 0.85rem;
   }
 
   .ld-main-surface {
@@ -1693,7 +1805,7 @@ section > .ld-glass-panel {
   }
 
   .ld-topbar-actions > .ld-search-shell {
-    min-width: min(420px, 100%);
+    min-width: 0;
   }
 
   .ld-topbar-controls {
@@ -1707,19 +1819,19 @@ section > .ld-glass-panel {
 
 @media (max-width: 767px) {
   .ld-page {
-    gap: 1rem;
+    gap: 0.85rem;
   }
 
   .ld-shell-grid {
-    gap: 0.7rem;
-    padding-inline: 0.65rem;
-    padding-top: 0.65rem;
+    gap: 0.65rem;
+    padding-inline: 0.55rem;
+    padding-top: 0.55rem;
   }
 
   .ld-shell-sidebar {
     border-color: rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    padding: 0.75rem;
+    border-radius: 14px;
+    padding: 0.6rem;
   }
 
   .ld-shell-sidebar-inner {
@@ -1727,12 +1839,11 @@ section > .ld-glass-panel {
   }
 
   .ld-shell-brand {
-    display: grid;
-    gap: 0.45rem;
+    display: block;
   }
 
   .ld-shell-brand h1 {
-    font-size: 1.55rem;
+    font-size: 1.25rem;
     line-height: 1.08;
   }
 
@@ -1745,13 +1856,13 @@ section > .ld-glass-panel {
   }
 
   .ld-hero {
-    border-radius: 16px;
-    padding: 1rem;
+    border-radius: 14px;
+    padding: 0.85rem;
   }
 
   .ld-panel {
-    border-radius: 16px;
-    padding: 1rem;
+    border-radius: 14px;
+    padding: 0.85rem;
   }
 
   .ld-page-meta {
@@ -1765,13 +1876,13 @@ section > .ld-glass-panel {
   }
 
   .ld-title {
-    font-size: clamp(1.8rem, 10vw, 2.5rem);
-    line-height: 0.98;
+    font-size: clamp(1.55rem, 8vw, 2rem);
+    line-height: 1.04;
   }
 
   .ld-subtitle {
-    font-size: 0.88rem;
-    line-height: 1.55;
+    font-size: 0.82rem;
+    line-height: 1.45;
   }
 
   .ld-panel-title {
@@ -1797,7 +1908,7 @@ section > .ld-glass-panel {
   .ld-form-section,
   .ld-hero-card,
   .ld-stat-card {
-    padding: 0.9rem;
+    padding: 0.8rem;
   }
 
   .ld-fee-toolbar {
@@ -1814,21 +1925,22 @@ section > .ld-glass-panel {
   .ld-search-shell {
     flex-wrap: nowrap;
     align-items: center;
-    gap: 0.55rem;
-    border-radius: 18px;
-    padding: 0.78rem 0.85rem;
+    gap: 0.45rem;
+    border-radius: 14px;
+    padding: 0.65rem;
   }
 
   .ld-search-shell > input {
-    width: auto;
+    width: 100%;
+    min-width: 0;
     min-height: 24px;
   }
 
   .ld-search-action {
     flex: 0 0 auto;
-    min-height: 40px;
-    min-width: 40px;
-    padding-inline: 0.8rem;
+    min-height: 38px;
+    min-width: 38px;
+    padding-inline: 0.65rem;
   }
 
   .ld-topbar-actions {
@@ -1859,7 +1971,7 @@ section > .ld-glass-panel {
 
   .ld-topbar-controls {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
     gap: 0.55rem;
   }
 
@@ -1892,13 +2004,15 @@ section > .ld-glass-panel {
   }
 
   .ld-settings-tabs {
-    border-radius: 16px;
+    border-radius: 14px;
+    padding: 0.25rem;
   }
 
   .ld-settings-tab {
     flex: 1 0 auto;
-    min-height: 40px;
-    padding-inline: 0.9rem;
+    min-height: 38px;
+    padding-inline: 0.75rem;
+    font-size: 0.8rem;
   }
 
   .ld-activity-entry {
@@ -1959,11 +2073,23 @@ section > .ld-glass-panel {
     border-radius: 14px;
     padding: 1.25rem;
   }
+
+  .ld-info-bubble {
+    left: auto;
+    right: -0.4rem;
+    max-width: min(16rem, calc(100vw - 1.5rem));
+    transform: translateY(0.25rem);
+  }
+
+  .ld-info-tip:hover .ld-info-bubble,
+  .ld-info-trigger:focus-visible + .ld-info-bubble {
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 479px) {
   .ld-topbar-controls {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    grid-template-columns: minmax(0, 1fr) !important;
   }
 
   .ld-topbar-controls > * {
