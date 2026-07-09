@@ -1,6 +1,7 @@
 import { Palette, RotateCcw, Save, ShieldCheck, Sparkles } from "lucide-react";
 
 import { AsyncRedirectForm } from "@/components/async-redirect-form";
+import { BrandThemePresets } from "@/components/brand-theme-presets";
 import { requirePermission } from "@/lib/auth/server";
 import { getIndustryPreset, presets } from "@/lib/config/industries";
 import { getWorkspaceSettings } from "@/lib/data";
@@ -9,15 +10,6 @@ const errorCopy: Record<string, string> = {
   "invalid-logo": "Use a PNG, JPG, or WebP logo under 2 MB.",
   "blob-token": "Logo storage is not configured.",
 };
-
-const colorFields = [
-  ["primaryColor", "Primary action"],
-  ["accentColor", "Accent"],
-  ["pageBackground", "Page background"],
-  ["surfaceColor", "Panels and sidebar"],
-  ["textColor", "Main text"],
-  ["mutedTextColor", "Muted text"],
-] as const;
 
 export default async function BrandingSettingsPage({
   searchParams,
@@ -168,31 +160,16 @@ export default async function BrandingSettingsPage({
             </div>
           </div>
 
-          <div className="ld-form-section">
-            <div className="ld-kicker">Theme colors</div>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              {colorFields.map(([name, label]) => (
-                <label key={name} className="grid gap-2">
-                  <span className="ld-label">{label}</span>
-                  <div className="flex items-center gap-3 rounded-[12px] border border-white/10 bg-black/12 p-2">
-                    <input
-                      type="color"
-                      name={name}
-                      defaultValue={settings[name]}
-                      className="h-10 w-12 shrink-0 cursor-pointer rounded-[10px] border-0 bg-transparent p-0"
-                      aria-label={label}
-                    />
-                    <input
-                      name={name}
-                      defaultValue={settings[name]}
-                      className="ld-input min-h-10"
-                      pattern="#[0-9a-fA-F]{6}"
-                    />
-                  </div>
-                </label>
-              ))}
-            </div>
-          </div>
+          <BrandThemePresets
+            initialTheme={{
+              primaryColor: settings.primaryColor,
+              accentColor: settings.accentColor,
+              pageBackground: settings.pageBackground,
+              surfaceColor: settings.surfaceColor,
+              textColor: settings.textColor,
+              mutedTextColor: settings.mutedTextColor,
+            }}
+          />
 
           <div className="ld-form-section">
             <div className="grid gap-4">
