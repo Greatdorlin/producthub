@@ -180,7 +180,7 @@ export default async function ProductDetailPage({
                 <div className="min-w-0">
                   <div className="text-sm font-semibold text-white">This product has expired.</div>
                   <div className="mt-1 text-sm text-[var(--ld-color-muted)]">
-                    Archive it to remove it from active use, or delete it if it should leave the hub completely.
+                    Archive it to remove it from active use, or delete it if it should leave the workspace completely.
                   </div>
                 </div>
 

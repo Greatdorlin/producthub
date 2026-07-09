@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, Sparkles } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import type { CSSProperties } from "react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -11,7 +11,7 @@ type ProductSuccessBannerProps = {
 const bannerCopy = {
   created: {
     title: "Product added successfully",
-    detail: "Your new product is live in the hub and ready for the next update.",
+    detail: "Your new product is live and ready for the next update.",
   },
   saved: {
     title: "Changes saved",
@@ -72,7 +72,7 @@ export function ProductSuccessBanner({ mode }: ProductSuccessBannerProps) {
 
       <div className="ld-success-banner">
         <span className="ld-success-icon">
-          {mode === "created" ? <Sparkles className="size-4" /> : <CheckCircle2 className="size-4" />}
+          <CheckCircle2 className="size-4" />
         </span>
         <div className="min-w-0">
           <div className="ld-success-title">{bannerCopy[mode].title}</div>

@@ -69,7 +69,7 @@ export default async function BackupsSettingsPage({
           </div>
 
           <div className="mt-4 space-y-3">
-            <h4 className="text-[1.15rem] font-semibold text-white">Keep the full product hub recoverable.</h4>
+            <h4 className="text-[1.15rem] font-semibold text-white">Keep the full workspace recoverable.</h4>
             <p className="text-sm leading-7 text-[var(--ld-color-muted)]">
               Snapshots cover products, attached assets, branding, and user access so you can recover the workspace state with less risk.
             </p>

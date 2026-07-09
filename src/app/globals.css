@@ -1515,24 +1515,40 @@ section > .ld-glass-panel {
 
 .ld-brand-preview-shell {
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: 18px;
   border: 1px solid color-mix(in srgb, var(--ld-color-text) 10%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .ld-brand-preview-nav {
   min-width: 0;
-  border-radius: 14px;
+  border-radius: 16px;
 }
 
 .ld-brand-preview-content {
   min-width: 0;
 }
 
+.ld-brand-live-indicator {
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  gap: 0.45rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--ld-color-primary) 28%, transparent);
+  background: color-mix(in srgb, var(--ld-color-primary) 12%, transparent);
+  padding: 0 0.75rem;
+  color: var(--ld-color-primary-strong);
+  font-size: 0.75rem;
+  font-weight: 650;
+}
+
 .ld-brand-preset-card {
   position: relative;
   min-width: 0;
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: 18px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .ld-brand-preset-card::after {
@@ -1548,6 +1564,62 @@ section > .ld-glass-panel {
 .ld-brand-preset-card.is-active::after,
 .ld-brand-preset-card:hover::after {
   opacity: 1;
+}
+
+.ld-brand-mini-window {
+  display: grid;
+  gap: 0.75rem;
+  min-height: 8.5rem;
+  border-radius: 16px;
+  border: 1px solid;
+  padding: 0.85rem;
+}
+
+.ld-brand-mini-topbar {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.ld-brand-mini-dot {
+  display: inline-flex;
+  height: 0.72rem;
+  width: 0.72rem;
+  flex: 0 0 auto;
+  border-radius: 999px;
+}
+
+.ld-brand-mini-line {
+  display: inline-flex;
+  height: 0.5rem;
+  width: min(7rem, 62%);
+  border-radius: 999px;
+}
+
+.ld-brand-mini-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 0.85rem;
+}
+
+.ld-brand-mini-panel {
+  display: grid;
+  gap: 0.45rem;
+  min-height: 4.4rem;
+  border-radius: 13px;
+  padding: 0.7rem;
+}
+
+.ld-brand-mini-panel span {
+  display: block;
+  height: 0.48rem;
+  border-radius: 999px;
+}
+
+.ld-brand-mini-panel span:first-child {
+  height: 1.75rem;
+  width: 48%;
 }
 
 .ld-brand-swatch-row {
@@ -1575,7 +1647,12 @@ section > .ld-glass-panel {
 
 .ld-brand-font-card {
   min-width: 0;
-  border-radius: 16px;
+  border-radius: 18px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.ld-brand-font-card:hover {
+  transform: translateY(-1px);
 }
 
 .ld-brand-logo-preview {

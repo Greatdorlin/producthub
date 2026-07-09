@@ -1,9 +1,8 @@
 "use client";
 
-import { Check, Palette, Sparkles } from "lucide-react";
+import { Check, CircleDot, LayoutDashboard, Palette, Type } from "lucide-react";
 import { useMemo, useState } from "react";
 
-import { chipClassName } from "@/components/chip";
 import {
   brandFontPresets,
   brandThemePresets,
@@ -64,13 +63,13 @@ export function BrandThemePresets({
             <div className="flex items-center gap-2">
               <div
                 className="flex size-9 items-center justify-center overflow-hidden rounded-full"
-                style={{ background: `${selectedTheme.accentColor}22`, color: selectedTheme.accentColor }}
+                style={{ background: `${selectedTheme.primaryColor}24`, color: selectedTheme.primaryColor }}
               >
                 {logoUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={logoUrl} alt={`${brandName} logo`} className="h-full w-full object-contain" />
                 ) : (
-                  <Sparkles className="size-5" />
+                  <LayoutDashboard className="size-5" />
                 )}
               </div>
               <div className="min-w-0 truncate text-sm font-semibold">{brandName}</div>
@@ -95,7 +94,7 @@ export function BrandThemePresets({
           <div className="ld-brand-preview-content grid content-between gap-3 rounded-[14px] p-2">
             <div>
               <div className="flex items-center gap-2 text-xs font-semibold uppercase" style={{ color: selectedTheme.accentColor }}>
-                <Sparkles className="size-3.5" />
+                <CircleDot className="size-3.5" />
                 {industryLabel}
               </div>
               <div className="mt-2 text-xl font-semibold">{brandName}</div>
@@ -115,7 +114,7 @@ export function BrandThemePresets({
               style={{ background: selectedTheme.primaryColor }}
             >
               <Palette className="size-4" />
-              Preview action
+              Save settings
             </button>
           </div>
         </div>
@@ -130,11 +129,11 @@ export function BrandThemePresets({
 
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <div className="ld-kicker">Look and feel</div>
+            <div className="ld-kicker">Theme presets</div>
           </div>
-          <span className={chipClassName("accent")}>
-            <Sparkles className="size-3.5" />
-            Instant preview
+          <span className="ld-brand-live-indicator">
+            <CircleDot className="size-3.5" />
+            Preview updates here
           </span>
         </div>
 
@@ -168,21 +167,28 @@ export function BrandThemePresets({
                 </span>
 
                 <span
-                  className="grid gap-3 rounded-[14px] border p-3"
+                  className="ld-brand-mini-window"
                   style={{
                     backgroundColor: preset.pageBackground,
                     borderColor: `${preset.mutedTextColor}33`,
                     color: preset.textColor,
                   }}
                 >
-                  <span className="ld-brand-swatch-row">
-                    <span className="ld-brand-swatch ld-brand-swatch-main" style={{ backgroundColor: preset.surfaceColor }} />
-                    <span className="ld-brand-swatch" style={{ backgroundColor: preset.primaryColor }} />
-                    <span className="ld-brand-swatch" style={{ backgroundColor: preset.accentColor }} />
+                  <span className="ld-brand-mini-topbar">
+                    <span className="ld-brand-mini-dot" style={{ backgroundColor: preset.primaryColor }} />
+                    <span className="ld-brand-mini-line" style={{ backgroundColor: `${preset.mutedTextColor}44` }} />
                   </span>
-                  <span className="flex items-center justify-between gap-2 text-[11px] font-semibold">
-                    <span style={{ color: preset.textColor }}>Dashboard ready</span>
-                    <span style={{ color: preset.mutedTextColor }}>Cards, forms, nav</span>
+                  <span className="ld-brand-mini-body">
+                    <span className="ld-brand-mini-panel" style={{ backgroundColor: preset.surfaceColor }}>
+                      <span style={{ backgroundColor: preset.primaryColor }} />
+                      <span style={{ backgroundColor: `${preset.mutedTextColor}44` }} />
+                      <span style={{ backgroundColor: `${preset.mutedTextColor}2e` }} />
+                    </span>
+                    <span className="ld-brand-swatch-row">
+                      <span className="ld-brand-swatch ld-brand-swatch-main" style={{ backgroundColor: preset.surfaceColor }} />
+                      <span className="ld-brand-swatch" style={{ backgroundColor: preset.primaryColor }} />
+                      <span className="ld-brand-swatch" style={{ backgroundColor: preset.accentColor }} />
+                    </span>
                   </span>
                 </span>
               </button>
@@ -191,7 +197,10 @@ export function BrandThemePresets({
         </div>
 
         <div className="mt-6 border-t border-white/10 pt-5">
-          <div className="ld-kicker">Font style</div>
+          <div className="flex items-center gap-2">
+            <Type className="size-4 text-[var(--ld-color-primary-strong)]" />
+            <div className="ld-kicker">Typography</div>
+          </div>
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
             {brandFontPresets.map((font) => {
               const active = fontPresetId === font.id;
@@ -212,6 +221,7 @@ export function BrandThemePresets({
                     <span className="text-sm font-semibold text-white">{font.name}</span>
                     {active ? <Check className="size-4 text-[var(--ld-color-primary-strong)]" /> : null}
                   </span>
+                  <span className="mt-3 block text-2xl font-semibold leading-none text-white">Aa</span>
                   <span className="mt-2 block text-xs leading-5 text-[var(--ld-color-muted)]">
                     {font.description}
                   </span>

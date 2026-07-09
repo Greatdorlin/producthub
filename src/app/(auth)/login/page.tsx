@@ -75,7 +75,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               type="submit"
               className="ld-glass-button inline-flex w-full items-center justify-center rounded-[16px] px-4 py-3 text-sm font-semibold transition hover:brightness-110"
             >
-              Open product hub
+              Open workspace
             </button>
           </form>
         </div>
