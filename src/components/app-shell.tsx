@@ -3,17 +3,19 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { CSSProperties } from "react";
+import { useSyncExternalStore } from "react";
 import {
   Boxes,
   ChevronRight,
   FolderKanban,
   LayoutDashboard,
+  PanelLeftClose,
+  PanelLeftOpen,
   Settings2,
   Settings,
   ShieldCheck,
 } from "lucide-react";
 
-import { chipClassName } from "@/components/chip";
 import type { Permission } from "@/lib/constants";
 
 const shellLinks = [
@@ -52,6 +54,29 @@ type AppShellProps = {
 };
 
 type WorkspaceThemeStyle = CSSProperties & Record<`--${string}`, string>;
+const SIDEBAR_STORAGE_KEY = "producthub.sidebar.collapsed";
+
+function subscribeSidebarCollapsed(onStoreChange: () => void) {
+  const handleChange = () => {
+    onStoreChange();
+  };
+
+  window.addEventListener("storage", handleChange);
+  window.addEventListener("producthub-sidebar-collapsed-change", handleChange);
+
+  return () => {
+    window.removeEventListener("storage", handleChange);
+    window.removeEventListener("producthub-sidebar-collapsed-change", handleChange);
+  };
+}
+
+function getSidebarCollapsedSnapshot() {
+  try {
+    return window.localStorage.getItem(SIDEBAR_STORAGE_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
 
 function buildThemeStyle(branding: AppShellProps["branding"]): WorkspaceThemeStyle {
   return {
@@ -82,20 +107,21 @@ function buildThemeStyle(branding: AppShellProps["branding"]): WorkspaceThemeSty
 
 function BrandMark({ branding }: { branding: AppShellProps["branding"] }) {
   return (
-    <span className={chipClassName("category", "min-w-0 text-[11px]")}>
-      <span className="flex size-4 shrink-0 items-center justify-center overflow-hidden rounded-full">
-        {branding.logoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={branding.logoUrl}
-            alt={`${branding.brandName} logo`}
-            className="h-full w-full object-contain"
-          />
-        ) : (
-          <ShieldCheck className="size-3.5" />
-        )}
-      </span>
-      <span className="truncate uppercase">{branding.brandName}</span>
+    <span
+      className="inline-flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-white/[0.06] text-white"
+      title={branding.brandName}
+      aria-label={branding.brandName}
+    >
+      {branding.logoUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={branding.logoUrl}
+          alt={`${branding.brandName} logo`}
+          className="h-full w-full object-contain"
+        />
+      ) : (
+        <ShieldCheck className="size-5" />
+      )}
     </span>
   );
 }
@@ -124,9 +150,11 @@ function UserAvatar({
 function ProfileEntry({
   user,
   compact = false,
+  collapsed = false,
 }: {
   user: AppShellProps["user"];
   compact?: boolean;
+  collapsed?: boolean;
 }) {
   return (
     <Link
@@ -136,7 +164,7 @@ function ProfileEntry({
       title="Open profile settings"
     >
       <div
-        className={`flex items-center gap-3 ${compact ? "rounded-full border border-white/12 bg-white/[0.06] px-2.5 py-2" : "rounded-[14px] border border-white/10 bg-white/[0.045] p-4 hover:border-white/16 hover:bg-white/[0.075]"}`}
+        className={`flex items-center gap-3 ${compact ? (collapsed ? "size-11 justify-center rounded-full border border-white/12 bg-white/[0.06] p-0" : "rounded-full border border-white/12 bg-white/[0.06] px-2.5 py-2") : "rounded-[14px] border border-white/10 bg-white/[0.045] p-4 hover:border-white/16 hover:bg-white/[0.075]"}`}
       >
         <UserAvatar name={user.name} avatarUrl={user.avatarUrl} className={compact ? "size-10" : "size-11"} />
         {!compact ? (
@@ -155,33 +183,67 @@ function ProfileEntry({
 
 export function AppShell({ user, branding, topSlot, children }: AppShellProps) {
   const pathname = usePathname();
+  const sidebarCollapsed = useSyncExternalStore(
+    subscribeSidebarCollapsed,
+    getSidebarCollapsedSnapshot,
+    () => false,
+  );
   const themeStyle = buildThemeStyle(branding);
+  const sidebarWidth = sidebarCollapsed ? "var(--ld-sidebar-collapsed-width)" : "var(--ld-sidebar-width)";
+
+  function setSidebarCollapsed(nextValue: boolean) {
+    try {
+      window.localStorage.setItem(SIDEBAR_STORAGE_KEY, String(nextValue));
+    } catch {
+      // Ignore storage errors; collapse state still updates for the current render.
+    }
+
+    window.dispatchEvent(new Event("producthub-sidebar-collapsed-change"));
+  }
 
   return (
-    <div className="ld-app-background" style={themeStyle}>
-      <div className="ld-shell-grid relative z-10 mx-auto grid min-h-screen max-w-[var(--ld-page-max-width)] grid-cols-1 gap-4 px-3 py-3 lg:grid-cols-[260px_minmax(0,1fr)] lg:px-5 lg:py-5">
-        <aside className="ld-glass-sidebar ld-shell-sidebar relative overflow-hidden rounded-[14px] px-4 py-5 text-white">
+    <div className="ld-app-background" style={{ ...themeStyle, "--ld-sidebar-current-width": sidebarWidth } as WorkspaceThemeStyle}>
+      <div className="ld-shell-grid relative z-10 mx-auto grid min-h-screen max-w-[var(--ld-page-max-width)] grid-cols-1 gap-4 px-3 py-3 lg:grid-cols-[var(--ld-sidebar-current-width)_minmax(0,1fr)] lg:px-5 lg:py-5">
+        <aside
+          className={`ld-glass-sidebar ld-shell-sidebar relative overflow-hidden rounded-[14px] px-4 py-5 text-white transition-[width] duration-200 ease-out lg:sticky lg:top-5 lg:self-start ${
+            sidebarCollapsed ? "lg:px-3" : ""
+          }`}
+          data-collapsed={sidebarCollapsed ? "true" : "false"}
+        >
           <div className="ld-shell-sidebar-inner relative flex h-full flex-col">
             <div className="ld-shell-brand space-y-5">
-              <div className="ld-mobile-brand lg:hidden">
-                <div className="min-w-0 flex-1">
+              <div className="ld-mobile-brand flex items-center justify-between gap-3 lg:hidden">
+                <div className="flex items-center gap-3">
                   <BrandMark branding={branding} />
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-semibold text-white">{branding.brandName}</div>
+                    <div className="truncate text-xs text-white/48">Workspace</div>
+                  </div>
                 </div>
-
-                <ProfileEntry user={user} compact />
+                <ProfileEntry user={user} compact collapsed />
               </div>
 
               <div className="hidden lg:block">
-                <BrandMark branding={branding} />
+                <div className="flex items-start justify-between gap-3">
+                  <BrandMark branding={branding} />
 
-                <div className="mt-5">
-                  <h1 className="text-[2rem] font-semibold text-white">
-                    {branding.brandName}
-                  </h1>
-                  <p className="mt-1 text-sm text-white/58">
-                    Self-hosted product workspace.
-                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                    className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] text-white/72 transition hover:border-white/18 hover:bg-white/[0.08] hover:text-white"
+                    aria-label={sidebarCollapsed ? "Expand side menu" : "Collapse side menu"}
+                    title={sidebarCollapsed ? "Expand side menu" : "Collapse side menu"}
+                  >
+                    {sidebarCollapsed ? <PanelLeftOpen className="size-4" /> : <PanelLeftClose className="size-4" />}
+                  </button>
                 </div>
+
+                {!sidebarCollapsed ? (
+                  <div className="mt-5">
+                    <p className="text-sm text-white/58">{branding.brandName}</p>
+                    <p className="mt-1 text-xs text-white/40">Products, assets, access, and backups in one place.</p>
+                  </div>
+                ) : null}
               </div>
             </div>
 
@@ -197,26 +259,27 @@ export function AppShell({ user, branding, topSlot, children }: AppShellProps) {
                     <Link
                       key={link.href}
                       href={link.href}
-                      className={`group ld-shell-nav-link flex min-w-[144px] items-center justify-between rounded-[12px] border px-3 py-3 transition lg:mb-2 lg:min-w-0 ${
+                      className={`group ld-shell-nav-link flex items-center justify-between rounded-[12px] border px-3 py-3 transition lg:mb-2 ${
                         active
                           ? "ld-glass-active"
                           : "border-transparent bg-white/[0.03] text-white/70 hover:border-white/12 hover:bg-white/[0.07] hover:text-white"
-                      }`}
+                      } ${sidebarCollapsed ? "min-w-0 lg:justify-center lg:px-2" : "min-w-[144px] lg:min-w-0"}`}
+                      title={link.label}
                     >
-                      <span className="flex items-center gap-3">
+                      <span className={`flex items-center gap-3 ${sidebarCollapsed ? "lg:justify-center" : ""}`}>
                         <span className={`rounded-[10px] border p-2 ${active ? "border-white/18 bg-white/12" : "border-white/8 bg-black/10"}`}>
                           <Icon className="size-4" />
                         </span>
-                        <span className="text-sm font-medium">{link.label}</span>
+                        <span className={`text-sm font-medium ${sidebarCollapsed ? "lg:hidden" : ""}`}>{link.label}</span>
                       </span>
-                      <ChevronRight className={`size-4 transition ${active ? "opacity-100" : "opacity-0 group-hover:opacity-60"}`} />
+                      <ChevronRight className={`size-4 transition ${sidebarCollapsed ? "lg:hidden" : active ? "opacity-100" : "opacity-0 group-hover:opacity-60"}`} />
                     </Link>
                   );
                 })}
             </nav>
 
             <div className="ld-shell-profile mt-auto">
-              <ProfileEntry user={user} />
+              <ProfileEntry user={user} compact={sidebarCollapsed} collapsed={sidebarCollapsed} />
             </div>
           </div>
         </aside>
