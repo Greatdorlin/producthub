@@ -2,7 +2,8 @@ import type { ProductRole } from "@/lib/constants";
 
 export const educationPreset = {
   id: "education",
-  label: "Education & Travel",
+  label: "Education",
+  description: "Admissions, programmes, test preparation, and student support.",
   roleLabels: {
     admin: "Admin",
     admissions_manager: "Admissions Manager",
@@ -13,15 +14,15 @@ export const educationPreset = {
     affiliate: "Affiliate",
   } satisfies Record<ProductRole, string>,
   productDefaults: {
-    categories: ["University Admission", "Visa Processing", "Language Test Prep", "Travel Package"],
+    categories: ["University Admission", "Foundation Programme", "Language Test Prep", "Student Visa Support"],
     routes: ["UK", "USA", "Canada", "Australia", "Europe"],
     currency: "NGN",
   },
   fieldLabels: {
-    route: "Route",
-    audience: "Target Market",
-    pitch: "Pitch",
-    slotsAvailable: "Slots Available",
-    expectedSales: "Expected Sales",
+    route: "Study Destination",
+    audience: "Student Profile",
+    pitch: "Programme Overview",
+    slotsAvailable: "Available Places",
+    expectedSales: "Enrolment Target",
   },
 };

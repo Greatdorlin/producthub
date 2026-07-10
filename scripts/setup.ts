@@ -61,18 +61,15 @@ async function main() {
     defaultValue: "generic",
     choices: [
       "generic",
+      "travel",
       "education",
       "real-estate",
-      "events",
       "professional-services",
-      "retail",
-      "hospitality",
-      "healthcare",
     ],
   });
   const brandName = await ask("Brand name", { defaultValue: "ProductHub" });
   const defaultCurrency = await ask("Default currency", {
-    defaultValue: industryTemplate === "generic" ? "USD" : "NGN",
+    defaultValue: ["education", "real-estate"].includes(industryTemplate) ? "NGN" : "USD",
   });
   const enableAffiliateRole = yesNo(await ask("Enable affiliate role? y/n", { defaultValue: "n" }));
   const enableMfa = yesNo(await ask("Enable MFA by default? y/n", { defaultValue: "y" }));

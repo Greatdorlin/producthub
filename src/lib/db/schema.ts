@@ -11,6 +11,7 @@ import {
 
 import { ASSET_KIND, PRODUCT_PRIORITY, PRODUCT_ROLES, PRODUCT_STATUS, PRODUCT_VISIBILITY } from "@/lib/constants";
 import type { ProductCustomFieldDefinition } from "@/lib/custom-fields";
+import type { ProductFieldLabelOverrides } from "@/lib/workspace-customization";
 
 export const productRoleEnum = pgEnum("product_role", PRODUCT_ROLES);
 export const productStatusEnum = pgEnum("product_status", PRODUCT_STATUS);
@@ -132,6 +133,18 @@ export const workspaceSettings = pgTable("workspace_settings", {
     .$type<ProductCustomFieldDefinition[]>()
     .notNull()
     .default(sql`'[]'::jsonb`),
+  productCategories: jsonb("product_categories")
+    .$type<string[]>()
+    .notNull()
+    .default(sql`'[]'::jsonb`),
+  productRoutes: jsonb("product_routes")
+    .$type<string[]>()
+    .notNull()
+    .default(sql`'[]'::jsonb`),
+  fieldLabelOverrides: jsonb("field_label_overrides")
+    .$type<ProductFieldLabelOverrides>()
+    .notNull()
+    .default(sql`'{}'::jsonb`),
   themePreset: text("theme_preset").notNull().default("command-graphite"),
   fontPreset: text("font_preset").notNull().default("system"),
   primaryColor: text("primary_color").notNull().default("#4f46e5"),

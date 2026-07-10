@@ -16,6 +16,7 @@ export type ChipTone =
   | "access"
   | "asset"
   | "status-active"
+  | "status-sold-out"
   | "status-draft"
   | "status-archived"
   | "priority-low"
@@ -31,6 +32,8 @@ export function statusChipTone(status: ProductStatus): ChipTone {
   switch (status) {
     case "active":
       return "status-active";
+    case "sold_out":
+      return "status-sold-out";
     case "archived":
       return "status-archived";
     case "draft":

@@ -2,7 +2,8 @@ import type { ProductRole } from "@/lib/constants";
 
 export const genericPreset = {
   id: "generic",
-  label: "Generic Products",
+  label: "Generic",
+  description: "Flexible products, services, packages, and internal offers.",
   roleLabels: {
     admin: "Admin",
     admissions_manager: "Manager",
@@ -13,7 +14,7 @@ export const genericPreset = {
     affiliate: "Affiliate",
   } satisfies Record<ProductRole, string>,
   productDefaults: {
-    categories: ["Service", "Package", "Product"],
+    categories: ["Product", "Service", "Package", "Subscription"],
     routes: ["Online", "Onsite", "Hybrid"],
     currency: "USD",
   },

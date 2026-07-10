@@ -351,7 +351,7 @@ a {
 }
 
 .ld-info-tip:hover .ld-info-bubble,
-.ld-info-trigger:focus-visible + .ld-info-bubble {
+.ld-info-tip:focus-within .ld-info-bubble {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
@@ -433,6 +433,7 @@ a {
 }
 
 .ld-chip-warning,
+.ld-chip-status-sold-out,
 .ld-chip-priority-high {
   border-color: color-mix(in srgb, var(--ld-color-warning) 33%, transparent);
   background: color-mix(in srgb, var(--ld-color-warning) 14%, transparent);
@@ -1548,6 +1549,40 @@ section > .ld-glass-panel {
   font-weight: 650;
 }
 
+.ld-brand-preview-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.ld-brand-preview-stat {
+  display: grid;
+  min-width: 0;
+  gap: 0.35rem;
+  border: 1px solid;
+  border-radius: 9px;
+  padding: 0.65rem;
+}
+
+.ld-brand-preview-stat span {
+  overflow: hidden;
+  font-size: 0.58rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ld-brand-preview-stat strong {
+  font-size: 0.9rem;
+  font-weight: 650;
+}
+
+.ld-brand-preview-product {
+  min-width: 0;
+  border: 1px solid;
+  border-radius: 10px;
+  padding: 0.75rem;
+}
+
 .ld-brand-preset-card {
   position: relative;
   min-width: 0;
@@ -2157,14 +2192,17 @@ section > .ld-glass-panel {
   }
 
   .ld-info-bubble {
-    left: auto;
-    right: -0.4rem;
-    max-width: min(16rem, calc(100vw - 1.5rem));
-    transform: translateY(0.25rem);
+    position: fixed;
+    left: 0.85rem;
+    right: 0.85rem;
+    bottom: 0.85rem;
+    width: auto;
+    max-width: none;
+    transform: translateY(0.4rem);
   }
 
   .ld-info-tip:hover .ld-info-bubble,
-  .ld-info-trigger:focus-visible + .ld-info-bubble {
+  .ld-info-tip:focus-within .ld-info-bubble {
     transform: translateY(0);
   }
 }
@@ -2493,12 +2531,81 @@ section > .ld-glass-panel {
   border-bottom: 1px solid color-mix(in srgb, var(--ld-color-text) 8%, transparent);
 }
 
+.ld-brand-identity-grid {
+  display: grid;
+  min-width: 0;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.ld-brand-logo-control {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.ld-brand-logo-button {
+  display: inline-flex;
+  height: 4.5rem;
+  width: 4.5rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--ld-color-text) 13%, transparent);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--ld-color-surface) 74%, white 4%);
+  color: var(--ld-color-primary-strong);
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.ld-brand-logo-button:hover,
+.ld-brand-logo-button:focus-visible {
+  border-color: color-mix(in srgb, var(--ld-color-primary) 48%, transparent);
+  background: color-mix(in srgb, var(--ld-color-primary) 10%, var(--ld-color-surface));
+  outline: none;
+}
+
+.ld-brand-logo-button img {
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
+}
+
+.ld-text-button {
+  display: inline-flex;
+  min-height: 1.75rem;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--ld-color-primary-strong);
+  font-size: 0.75rem;
+  font-weight: 650;
+}
+
+.ld-text-button:hover,
+.ld-text-button:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  outline: none;
+}
+
+.ld-text-button.is-danger {
+  color: var(--ld-color-danger);
+}
+
+.ld-brand-wording-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
 .ld-industry-preset,
 .ld-brand-preset-card,
 .ld-brand-font-card {
   display: flex;
   min-width: 0;
-  min-height: 72px;
+  min-height: 82px;
   align-items: center;
   gap: 0.75rem;
   border: 1px solid color-mix(in srgb, var(--ld-color-text) 9%, transparent);
@@ -2862,6 +2969,13 @@ section > .ld-glass-panel {
   font-size: 0.75rem;
 }
 
+@media (min-width: 640px) {
+  .ld-brand-identity-grid {
+    grid-template-columns: minmax(230px, 0.75fr) minmax(0, 1.25fr);
+    align-items: center;
+  }
+}
+
 @media (min-width: 1180px) {
   .ld-brand-studio {
     grid-template-columns: minmax(350px, 0.8fr) minmax(0, 1.2fr);
@@ -2999,6 +3113,19 @@ section > .ld-glass-panel {
 
   .ld-brand-preview-nav {
     display: none;
+  }
+
+  .ld-brand-preview-stats {
+    gap: 0.35rem;
+  }
+
+  .ld-brand-preview-stat {
+    padding: 0.55rem;
+  }
+
+  .ld-custom-field-card-header > .flex:last-child {
+    width: 100%;
+    justify-content: flex-end;
   }
 
   .ld-stat-card-premium {

@@ -3,6 +3,7 @@ import { requirePermission } from "@/lib/auth/server";
 import { getFieldLabel } from "@/lib/config/industries";
 import { getActivityFeed, getWorkspaceSettings } from "@/lib/data";
 import { formatDateLabel } from "@/lib/utils";
+import type { ProductFieldLabelOverrides } from "@/lib/workspace-customization";
 
 const entityLabels: Record<string, string> = {
   product: "Product",
@@ -40,9 +41,9 @@ function formatAction(action: string) {
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
-function formatDetailKey(key: string, industryTemplate: string) {
+function formatDetailKey(key: string, industryTemplate: string, overrides: ProductFieldLabelOverrides) {
   if (["route", "audience", "pitch", "slotsAvailable", "expectedSales"].includes(key)) {
-    return getFieldLabel(key, industryTemplate);
+    return getFieldLabel(key, industryTemplate, overrides);
   }
 
   return detailLabels[key] ?? key.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/\b\w/g, (letter) => letter.toUpperCase());
@@ -113,7 +114,9 @@ export default async function ActivitySettingsPage() {
                 <div className="ld-activity-detail-grid">
                   {Object.entries(entry.details).map(([key, value]) => (
                     <div key={key} className="ld-activity-detail-card">
-                      <div className="ld-stat-label">{formatDetailKey(key, workspaceSettings.industryTemplate)}</div>
+                      <div className="ld-stat-label">
+                        {formatDetailKey(key, workspaceSettings.industryTemplate, workspaceSettings.fieldLabelOverrides)}
+                      </div>
                       <div className="mt-2 break-words text-sm text-[var(--ld-color-text)]">
                         {renderDetailValue(value)}
                       </div>

@@ -4,21 +4,18 @@ Industry presets let ProductHub keep stable database columns while changing buye
 
 Built-in presets:
 
-- Generic Products
-- Education & Travel
-- Real Estate & Property
-- Events & Venues
+- Generic
+- Travel
+- Education
+- Real Estate
 - Professional Services
-- Retail & Commerce
-- Hospitality & Experiences
-- Healthcare & Wellness
 
-Workspace admins can choose the default currency in Branding. ProductHub suggests ISO currency codes but accepts any valid three-letter code. Custom product fields can also be configured there without adding database columns.
+Each preset is a starting point. Workspace admins can edit its categories, routes or locations, product wording, default currency, and custom fields in Branding. The currency selector includes the full ISO currency list.
 
 To create a custom preset:
 
 1. Copy `src/lib/config/industries/generic.ts`.
-2. Rename the file and update `id`, `label`, `roleLabels`, `productDefaults`, and `fieldLabels`.
+2. Rename the file and update `id`, `label`, `description`, `roleLabels`, `productDefaults`, and `fieldLabels`.
 3. Register it in `src/lib/config/industries/index.ts`.
 4. Set `INDUSTRY_TEMPLATE` to your preset ID.
 5. Add a new migration only if your custom workflow needs new database fields.

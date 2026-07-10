@@ -39,7 +39,7 @@ import {
   verifyPendingMfaToken,
   verifyTotpToken,
 } from "@/lib/auth/server";
-import { getDefaultCurrency, getIndustryPreset } from "@/lib/config/industries";
+import { getDefaultCurrency, getProductOptions } from "@/lib/config/industries";
 import { isCurrencyCode } from "@/lib/currencies";
 import { readProductCustomFieldValues } from "@/lib/custom-fields";
 import {
@@ -159,20 +159,22 @@ function buildSalesPeriodSummary(start: Date | null, end: Date | null) {
 
 function getAllowedProductDefaults(
   industryTemplate: string,
+  productCategories: string[],
+  productRoutes: string[],
   existing?: { category?: string; route?: string },
 ) {
-  const preset = getIndustryPreset(industryTemplate);
+  const configuredOptions = getProductOptions(industryTemplate, productCategories, productRoutes);
 
   return {
     categories: new Set([
       existing?.category,
       ...CATEGORY_OPTIONS,
-      ...preset.productDefaults.categories,
+      ...configuredOptions.categories,
     ].filter(Boolean)),
     routes: new Set([
       existing?.route,
       ...ROUTE_OPTIONS,
-      ...preset.productDefaults.routes,
+      ...configuredOptions.routes,
     ].filter(Boolean)),
   };
 }
@@ -489,7 +491,11 @@ export async function createProductAction(formData: FormData) {
   const visibility = deriveAssetVisibilityFromRoles(assetAccessRoles);
   const customFieldInput = readProductCustomFieldValues(formData, workspaceSettings.productFieldDefinitions);
 
-  const allowedDefaults = getAllowedProductDefaults(workspaceSettings.industryTemplate);
+  const allowedDefaults = getAllowedProductDefaults(
+    workspaceSettings.industryTemplate,
+    workspaceSettings.productCategories,
+    workspaceSettings.productRoutes,
+  );
 
   if (
     !name ||
@@ -628,10 +634,12 @@ export async function updateProductAction(formData: FormData) {
     Object.entries(existing.customFields).filter(([id]) => !activeCustomFieldIds.has(id)),
   );
 
-  const allowedDefaults = getAllowedProductDefaults(workspaceSettings.industryTemplate, {
-    category: existing.category,
-    route: existing.route,
-  });
+  const allowedDefaults = getAllowedProductDefaults(
+    workspaceSettings.industryTemplate,
+    workspaceSettings.productCategories,
+    workspaceSettings.productRoutes,
+    { category: existing.category, route: existing.route },
+  );
 
   if (
     !name ||

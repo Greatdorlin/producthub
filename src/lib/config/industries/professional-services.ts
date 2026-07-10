@@ -3,6 +3,7 @@ import type { ProductRole } from "@/lib/constants";
 export const professionalServicesPreset = {
   id: "professional-services",
   label: "Professional Services",
+  description: "Consulting, retainers, audits, training, and client delivery.",
   roleLabels: {
     admin: "Admin",
     admissions_manager: "Delivery Manager",

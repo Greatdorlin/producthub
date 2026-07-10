@@ -3,7 +3,6 @@
 import { ArrowDown, ArrowUp, CheckSquare2, ListChecks, Plus, Trash2, Type } from "lucide-react";
 import { useRef, useState } from "react";
 
-import { FieldLabel } from "@/components/field-label";
 import {
   PRODUCT_CUSTOM_FIELD_TYPES,
   type ProductCustomFieldDefinition,
@@ -99,6 +98,9 @@ export function CustomFieldBuilder({
                   <span className="min-w-0 flex-1 truncate text-sm font-semibold text-[var(--ld-color-text)]">
                     {definition.label || `Untitled field ${index + 1}`}
                   </span>
+                  <span className={definition.required ? "ld-field-state ld-field-state-required" : "ld-field-state ld-field-state-optional"}>
+                    {definition.required ? "Required" : "Optional"}
+                  </span>
                   <div className="flex items-center gap-1">
                     <button
                       type="button"
@@ -134,7 +136,7 @@ export function CustomFieldBuilder({
 
                 <div className="mt-4 grid gap-3 sm:grid-cols-[minmax(0,1fr)_170px]">
                   <label className="grid gap-2">
-                    <FieldLabel label="Field label" required />
+                    <span className="ld-label">Field label</span>
                     <input
                       className="ld-input"
                       value={definition.label}
@@ -146,7 +148,7 @@ export function CustomFieldBuilder({
                   </label>
 
                   <label className="grid gap-2">
-                    <FieldLabel label="Field type" required />
+                    <span className="ld-label">Field type</span>
                     <select
                       className="ld-input ld-select"
                       value={definition.type}
@@ -168,7 +170,7 @@ export function CustomFieldBuilder({
                 {choiceField ? (
                   <div className="mt-3">
                     <label className="grid gap-2">
-                      <FieldLabel label="Choices" required info="Separate each option with a comma." />
+                      <span className="ld-label">Choices</span>
                       <input
                         className={`ld-input ${choicesValid ? "" : "is-invalid"}`}
                         value={definition.options.join(", ")}
@@ -204,7 +206,7 @@ export function CustomFieldBuilder({
                     onChange={(event) => updateDefinition(definition.id, { required: event.target.checked })}
                   />
                   <span aria-hidden />
-                  Required when creating a product
+                  Required on products
                 </label>
               </div>
             );

@@ -12,7 +12,7 @@ import { ProductFeesField } from "@/components/product-fees-field";
 import { ProductCustomFields } from "@/components/product-custom-fields";
 import { ValidatedForm } from "@/components/validated-form";
 import { requirePermission } from "@/lib/auth/server";
-import { getDefaultCurrency, getFieldLabel, getIndustryPreset, getRoleLabel } from "@/lib/config/industries";
+import { getDefaultCurrency, getFieldLabel, getProductOptions, getRoleLabel } from "@/lib/config/industries";
 import {
   CATEGORY_OPTIONS,
   PRODUCT_ACCESS_ROLES,
@@ -47,20 +47,22 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   const params = await searchParams;
   const query = params.q?.trim().toLowerCase() ?? "";
   const canEdit = viewer.permissions.includes("products:edit");
-  const industryPreset = getIndustryPreset(workspaceSettings.industryTemplate);
-  const categoryOptions = industryPreset.productDefaults.categories.length
-    ? industryPreset.productDefaults.categories
-    : [...CATEGORY_OPTIONS];
-  const routeOptions = industryPreset.productDefaults.routes.length
-    ? industryPreset.productDefaults.routes
-    : [...ROUTE_OPTIONS];
+  const configuredOptions = getProductOptions(
+    workspaceSettings.industryTemplate,
+    workspaceSettings.productCategories,
+    workspaceSettings.productRoutes,
+  );
+  const categoryOptions = configuredOptions.categories.length ? configuredOptions.categories : [...CATEGORY_OPTIONS];
+  const routeOptions = configuredOptions.routes.length ? configuredOptions.routes : [...ROUTE_OPTIONS];
+  const fieldLabel = (columnName: string) =>
+    getFieldLabel(columnName, workspaceSettings.industryTemplate, workspaceSettings.fieldLabelOverrides);
   const defaultCurrency = getDefaultCurrency(
     workspaceSettings.industryTemplate,
     workspaceSettings.defaultCurrency,
   );
   const liveCount = allProducts.filter((product) => product.status === "active").length;
   const draftCount = allProducts.filter((product) => product.status === "draft").length;
-  const affiliateReadyCount = allProducts.filter((product) => product.accessRoles.includes("affiliate")).length;
+  const soldOutCount = allProducts.filter((product) => product.status === "sold_out").length;
   const formError =
     params.error === "invalid-sales-period"
       ? "Sales start must be before sales end."
@@ -123,9 +125,9 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
           <div className="ld-stat-detail text-[var(--ld-color-success)]">Ready to share</div>
         </div>
         <div className="ld-stat-card ld-stat-card-premium">
-          <div className="ld-stat-label">Needs attention</div>
-          <div className="ld-stat-value">{draftCount}</div>
-          <div className="ld-stat-detail">{affiliateReadyCount} affiliate-ready</div>
+          <div className="ld-stat-label">Sold out</div>
+          <div className="ld-stat-value">{soldOutCount}</div>
+          <div className="ld-stat-detail">{draftCount} drafts</div>
         </div>
       </section>
 
@@ -193,11 +195,11 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                     <div className="ld-meta-value">{product.ownerTeam}</div>
                   </div>
                   <div className="ld-meta-pill">
-                    <div className="ld-meta-title">{getFieldLabel("slotsAvailable", workspaceSettings.industryTemplate)}</div>
+                    <div className="ld-meta-title">{fieldLabel("slotsAvailable")}</div>
                     <div className="ld-meta-value">{product.slotsAvailable ?? "Not set"}</div>
                   </div>
                   <div className="ld-meta-pill">
-                    <div className="ld-meta-title">{getFieldLabel("expectedSales", workspaceSettings.industryTemplate)}</div>
+                    <div className="ld-meta-title">{fieldLabel("expectedSales")}</div>
                     <div className="ld-meta-value">
                       {product.expectedSales
                         ? `${product.expectedSales}${product.salesStartsAt || product.salesEndsAt ? ` · ${formatDateRangeLabel(product.salesStartsAt, product.salesEndsAt)}` : ""}`
@@ -260,8 +262,8 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
                   <div className="ld-form-split">
                     <label className="block space-y-2">
-                      <FieldLabel label="Category" />
-                      <select name="category" className="ld-input ld-select">
+                      <FieldLabel label="Category" required />
+                      <select required name="category" className="ld-input ld-select">
                         {categoryOptions.map((item) => (
                           <option key={item} value={item}>
                             {item}
@@ -271,8 +273,8 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                     </label>
 
                     <label className="block space-y-2">
-                      <FieldLabel label={getFieldLabel("route", workspaceSettings.industryTemplate)} />
-                      <select name="route" className="ld-input ld-select">
+                      <FieldLabel label={fieldLabel("route")} required />
+                      <select required name="route" className="ld-input ld-select">
                         {routeOptions.map((item) => (
                           <option key={item} value={item}>
                             {item}
@@ -289,7 +291,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                   </label>
 
                   <label className="block space-y-2 ld-required-field">
-                    <FieldLabel label={getFieldLabel("pitch", workspaceSettings.industryTemplate)} required info="The sales-ready explanation for this product." />
+                    <FieldLabel label={fieldLabel("pitch")} required info="The sales-ready explanation for this product." />
                     <textarea required name="pitch" rows={3} className="ld-input ld-textarea" />
                     <span className="ld-required-note">Required</span>
                   </label>
@@ -300,7 +302,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                 <div className="ld-field-group">
                   <div className="ld-form-split">
                     <label className="block space-y-2 ld-required-field">
-                      <FieldLabel label={getFieldLabel("audience", workspaceSettings.industryTemplate)} required info="Who this product is for." />
+                      <FieldLabel label={fieldLabel("audience")} required info="Who this product is for." />
                       <input required name="audience" className="ld-input" placeholder="For example: corporate clients who need travel support" />
                       <span className="ld-required-note">Required</span>
                     </label>
@@ -335,8 +337,8 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
                   <div className="ld-form-split ld-form-split-tight">
                     <label className="block space-y-2">
-                      <FieldLabel label="Status" />
-                      <select name="status" className="ld-input ld-select">
+                      <FieldLabel label="Status" required />
+                      <select required name="status" className="ld-input ld-select">
                         {PRODUCT_STATUS.map((item) => (
                           <option key={item} value={item}>
                             {statusLabels[item]}
@@ -345,8 +347,8 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                       </select>
                     </label>
                     <label className="block space-y-2">
-                      <FieldLabel label="Priority" />
-                      <select name="priority" className="ld-input ld-select" defaultValue="normal">
+                      <FieldLabel label="Priority" required />
+                      <select required name="priority" className="ld-input ld-select" defaultValue="normal">
                         {PRODUCT_PRIORITY.map((item) => (
                           <option key={item} value={item}>
                             {priorityLabels[item]}
@@ -400,11 +402,11 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                       helperText="Choose the day this offer should stop showing as current."
                     />
                     <label className="block space-y-2">
-                      <FieldLabel label={getFieldLabel("slotsAvailable", workspaceSettings.industryTemplate)} info="Optional capacity or quantity available." />
+                      <FieldLabel label={fieldLabel("slotsAvailable")} info="Optional capacity or quantity available." />
                       <input name="slotsAvailable" type="number" min="0" step="1" className="ld-input" placeholder="For example: 30 places or visa slots" />
                     </label>
                     <label className="block space-y-2">
-                      <FieldLabel label={getFieldLabel("expectedSales", workspaceSettings.industryTemplate)} info="Optional target for the sales window." />
+                      <FieldLabel label={fieldLabel("expectedSales")} info="Optional target for the sales window." />
                       <input name="expectedSales" type="number" min="0" step="1" className="ld-input" placeholder="For example: 18 expected sales" />
                     </label>
                   </div>

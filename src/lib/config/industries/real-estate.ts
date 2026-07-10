@@ -2,7 +2,8 @@ import type { ProductRole } from "@/lib/constants";
 
 export const realEstatePreset = {
   id: "real-estate",
-  label: "Real Estate & Property",
+  label: "Real Estate",
+  description: "Property listings, developments, land, and short-let inventory.",
   roleLabels: {
     admin: "Admin",
     admissions_manager: "Broker Manager",

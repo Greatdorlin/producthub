@@ -11,6 +11,9 @@ const defaultWorkspaceSettings = {
   logoStoragePath: null as string | null,
   defaultCurrency: siteConfig.defaultCurrency,
   productFieldDefinitions: [],
+  productCategories: [],
+  productRoutes: [],
+  fieldLabelOverrides: {},
 };
 
 function buildBackupPath(reason: string) {

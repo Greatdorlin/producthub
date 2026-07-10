@@ -1,9 +1,8 @@
-import { RotateCcw, Save } from "lucide-react";
+import { Save } from "lucide-react";
 
 import { AsyncRedirectForm } from "@/components/async-redirect-form";
 import { BrandThemePresets } from "@/components/brand-theme-presets";
 import { chipClassName } from "@/components/chip";
-import { FieldLabel } from "@/components/field-label";
 import { requirePermission } from "@/lib/auth/server";
 import { presets } from "@/lib/config/industries";
 import { getWorkspaceSettings } from "@/lib/data";
@@ -13,6 +12,7 @@ const errorCopy: Record<string, string> = {
   "blob-token": "Logo storage is not configured.",
   "invalid-currency": "Enter a valid three-letter currency code.",
   "invalid-custom-fields": "Check custom field labels and add at least two choices for dropdown or radio fields.",
+  "invalid-catalogue": "Add at least one category and one route, location, or delivery mode.",
 };
 
 export default async function BrandingSettingsPage({
@@ -31,9 +31,11 @@ export default async function BrandingSettingsPage({
   const industryPresets = Object.values(presets).map((preset) => ({
     id: preset.id,
     label: preset.label,
+    description: preset.description,
     categories: preset.productDefaults.categories,
     routes: preset.productDefaults.routes,
     currency: preset.productDefaults.currency,
+    fieldLabels: preset.fieldLabels,
   }));
 
   return (
@@ -65,39 +67,12 @@ export default async function BrandingSettingsPage({
           initialIndustryPreset={settings.industryTemplate}
           initialDefaultCurrency={settings.defaultCurrency}
           initialCustomFields={settings.productFieldDefinitions}
+          initialProductCategories={settings.productCategories}
+          initialProductRoutes={settings.productRoutes}
+          initialFieldLabelOverrides={settings.fieldLabelOverrides}
           initialThemePreset={settings.themePreset}
           initialFontPreset={settings.fontPreset}
         />
-
-        <div className="ld-brand-assets-section">
-          <div>
-            <p className="ld-kicker">Logo</p>
-            <h3 className="ld-panel-title mt-2">Workspace mark</h3>
-          </div>
-          <div className="grid min-w-0 gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
-            <label className="grid gap-2">
-              <FieldLabel label="Upload logo" info="PNG, JPG, or WebP up to 2 MB." />
-              <input
-                className="ld-input ld-file-input file:mr-3 file:rounded-[9px] file:border-0 file:bg-[var(--ld-color-primary)] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white"
-                type="file"
-                name="logo"
-                accept="image/png,image/jpeg,image/webp"
-              />
-            </label>
-
-            {settings.logoUrl ? (
-              <label className="ld-check-tile md:min-w-[220px]">
-                <input type="checkbox" name="removeLogo" />
-                <span className="ld-check-tile-card">
-                  <span className="ld-check-tile-title flex items-center gap-2">
-                    <RotateCcw className="size-4" />
-                    Use default mark
-                  </span>
-                </span>
-              </label>
-            ) : null}
-          </div>
-        </div>
 
         <div className="ld-brand-savebar">
           <span className="hidden text-sm text-[var(--ld-color-muted)] sm:block">Preview first, then publish your changes.</span>

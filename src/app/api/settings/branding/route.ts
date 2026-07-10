@@ -11,6 +11,10 @@ import { presets } from "@/lib/config/industries";
 import { getBrandFontPreset, getBrandThemePreset } from "@/lib/branding/presets";
 import { isCurrencyCode } from "@/lib/currencies";
 import { parseProductFieldDefinitionsInput } from "@/lib/custom-fields";
+import {
+  parseFieldLabelOverridesInput,
+  parseWorkspaceOptionsInput,
+} from "@/lib/workspace-customization";
 import { eq } from "drizzle-orm";
 
 const ALLOWED_LOGO_TYPES = new Set(["image/png", "image/jpeg", "image/webp"]);
@@ -57,6 +61,9 @@ export async function POST(request: NextRequest) {
   const industryTemplate = presets[requestedTemplate] ? requestedTemplate : "generic";
   const defaultCurrency = getString(formData, "defaultCurrency", currentSettings.defaultCurrency).toUpperCase();
   const productFieldDefinitions = parseProductFieldDefinitionsInput(formData.get("productFieldDefinitions"));
+  const productCategories = parseWorkspaceOptionsInput(formData.get("productCategories"));
+  const productRoutes = parseWorkspaceOptionsInput(formData.get("productRoutes"));
+  const fieldLabelOverrides = parseFieldLabelOverridesInput(formData.get("fieldLabelOverrides"));
 
   if (!isCurrencyCode(defaultCurrency)) {
     return NextResponse.redirect(new URL("/settings/branding?error=invalid-currency", request.url));
@@ -64,6 +71,10 @@ export async function POST(request: NextRequest) {
 
   if (!productFieldDefinitions) {
     return NextResponse.redirect(new URL("/settings/branding?error=invalid-custom-fields", request.url));
+  }
+
+  if (!productCategories?.length || !productRoutes?.length || !fieldLabelOverrides) {
+    return NextResponse.redirect(new URL("/settings/branding?error=invalid-catalogue", request.url));
   }
 
   const themePreset = getBrandThemePreset(getString(formData, "themePreset", currentSettings.themePreset));
@@ -119,6 +130,9 @@ export async function POST(request: NextRequest) {
       industryTemplate,
       defaultCurrency,
       productFieldDefinitions,
+      productCategories,
+      productRoutes,
+      fieldLabelOverrides,
       themePreset: themePreset.id,
       fontPreset: fontPreset.id,
       primaryColor,
@@ -139,6 +153,9 @@ export async function POST(request: NextRequest) {
         industryTemplate,
         defaultCurrency,
         productFieldDefinitions,
+        productCategories,
+        productRoutes,
+        fieldLabelOverrides,
         themePreset: themePreset.id,
         fontPreset: fontPreset.id,
         primaryColor,
@@ -163,6 +180,9 @@ export async function POST(request: NextRequest) {
       industryTemplate,
       defaultCurrency,
       productFieldDefinitions,
+      productCategories,
+      productRoutes,
+      fieldLabelOverrides,
       themePreset: themePreset.id,
       fontPreset: fontPreset.id,
       logoStoragePath,

@@ -8,6 +8,7 @@ import type { ProductAccessRole } from "@/lib/constants";
 import { siteConfig } from "@/lib/config/site";
 import { getBrandFontPreset, getBrandThemePreset } from "@/lib/branding/presets";
 import { normalizeProductFieldDefinitions } from "@/lib/custom-fields";
+import { normalizeFieldLabelOverrides, normalizeWorkspaceOptions } from "@/lib/workspace-customization";
 import { canUserAccessProductAssets } from "@/lib/product-access";
 import { getDaysToExpiry } from "@/lib/utils";
 export { getWorkspaceBackupSnapshots } from "@/lib/backups";
@@ -23,6 +24,9 @@ export const DEFAULT_WORKSPACE_SETTINGS = {
   industryTemplate: siteConfig.industryTemplate,
   defaultCurrency: siteConfig.defaultCurrency,
   productFieldDefinitions: [],
+  productCategories: [],
+  productRoutes: [],
+  fieldLabelOverrides: {},
   themePreset: "command-graphite",
   fontPreset: "system",
   primaryColor: getBrandThemePreset("command-graphite").primaryColor,
@@ -38,6 +42,10 @@ type ProductAccessShape = Pick<ProductRecord, "status" | "accessRoles">;
 type ProductAssetAccessShape = Pick<ProductAssetRecord, "visibility">;
 type ProductAssetProductAccessShape = Pick<ProductRecord, "assetAccessRoles" | "status">;
 
+function isPublishedStatus(status: ProductRecord["status"]) {
+  return status === "active" || status === "sold_out";
+}
+
 function canAccessProduct(product: ProductAccessShape, viewer: AuthenticatedUser) {
   if (viewer.role === "admin") {
     return true;
@@ -48,7 +56,7 @@ function canAccessProduct(product: ProductAccessShape, viewer: AuthenticatedUser
   }
 
   if (viewer.role === "affiliate") {
-    return product.status === "active";
+    return isPublishedStatus(product.status);
   }
 
   return true;
@@ -80,7 +88,7 @@ function canAccessAssetGroup(product: ProductAssetProductAccessShape, viewer: Au
   }
 
   if (viewer.role === "affiliate") {
-    return product.status === "active";
+    return isPublishedStatus(product.status);
   }
 
   return true;
@@ -94,8 +102,9 @@ export async function getDashboardData(viewer: AuthenticatedUser) {
     .orderBy(
       sql`CASE ${products.status}
         WHEN 'active' THEN 0
-        WHEN 'draft' THEN 1
-        ELSE 2
+        WHEN 'sold_out' THEN 1
+        WHEN 'draft' THEN 2
+        ELSE 3
       END`,
       sql`CASE ${products.priority}
         WHEN 'urgent' THEN 0
@@ -126,6 +135,7 @@ export async function getDashboardData(viewer: AuthenticatedUser) {
   });
 
   const published = visibleProducts.filter((product) => product.status === "active");
+  const soldOut = visibleProducts.filter((product) => product.status === "sold_out");
   const draft = visibleProducts.filter((product) => product.status === "draft");
   const archived = visibleProducts.filter((product) => product.status === "archived");
 
@@ -133,6 +143,7 @@ export async function getDashboardData(viewer: AuthenticatedUser) {
     stats: {
       products: visibleProducts.length,
       published: published.length,
+      soldOut: soldOut.length,
       draft: draft.length,
       archived: archived.length,
       expiringSoon: expiringSoon.length,
@@ -155,6 +166,9 @@ export async function getWorkspaceSettings() {
       industryTemplate: workspaceSettings.industryTemplate,
       defaultCurrency: workspaceSettings.defaultCurrency,
       productFieldDefinitions: workspaceSettings.productFieldDefinitions,
+      productCategories: workspaceSettings.productCategories,
+      productRoutes: workspaceSettings.productRoutes,
+      fieldLabelOverrides: workspaceSettings.fieldLabelOverrides,
       themePreset: workspaceSettings.themePreset,
       fontPreset: workspaceSettings.fontPreset,
       primaryColor: workspaceSettings.primaryColor,
@@ -175,6 +189,9 @@ export async function getWorkspaceSettings() {
   return {
     ...settings,
     productFieldDefinitions: normalizeProductFieldDefinitions(settings.productFieldDefinitions),
+    productCategories: normalizeWorkspaceOptions(settings.productCategories),
+    productRoutes: normalizeWorkspaceOptions(settings.productRoutes),
+    fieldLabelOverrides: normalizeFieldLabelOverrides(settings.fieldLabelOverrides),
     fontFamily: getBrandFontPreset(settings.fontPreset).stack,
   };
 }
@@ -214,8 +231,9 @@ export async function getVisibleProducts(viewer: AuthenticatedUser) {
     .orderBy(
       sql`CASE ${products.status}
         WHEN 'active' THEN 0
-        WHEN 'draft' THEN 1
-        ELSE 2
+        WHEN 'sold_out' THEN 1
+        WHEN 'draft' THEN 2
+        ELSE 3
       END`,
       sql`CASE ${products.priority}
         WHEN 'urgent' THEN 0

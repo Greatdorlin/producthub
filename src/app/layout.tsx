@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Manrope, Roboto_Condensed, Source_Sans_3 } from "next/font/google";
+import { Geist, Geist_Mono, Inter, Manrope, Poppins, Roboto_Condensed, Source_Sans_3 } from "next/font/google";
 import { siteConfig } from "@/lib/config/site";
 import "./globals.css";
 
@@ -31,6 +31,19 @@ const sourceSans = Source_Sans_3({
   preload: false,
 });
 
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+  preload: false,
+});
+
+const poppins = Poppins({
+  variable: "--font-poppins",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  preload: false,
+});
+
 export const metadata: Metadata = {
   title: siteConfig.brandName,
   description: siteConfig.brandTagline,
@@ -49,7 +62,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${manrope.variable} ${robotoCondensed.variable} ${sourceSans.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${manrope.variable} ${robotoCondensed.variable} ${sourceSans.variable} ${inter.variable} ${poppins.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-[var(--ld-color-background)] text-[var(--ld-color-text)]">
         {children}

@@ -18,9 +18,9 @@ export default async function DashboardPage() {
   const canEditProducts = viewer.permissions.includes("products:edit");
   const healthRows = [
     { label: "Live", value: data.stats.published, tone: "tone-success" },
+    { label: "Sold out", value: data.stats.soldOut, tone: "tone-warning" },
     { label: "Draft", value: data.stats.draft, tone: "tone-calm" },
-    { label: "Expiring", value: data.stats.expiringSoon, tone: "tone-warning" },
-    { label: "Expired", value: data.stats.expired, tone: "tone-danger" },
+    { label: "Archived", value: data.stats.archived, tone: "tone-calm" },
   ];
   const quickActions = [
     { label: "Products", href: canEditProducts ? "/products#create-product" : "/products", icon: Boxes, show: viewer.permissions.includes("products:view") },

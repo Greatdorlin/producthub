@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Archive, ExternalLink, Film, ImageIcon, Link2, Presentation, Trash2, Upload } from "lucide-react";
+import { Archive, ExternalLink, Film, ImageIcon, Link2, PackageX, Presentation, Trash2, Upload } from "lucide-react";
 
 import {
   deleteAssetAction,
@@ -20,7 +20,7 @@ import { ProductSuccessBanner } from "@/components/product-success-banner";
 import { AsyncRedirectForm } from "@/components/async-redirect-form";
 import { ValidatedForm } from "@/components/validated-form";
 import { requirePermission } from "@/lib/auth/server";
-import { getDefaultCurrency, getFieldLabel, getIndustryPreset, getRoleLabel } from "@/lib/config/industries";
+import { getDefaultCurrency, getFieldLabel, getProductOptions, getRoleLabel } from "@/lib/config/industries";
 import {
   assetVisibilityLabels,
   ASSET_KIND,
@@ -87,15 +87,21 @@ export default async function ProductDetailPage({
   const canManageLifecycle = viewer.permissions.includes("products:publish");
   const canDeleteProducts = viewer.permissions.includes("products:delete");
   const allowedAssetVisibility = getAllowedAssetVisibility(product.assetAccessRoles as ProductAccessRole[]);
-  const industryPreset = getIndustryPreset(workspaceSettings.industryTemplate);
+  const configuredOptions = getProductOptions(
+    workspaceSettings.industryTemplate,
+    workspaceSettings.productCategories,
+    workspaceSettings.productRoutes,
+  );
   const categoryOptions = Array.from(new Set([
     product.category,
-    ...(industryPreset.productDefaults.categories.length ? industryPreset.productDefaults.categories : [...CATEGORY_OPTIONS]),
+    ...(configuredOptions.categories.length ? configuredOptions.categories : [...CATEGORY_OPTIONS]),
   ]));
   const routeOptions = Array.from(new Set([
     product.route,
-    ...(industryPreset.productDefaults.routes.length ? industryPreset.productDefaults.routes : [...ROUTE_OPTIONS]),
+    ...(configuredOptions.routes.length ? configuredOptions.routes : [...ROUTE_OPTIONS]),
   ]));
+  const fieldLabel = (columnName: string) =>
+    getFieldLabel(columnName, workspaceSettings.industryTemplate, workspaceSettings.fieldLabelOverrides);
   const defaultCurrency = getDefaultCurrency(
     workspaceSettings.industryTemplate,
     workspaceSettings.defaultCurrency,
@@ -131,6 +137,7 @@ export default async function ProductDetailPage({
           : null;
   const lifecycleChoices = [
     product.status !== "active" ? { label: "Move live", value: "active" } : null,
+    product.status !== "sold_out" ? { label: "Mark sold out", value: "sold_out" } : null,
     product.status !== "draft" ? { label: "Move to draft", value: "draft" } : null,
     product.status !== "archived" ? { label: "Archive", value: "archived" } : null,
   ].filter((item): item is { label: string; value: (typeof PRODUCT_STATUS)[number] } => Boolean(item));
@@ -171,7 +178,7 @@ export default async function ProductDetailPage({
                       type="submit"
                       className="ld-secondary-button inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
                     >
-                      <Archive className="size-4" />
+                      {choice.value === "sold_out" ? <PackageX className="size-4" /> : <Archive className="size-4" />}
                       {choice.label}
                     </button>
                   </form>
@@ -238,7 +245,7 @@ export default async function ProductDetailPage({
               <div className="mt-3 text-lg font-semibold text-white">{product.ownerTeam}</div>
             </div>
             <div className="ld-hero-card">
-              <div className="ld-stat-label">{getFieldLabel("audience", workspaceSettings.industryTemplate)}</div>
+              <div className="ld-stat-label">{fieldLabel("audience")}</div>
               <div className="mt-3 text-base font-semibold text-white">{product.audience}</div>
             </div>
               <div className="ld-hero-card">
@@ -265,7 +272,7 @@ export default async function ProductDetailPage({
       <section className="grid gap-5 xl:grid-cols-[1.04fr_0.96fr]">
         <div className="grid gap-5">
           <div className="ld-solid-panel ld-panel">
-            <div className="ld-kicker">{getFieldLabel("pitch", workspaceSettings.industryTemplate)}</div>
+            <div className="ld-kicker">{fieldLabel("pitch")}</div>
             <h3 className="ld-panel-title mt-2">How this product should be sold</h3>
             <p className="mt-4 text-sm leading-7 text-[var(--ld-color-text)]">{product.pitch}</p>
           </div>
@@ -284,11 +291,11 @@ export default async function ProductDetailPage({
                 <div className="ld-meta-value">{product.feeItems.length ? `${product.feeItems.length} added` : "Not set"}</div>
               </div>
               <div className="ld-meta-pill">
-                <div className="ld-meta-title">{getFieldLabel("slotsAvailable", workspaceSettings.industryTemplate)}</div>
+                <div className="ld-meta-title">{fieldLabel("slotsAvailable")}</div>
                 <div className="ld-meta-value">{product.slotsAvailable ?? "Not set"}</div>
               </div>
               <div className="ld-meta-pill">
-                <div className="ld-meta-title">{getFieldLabel("expectedSales", workspaceSettings.industryTemplate)}</div>
+                <div className="ld-meta-title">{fieldLabel("expectedSales")}</div>
                 <div className="ld-meta-value">{product.expectedSales ?? "Not set"}</div>
               </div>
               <div className="ld-meta-pill">
@@ -354,8 +361,8 @@ export default async function ProductDetailPage({
 
                   <div className="ld-form-split">
                     <label className="block space-y-2">
-                      <FieldLabel label="Category" />
-                      <select name="category" defaultValue={product.category} className="ld-input ld-select">
+                      <FieldLabel label="Category" required />
+                      <select required name="category" defaultValue={product.category} className="ld-input ld-select">
                         {categoryOptions.map((item) => (
                           <option key={item} value={item}>
                             {item}
@@ -364,8 +371,8 @@ export default async function ProductDetailPage({
                       </select>
                     </label>
                     <label className="block space-y-2">
-                      <FieldLabel label={getFieldLabel("route", workspaceSettings.industryTemplate)} />
-                      <select name="route" defaultValue={product.route} className="ld-input ld-select">
+                      <FieldLabel label={fieldLabel("route")} required />
+                      <select required name="route" defaultValue={product.route} className="ld-input ld-select">
                         {routeOptions.map((item) => (
                           <option key={item} value={item}>
                             {item}
@@ -382,7 +389,7 @@ export default async function ProductDetailPage({
                   </label>
 
                   <label className="block space-y-2 ld-required-field">
-                    <FieldLabel label={getFieldLabel("pitch", workspaceSettings.industryTemplate)} required info="The sales-ready explanation for this product." />
+                    <FieldLabel label={fieldLabel("pitch")} required info="The sales-ready explanation for this product." />
                     <textarea defaultValue={product.pitch} required name="pitch" rows={3} className="ld-input ld-textarea" />
                     <span className="ld-required-note">Required</span>
                   </label>
@@ -393,7 +400,7 @@ export default async function ProductDetailPage({
                 <div className="ld-field-group">
                   <div className="ld-form-split">
                     <label className="block space-y-2 ld-required-field">
-                      <FieldLabel label={getFieldLabel("audience", workspaceSettings.industryTemplate)} required info="Who this product is for." />
+                      <FieldLabel label={fieldLabel("audience")} required info="Who this product is for." />
                       <input defaultValue={product.audience} required name="audience" className="ld-input" placeholder="For example: families, students, or corporate travellers" />
                       <span className="ld-required-note">Required</span>
                     </label>
@@ -427,8 +434,8 @@ export default async function ProductDetailPage({
 
                   <div className="ld-form-split">
                     <label className="block space-y-2">
-                      <FieldLabel label="Status" />
-                      <select name="status" defaultValue={product.status} className="ld-input ld-select">
+                      <FieldLabel label="Status" required />
+                      <select required name="status" defaultValue={product.status} className="ld-input ld-select">
                         {PRODUCT_STATUS.map((item) => (
                           <option key={item} value={item}>
                             {statusLabels[item]}
@@ -437,8 +444,8 @@ export default async function ProductDetailPage({
                       </select>
                     </label>
                     <label className="block space-y-2">
-                      <FieldLabel label="Priority" />
-                      <select name="priority" defaultValue={product.priority} className="ld-input ld-select">
+                      <FieldLabel label="Priority" required />
+                      <select required name="priority" defaultValue={product.priority} className="ld-input ld-select">
                         {PRODUCT_PRIORITY.map((item) => (
                           <option key={item} value={item}>
                             {priorityLabels[item]}
@@ -500,7 +507,7 @@ export default async function ProductDetailPage({
                       helperText="Choose the day this offer should stop showing as current."
                     />
                     <label className="block space-y-2">
-                      <FieldLabel label={getFieldLabel("slotsAvailable", workspaceSettings.industryTemplate)} info="Optional capacity or quantity available." />
+                      <FieldLabel label={fieldLabel("slotsAvailable")} info="Optional capacity or quantity available." />
                       <input
                         defaultValue={product.slotsAvailable ?? ""}
                         name="slotsAvailable"
@@ -512,7 +519,7 @@ export default async function ProductDetailPage({
                       />
                     </label>
                     <label className="block space-y-2">
-                      <FieldLabel label={getFieldLabel("expectedSales", workspaceSettings.industryTemplate)} info="Optional target for the sales window." />
+                      <FieldLabel label={fieldLabel("expectedSales")} info="Optional target for the sales window." />
                       <input
                         defaultValue={product.expectedSales ?? ""}
                         name="expectedSales"

@@ -92,6 +92,18 @@ export const brandFontPresets = [
     stack: 'var(--font-manrope), var(--font-geist-sans), sans-serif',
   },
   {
+    id: "inter",
+    name: "Inter",
+    description: "Clean and highly legible.",
+    stack: 'var(--font-inter), var(--font-geist-sans), sans-serif',
+  },
+  {
+    id: "poppins",
+    name: "Poppins",
+    description: "Friendly geometric clarity.",
+    stack: 'var(--font-poppins), var(--font-geist-sans), sans-serif',
+  },
+  {
     id: "operator",
     name: "Roboto Condensed",
     description: "Compact and efficient.",

@@ -1,9 +1,5 @@
-"use client";
-
-import { useId } from "react";
-
 import { FieldLabel } from "@/components/field-label";
-import { CURRENCY_CODES } from "@/lib/currencies";
+import { currencyOptions } from "@/lib/currencies";
 
 type CurrencyFieldProps = {
   name?: string;
@@ -16,33 +12,26 @@ export function CurrencyField({
   name = "currency",
   label = "Currency",
   defaultValue,
-  info = "Enter any three-letter currency code.",
+  info = "Used for this product's price and fees.",
 }: CurrencyFieldProps) {
-  const listId = useId();
+  const hasDefaultOption = currencyOptions.some((currency) => currency.code === defaultValue);
 
   return (
     <label className="block space-y-2">
       <FieldLabel label={label} required info={info} />
-      <input
+      <select
         name={name}
-        className="ld-input uppercase"
+        className="ld-input ld-select"
         defaultValue={defaultValue}
-        list={listId}
         required
-        minLength={3}
-        maxLength={3}
-        pattern="[A-Za-z]{3}"
-        autoComplete="off"
-        placeholder="USD"
-        onInput={(event) => {
-          event.currentTarget.value = event.currentTarget.value.replace(/[^a-z]/gi, "").slice(0, 3).toUpperCase();
-        }}
-      />
-      <datalist id={listId}>
-        {CURRENCY_CODES.map((currency) => (
-          <option key={currency} value={currency} />
+      >
+        {!hasDefaultOption ? <option value={defaultValue}>{defaultValue}</option> : null}
+        {currencyOptions.map((currency) => (
+          <option key={currency.code} value={currency.code}>
+            {currency.code} - {currency.name}
+          </option>
         ))}
-      </datalist>
+      </select>
     </label>
   );
 }

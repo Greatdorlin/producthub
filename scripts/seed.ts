@@ -30,6 +30,8 @@ async function main() {
       id: "default",
       brandName: siteConfig.brandName,
       defaultCurrency,
+      productCategories: categories,
+      productRoutes: routes,
     })
     .onConflictDoUpdate({
       target: workspaceSettings.id,

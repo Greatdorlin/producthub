@@ -24,7 +24,7 @@ export type ProductAccessRole = (typeof PRODUCT_ACCESS_ROLES)[number];
 export const PRODUCT_VISIBILITY = ["internal", "team", "affiliate"] as const;
 export type ProductVisibility = (typeof PRODUCT_VISIBILITY)[number];
 
-export const PRODUCT_STATUS = ["draft", "active", "archived"] as const;
+export const PRODUCT_STATUS = ["draft", "active", "sold_out", "archived"] as const;
 export type ProductStatus = (typeof PRODUCT_STATUS)[number];
 
 export const PRODUCT_PRIORITY = ["low", "normal", "high", "urgent"] as const;
@@ -97,6 +97,7 @@ export const currencyLabels: Record<ProductCurrency, string> = {
 export const statusLabels: Record<ProductStatus, string> = {
   draft: "Draft",
   active: "Live",
+  sold_out: "Sold out",
   archived: "Archived",
 };
 
