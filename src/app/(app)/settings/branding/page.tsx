@@ -5,7 +5,7 @@ import { BrandThemePresets } from "@/components/brand-theme-presets";
 import { chipClassName } from "@/components/chip";
 import { FieldLabel } from "@/components/field-label";
 import { requirePermission } from "@/lib/auth/server";
-import { getIndustryPreset, presets } from "@/lib/config/industries";
+import { presets } from "@/lib/config/industries";
 import { getWorkspaceSettings } from "@/lib/data";
 
 const errorCopy: Record<string, string> = {
@@ -26,100 +26,86 @@ export default async function BrandingSettingsPage({
   ]);
 
   const message = error ? errorCopy[error] ?? "Brand update failed." : null;
-  const activePreset = getIndustryPreset(settings.industryTemplate);
+  const industryPresets = Object.values(presets).map((preset) => ({
+    id: preset.id,
+    label: preset.label,
+    categories: preset.productDefaults.categories,
+    routes: preset.productDefaults.routes,
+    currency: preset.productDefaults.currency,
+  }));
 
   return (
-    <section className="grid gap-4 xl:grid-cols-[minmax(220px,0.48fr)_minmax(0,1.52fr)]">
-      <div className="self-start xl:sticky xl:top-5">
-        <div className="ld-panel-header rounded-[14px] border border-white/8 bg-white/[0.025] p-4">
-          <div>
-            <p className="ld-kicker">Workspace identity</p>
-            <h3 className="ld-panel-title mt-2">Brand system</h3>
-          </div>
-          {saved ? <span className={chipClassName("success")}>Saved</span> : null}
+    <section className="min-w-0">
+      <div className="ld-branding-page-header">
+        <div>
+          <p className="ld-kicker">Brand studio</p>
+          <h3 className="ld-panel-title mt-2">Make the workspace yours</h3>
         </div>
-
-        {message ? (
-          <div className="mt-5 rounded-[12px] border border-[rgba(255,122,114,0.28)] bg-[rgba(255,122,114,0.12)] px-4 py-3 text-sm text-[#fff0ed]">
-            {message}
-          </div>
-        ) : null}
+        {saved ? <span className={chipClassName("success")}>Changes saved</span> : null}
       </div>
 
-      <div className="min-w-0">
-        <AsyncRedirectForm
-          action="/api/settings/branding"
-          method="post"
-          encType="multipart/form-data"
-          className="ld-form-grid"
-        >
-          <div className="ld-form-section">
-            <div className="ld-field-group">
-              <label className="grid gap-2">
-                <FieldLabel label="Brand name" info="Shown in the sidebar, login screen, and browser metadata." />
-                <input className="ld-input" name="brandName" defaultValue={settings.brandName} maxLength={80} />
-              </label>
+      {message ? (
+        <div className="mt-4 rounded-[12px] border border-[rgba(255,122,114,0.28)] bg-[rgba(255,122,114,0.12)] px-4 py-3 text-sm text-[#fff0ed]">
+          {message}
+        </div>
+      ) : null}
 
-              <label className="grid gap-2">
-                <FieldLabel label="Industry preset" info="Changes role labels, field labels, default routes, categories, and currency." />
-                <select name="industryTemplate" className="ld-input ld-select" defaultValue={settings.industryTemplate}>
-                  {Object.values(presets).map((preset) => (
-                    <option key={preset.id} value={preset.id}>
-                      {preset.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
+      <AsyncRedirectForm
+        action="/api/settings/branding"
+        method="post"
+        encType="multipart/form-data"
+        className="mt-5"
+      >
+        <BrandThemePresets
+          initialBrandName={settings.brandName}
+          industryPresets={industryPresets}
+          logoUrl={settings.logoUrl}
+          initialIndustryPreset={settings.industryTemplate}
+          initialThemePreset={settings.themePreset}
+          initialFontPreset={settings.fontPreset}
+        />
+
+        <div className="ld-brand-assets-section">
+          <div>
+            <p className="ld-kicker">Logo</p>
+            <h3 className="ld-panel-title mt-2">Workspace mark</h3>
           </div>
+          <div className="grid min-w-0 gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+            <label className="grid gap-2">
+              <FieldLabel label="Upload logo" info="PNG, JPG, or WebP up to 2 MB." />
+              <input
+                className="ld-input ld-file-input file:mr-3 file:rounded-[9px] file:border-0 file:bg-[var(--ld-color-primary)] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white"
+                type="file"
+                name="logo"
+                accept="image/png,image/jpeg,image/webp"
+              />
+            </label>
 
-          <BrandThemePresets
-            brandName={settings.brandName}
-            industryLabel={activePreset.label}
-            categories={activePreset.productDefaults.categories}
-            logoUrl={settings.logoUrl}
-            initialThemePreset={settings.themePreset}
-            initialFontPreset={settings.fontPreset}
-          />
-
-          <div className="ld-form-section">
-            <div className="grid gap-4">
-              <label className="grid gap-2">
-                <FieldLabel label="Upload logo" info="Optional PNG, JPG, or WebP. Keep it under 2 MB." />
-                <input
-                  className="ld-input file:mr-3 file:rounded-full file:border-0 file:bg-[var(--ld-color-primary)] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white"
-                  type="file"
-                  name="logo"
-                  accept="image/png,image/jpeg,image/webp"
-                />
-              </label>
-
-              {settings.logoUrl ? (
-                <label className="ld-check-tile">
-                  <input type="checkbox" name="removeLogo" />
-                  <span className="ld-check-tile-card">
-                    <span className="ld-check-tile-title flex items-center gap-2">
-                      <RotateCcw className="size-4" />
-                      Use default mark
-                    </span>
-                    <span className="ld-check-tile-copy">
-                      Removes the custom logo from the app shell.
-                    </span>
+            {settings.logoUrl ? (
+              <label className="ld-check-tile md:min-w-[220px]">
+                <input type="checkbox" name="removeLogo" />
+                <span className="ld-check-tile-card">
+                  <span className="ld-check-tile-title flex items-center gap-2">
+                    <RotateCcw className="size-4" />
+                    Use default mark
                   </span>
-                </label>
-              ) : null}
-            </div>
+                </span>
+              </label>
+            ) : null}
           </div>
+        </div>
 
+        <div className="ld-brand-savebar">
+          <span className="hidden text-sm text-[var(--ld-color-muted)] sm:block">Preview first, then publish your changes.</span>
           <button
             type="submit"
             className="ld-glass-button inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-5 text-sm font-semibold transition hover:brightness-110"
           >
             <Save className="size-4" />
-            Save brand settings
+            Save branding
           </button>
-        </AsyncRedirectForm>
-      </div>
+        </div>
+      </AsyncRedirectForm>
     </section>
   );
 }

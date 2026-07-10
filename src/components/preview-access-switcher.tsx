@@ -19,6 +19,7 @@ type PreviewAccessSwitcherProps = {
   isPreviewing: boolean;
   candidates: PreviewCandidate[];
   industryTemplate?: string;
+  compact?: boolean;
 };
 
 export function PreviewAccessSwitcher({
@@ -31,18 +32,19 @@ export function PreviewAccessSwitcher({
   isPreviewing,
   candidates,
   industryTemplate,
+  compact = false,
 }: PreviewAccessSwitcherProps) {
   if (!candidates.length) {
     return null;
   }
 
   return (
-    <div className="ld-preview-switcher">
-      <div className="ld-preview-copy">
+    <div className={`ld-preview-switcher ${compact ? "is-compact" : ""}`}>
+      <div className={`ld-preview-copy ${compact ? "is-compact" : ""}`}>
         <span className="ld-preview-icon">
           <Eye className="size-3.5" />
         </span>
-        <div className="min-w-0">
+        <div className={`min-w-0 ${compact ? "hidden" : ""}`}>
           <div className="ld-preview-title">
             {isPreviewing ? `Viewing as ${effectiveUserName}` : "View as another role"}
           </div>
@@ -74,7 +76,7 @@ export function PreviewAccessSwitcher({
             type="submit"
             className="ld-secondary-button inline-flex min-h-[44px] items-center justify-center rounded-full px-4 text-sm font-semibold"
           >
-            Switch view
+            {compact ? "Apply" : "Switch view"}
           </button>
         </form>
 

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Compass, Plus } from "lucide-react";
+import { ArrowRight, Plus } from "lucide-react";
 
 import { createProductAction } from "@/app/actions";
 import { chipClassName, priorityChipTone, statusChipTone } from "@/components/chip";
@@ -96,14 +96,8 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
       <section className="ld-page-header">
         <div>
-          <div className="ld-page-meta">
-            <span className={chipClassName("accent")}>
-              <Compass className="size-3.5" />
-              Live product list
-            </span>
-          </div>
-          <h2 className="ld-title mt-4">Products</h2>
-          <p className="ld-subtitle mt-3">Manage offers, pricing, access, and assets.</p>
+          <h2 className="ld-title">Products</h2>
+          <p className="ld-subtitle mt-2">Offers, pricing, access, and assets.</p>
           {query ? <p className="ld-note mt-3">Showing results for “{params.q}”.</p> : null}
           {formError ? (
             <div className="mt-4 rounded-[14px] border border-[rgba(255,122,114,0.22)] bg-[rgba(255,122,114,0.1)] px-4 py-3 text-sm text-[var(--ld-color-danger)]">
@@ -114,28 +108,20 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
       </section>
 
       <section className="grid gap-3 md:grid-cols-3">
-        <div className="ld-stat-card">
+        <div className="ld-stat-card ld-stat-card-premium">
           <div className="ld-stat-label">Visible products</div>
-          <div className="mt-3 flex items-center justify-between gap-3">
-            <div className="text-2xl font-semibold text-white">{products.length}</div>
-            <span className="tone-calm rounded-full px-3 py-1 text-sm font-semibold">Now</span>
-          </div>
+          <div className="ld-stat-value">{products.length}</div>
+          <div className="ld-stat-detail">In this view</div>
         </div>
-        <div className="ld-stat-card">
+        <div className="ld-stat-card ld-stat-card-premium">
           <div className="ld-stat-label">Live right now</div>
-          <div className="mt-3 flex items-center justify-between gap-3">
-            <div className="text-2xl font-semibold text-white">{liveCount}</div>
-            <span className="tone-success rounded-full px-3 py-1 text-sm font-semibold">Live</span>
-          </div>
+          <div className="ld-stat-value">{liveCount}</div>
+          <div className="ld-stat-detail text-[var(--ld-color-success)]">Ready to share</div>
         </div>
-        <div className="ld-stat-card">
+        <div className="ld-stat-card ld-stat-card-premium">
           <div className="ld-stat-label">Needs attention</div>
-          <div className="mt-3 flex items-center justify-between gap-3">
-            <div className="text-2xl font-semibold text-white">{draftCount}</div>
-            <span className="tone-warning rounded-full px-3 py-1 text-sm font-semibold">
-              {affiliateReadyCount} affiliate-ready
-            </span>
-          </div>
+          <div className="ld-stat-value">{draftCount}</div>
+          <div className="ld-stat-detail">{affiliateReadyCount} affiliate-ready</div>
         </div>
       </section>
 

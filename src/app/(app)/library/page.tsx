@@ -69,12 +69,8 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
     <div className="ld-page">
       <section className="ld-page-header">
         <div>
-          <div className="ld-page-meta">
-            <span className={chipClassName("asset")}>Shared assets</span>
-            <span className={chipClassName("category")}>Grouped by product</span>
-          </div>
-          <h2 className="ld-title mt-4">Asset Library</h2>
-          <p className="ld-subtitle mt-3">Browse approved files and links by product.</p>
+          <h2 className="ld-title">Asset Library</h2>
+          <p className="ld-subtitle mt-2">Approved files and links, grouped by product.</p>
           {query ? <p className="ld-note mt-3">Showing asset results for “{params.q}”.</p> : null}
           {params.error ? (
             <div className="mt-4 rounded-[14px] border border-[rgba(255,122,114,0.22)] bg-[rgba(255,122,114,0.1)] px-4 py-3 text-sm text-[var(--ld-color-danger)]">

@@ -68,6 +68,7 @@ export default async function ProductAppLayout({
                   isPreviewing={user.isPreviewing}
                   candidates={previewCandidates}
                   industryTemplate={workspaceSettings.industryTemplate}
+                  compact
                 />
               ) : null}
 

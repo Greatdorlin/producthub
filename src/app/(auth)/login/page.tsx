@@ -1,3 +1,4 @@
+import { LockKeyhole } from "lucide-react";
 import { redirect } from "next/navigation";
 
 import { loginAction } from "@/app/actions";
@@ -22,19 +23,26 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   const params = await searchParams;
   const errorMessage = params.error ? errorCopy[params.error] : null;
+  const brandInitials = siteConfig.brandName
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word[0]?.toUpperCase())
+    .join("");
 
   return (
-    <main className="ld-app-background flex min-h-screen items-center justify-center px-4 py-6 sm:px-6">
-      <section className="ld-login-stage relative z-10 flex w-full max-w-[460px] items-center justify-center">
-        <div className="ld-login-panel ld-glass-login-panel w-full rounded-[24px] p-6 sm:p-8">
-          <div className="text-center">
-            <p className="ld-kicker">Secure sign in</p>
-            <h1 className="mt-3 text-[2.9rem] font-semibold leading-[0.94] text-white sm:text-[3.25rem]">
-              {siteConfig.brandName}
+    <main className="ld-app-background ld-login-canvas flex min-h-screen items-center justify-center px-4 py-6 sm:px-6">
+      <section className="ld-login-stage relative z-10 w-full max-w-[440px]">
+        <div className="ld-login-panel ld-glass-login-panel w-full rounded-[20px] p-6 sm:p-8">
+          <div>
+            <div className="ld-login-brand-row">
+              <span className="ld-login-mark">{brandInitials || "P"}</span>
+              <span className="truncate text-sm font-semibold text-[var(--ld-color-text)]">{siteConfig.brandName}</span>
+            </div>
+            <h1 className="mt-8 text-[2rem] font-semibold leading-tight text-[var(--ld-color-text)] sm:text-[2.2rem]">
+              Welcome back
             </h1>
-            <p className="mx-auto mt-3 max-w-sm text-sm text-[var(--ld-color-muted)] sm:text-[0.95rem]">
-              {siteConfig.brandTagline}
-            </p>
+            <p className="mt-2 text-sm text-[var(--ld-color-muted)]">{siteConfig.brandTagline}</p>
           </div>
 
           <form action={loginAction} className="mt-8 space-y-4">
@@ -73,11 +81,16 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
             <button
               type="submit"
-              className="ld-glass-button inline-flex w-full items-center justify-center rounded-[16px] px-4 py-3 text-sm font-semibold transition hover:brightness-110"
+              className="ld-glass-button inline-flex min-h-12 w-full items-center justify-center rounded-full px-4 text-sm font-semibold transition hover:brightness-110"
             >
-              Open workspace
+              Sign in
             </button>
           </form>
+
+          <div className="ld-login-trust-row">
+            <LockKeyhole className="size-3.5" />
+            <span>Secure workspace access</span>
+          </div>
         </div>
       </section>
     </main>

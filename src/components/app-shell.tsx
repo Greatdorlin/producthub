@@ -108,7 +108,7 @@ function buildThemeStyle(branding: AppShellProps["branding"]): WorkspaceThemeSty
 function BrandMark({ branding }: { branding: AppShellProps["branding"] }) {
   return (
     <span
-      className="inline-flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-white/[0.06] text-white"
+      className="inline-flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-[11px] border border-white/10 bg-white/[0.06] text-white"
       title={branding.brandName}
       aria-label={branding.brandName}
     >
@@ -136,7 +136,7 @@ function UserAvatar({
   className?: string;
 }) {
   return (
-    <div className={`flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--ld-color-accent-soft)] text-sm font-bold text-[#08172b] ${className}`}>
+    <div className={`flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--ld-color-primary)] text-sm font-semibold text-white ${className}`}>
       {avatarUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={avatarUrl} alt={`${name} profile picture`} className="h-full w-full object-cover" />
@@ -159,19 +159,19 @@ function ProfileEntry({
   return (
     <Link
       href="/settings/profile"
-      className={`group ${compact ? "inline-flex" : "block"} rounded-[14px] transition hover:brightness-110`}
+      className={`group ${compact ? "inline-flex" : "block"} rounded-[11px] transition hover:brightness-110`}
       aria-label="Open profile settings"
       title="Open profile settings"
     >
       <div
-        className={`flex items-center gap-3 ${compact ? (collapsed ? "size-11 justify-center rounded-full border border-white/12 bg-white/[0.06] p-0" : "rounded-full border border-white/12 bg-white/[0.06] px-2.5 py-2") : "rounded-[14px] border border-white/10 bg-white/[0.045] p-4 hover:border-white/16 hover:bg-white/[0.075]"}`}
+        className={`flex items-center gap-3 ${compact ? (collapsed ? "size-11 justify-center rounded-full border border-white/10 bg-white/[0.04] p-0" : "rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-2") : "rounded-[11px] border border-white/8 bg-white/[0.025] p-3 hover:border-white/14 hover:bg-white/[0.05]"}`}
       >
         <UserAvatar name={user.name} avatarUrl={user.avatarUrl} className={compact ? "size-10" : "size-11"} />
         {!compact ? (
           <>
             <div className="min-w-0 flex-1">
-              <div className="truncate text-sm font-semibold text-white">{user.name}</div>
-              <div className="truncate text-xs text-white/48">Profile and security</div>
+              <div className="truncate text-sm font-semibold text-[var(--ld-color-text)]">{user.name}</div>
+              <div className="truncate text-xs text-[var(--ld-color-muted)]">Account settings</div>
             </div>
             <Settings2 className="size-4 text-white/42 transition group-hover:text-white/72" />
           </>
@@ -203,9 +203,9 @@ export function AppShell({ user, branding, topSlot, children }: AppShellProps) {
 
   return (
     <div className="ld-app-background" style={{ ...themeStyle, "--ld-sidebar-current-width": sidebarWidth } as WorkspaceThemeStyle}>
-      <div className="ld-shell-grid relative z-10 mx-auto grid min-h-screen max-w-[var(--ld-page-max-width)] grid-cols-1 gap-4 px-3 py-3 lg:grid-cols-[var(--ld-sidebar-current-width)_minmax(0,1fr)] lg:px-5 lg:py-5">
+      <div className="ld-shell-grid relative z-10 grid min-h-screen grid-cols-1 lg:grid-cols-[var(--ld-sidebar-current-width)_minmax(0,1fr)]">
         <aside
-          className={`ld-glass-sidebar ld-shell-sidebar relative overflow-hidden rounded-[14px] px-4 py-5 text-white transition-[width] duration-200 ease-out lg:sticky lg:top-5 lg:self-start ${
+          className={`ld-glass-sidebar ld-shell-sidebar relative overflow-hidden px-4 py-4 text-white transition-[width] duration-200 ease-out lg:sticky lg:top-0 lg:h-screen lg:self-start ${
             sidebarCollapsed ? "lg:px-3" : ""
           }`}
           data-collapsed={sidebarCollapsed ? "true" : "false"}
@@ -224,13 +224,21 @@ export function AppShell({ user, branding, topSlot, children }: AppShellProps) {
               </div>
 
               <div className="hidden lg:block">
-                <div className="flex items-start justify-between gap-3">
-                  <BrandMark branding={branding} />
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <BrandMark branding={branding} />
+                    {!sidebarCollapsed ? (
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-semibold text-[var(--ld-color-text)]">{branding.brandName}</div>
+                        <div className="mt-0.5 text-xs text-[var(--ld-color-muted)]">Workspace</div>
+                      </div>
+                    ) : null}
+                  </div>
 
                   <button
                     type="button"
                     onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                    className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] text-white/72 transition hover:border-white/18 hover:bg-white/[0.08] hover:text-white"
+                    className="inline-flex size-9 shrink-0 items-center justify-center rounded-[9px] border border-white/8 bg-white/[0.03] text-white/60 transition hover:border-white/16 hover:bg-white/[0.07] hover:text-white"
                     aria-label={sidebarCollapsed ? "Expand side menu" : "Collapse side menu"}
                     title={sidebarCollapsed ? "Expand side menu" : "Collapse side menu"}
                   >
@@ -238,12 +246,6 @@ export function AppShell({ user, branding, topSlot, children }: AppShellProps) {
                   </button>
                 </div>
 
-                {!sidebarCollapsed ? (
-                  <div className="mt-5">
-                    <p className="text-sm text-white/58">{branding.brandName}</p>
-                    <p className="mt-1 text-xs text-white/40">Products, assets, access, and backups in one place.</p>
-                  </div>
-                ) : null}
               </div>
             </div>
 
@@ -259,7 +261,7 @@ export function AppShell({ user, branding, topSlot, children }: AppShellProps) {
                     <Link
                       key={link.href}
                       href={link.href}
-                      className={`group ld-shell-nav-link flex items-center justify-between rounded-[12px] border px-3 py-3 transition lg:mb-2 ${
+                      className={`group ld-shell-nav-link flex min-h-11 items-center justify-between rounded-[10px] border px-2.5 py-2 transition lg:mb-1 ${
                         active
                           ? "ld-glass-active"
                           : "border-transparent bg-white/[0.03] text-white/70 hover:border-white/12 hover:bg-white/[0.07] hover:text-white"
@@ -267,7 +269,7 @@ export function AppShell({ user, branding, topSlot, children }: AppShellProps) {
                       title={link.label}
                     >
                       <span className={`flex items-center gap-3 ${sidebarCollapsed ? "lg:justify-center" : ""}`}>
-                        <span className={`rounded-[10px] border p-2 ${active ? "border-white/18 bg-white/12" : "border-white/8 bg-black/10"}`}>
+                        <span className={`ld-shell-nav-icon ${active ? "is-active" : ""}`}>
                           <Icon className="size-4" />
                         </span>
                         <span className={`text-sm font-medium ${sidebarCollapsed ? "lg:hidden" : ""}`}>{link.label}</span>
@@ -284,7 +286,7 @@ export function AppShell({ user, branding, topSlot, children }: AppShellProps) {
           </div>
         </aside>
 
-        <div className="flex min-h-screen flex-col gap-5">
+        <div className="ld-shell-content flex min-h-screen min-w-0 flex-col">
           {topSlot}
           <main id="content-start" className="ld-main-surface flex-1 scroll-mt-4">
             {children}

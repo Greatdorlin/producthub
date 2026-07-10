@@ -1,7 +1,16 @@
 "use client";
 
-import { Check, CircleDot, LayoutDashboard, Palette, Type } from "lucide-react";
-import { useMemo, useState } from "react";
+import {
+  BriefcaseBusiness,
+  Building2,
+  Check,
+  CircleDot,
+  GraduationCap,
+  LayoutDashboard,
+  Palette,
+  Type,
+} from "lucide-react";
+import { useState } from "react";
 
 import {
   brandFontPresets,
@@ -10,11 +19,19 @@ import {
   getBrandThemePreset,
 } from "@/lib/branding/presets";
 
-type BrandThemePresetsProps = {
-  brandName: string;
-  industryLabel: string;
+type IndustryChoice = {
+  id: string;
+  label: string;
   categories: string[];
+  routes: string[];
+  currency: string;
+};
+
+type BrandThemePresetsProps = {
+  initialBrandName: string;
+  industryPresets: IndustryChoice[];
   logoUrl: string | null;
+  initialIndustryPreset: string;
   initialThemePreset: string;
   initialFontPreset: string;
 };
@@ -28,61 +45,87 @@ const colorKeys = [
   "mutedTextColor",
 ] as const;
 
+function IndustryIcon({ id }: { id: string }) {
+  if (id === "education") return <GraduationCap className="size-4" />;
+  if (id === "real-estate") return <Building2 className="size-4" />;
+  return <BriefcaseBusiness className="size-4" />;
+}
+
 export function BrandThemePresets({
-  brandName,
-  industryLabel,
-  categories,
+  initialBrandName,
+  industryPresets,
   logoUrl,
+  initialIndustryPreset,
   initialThemePreset,
   initialFontPreset,
 }: BrandThemePresetsProps) {
+  const [brandName, setBrandName] = useState(initialBrandName);
+  const [industryPresetId, setIndustryPresetId] = useState(initialIndustryPreset);
   const [themePresetId, setThemePresetId] = useState(initialThemePreset);
   const [fontPresetId, setFontPresetId] = useState(initialFontPreset);
-  const selectedTheme = useMemo(() => getBrandThemePreset(themePresetId), [themePresetId]);
-  const selectedFont = useMemo(() => getBrandFontPreset(fontPresetId), [fontPresetId]);
+  const selectedTheme = getBrandThemePreset(themePresetId);
+  const selectedFont = getBrandFontPreset(fontPresetId);
+  const selectedIndustry =
+    industryPresets.find((preset) => preset.id === industryPresetId) ?? industryPresets[0];
+  const previewName = brandName.trim() || "Your workspace";
 
   return (
-    <>
-      <div
-        className="ld-brand-preview-shell p-3"
-        style={{
-          background: selectedTheme.pageBackground,
-          borderColor: `${selectedTheme.mutedTextColor}33`,
-          color: selectedTheme.textColor,
-          fontFamily: selectedFont.stack,
-        }}
-      >
-        <div className="grid gap-3 md:grid-cols-[160px_minmax(0,1fr)]">
+    <div className="ld-brand-studio">
+      <input type="hidden" name="industryTemplate" value={industryPresetId} />
+      <input type="hidden" name="themePreset" value={themePresetId} />
+      <input type="hidden" name="fontPreset" value={fontPresetId} />
+      {colorKeys.map((key) => (
+        <input key={key} type="hidden" name={key} value={selectedTheme[key]} />
+      ))}
+
+      <aside className="ld-brand-preview-column">
+        <div className="ld-brand-preview-heading">
+          <span className="ld-kicker">Live preview</span>
+          <span className="ld-brand-live-indicator">
+            <CircleDot className="size-3.5" />
+            Unsaved
+          </span>
+        </div>
+
+        <div
+          className="ld-brand-preview-shell"
+          style={{
+            background: selectedTheme.pageBackground,
+            borderColor: `${selectedTheme.mutedTextColor}33`,
+            color: selectedTheme.textColor,
+            fontFamily: selectedFont.stack,
+          }}
+        >
           <div
-            className="ld-brand-preview-nav p-3"
+            className="ld-brand-preview-nav"
             style={{
               background: selectedTheme.surfaceColor,
-              border: `1px solid ${selectedTheme.mutedTextColor}22`,
+              borderColor: `${selectedTheme.mutedTextColor}24`,
             }}
           >
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               <div
                 className="flex size-9 items-center justify-center overflow-hidden rounded-full"
                 style={{ background: `${selectedTheme.primaryColor}24`, color: selectedTheme.primaryColor }}
               >
                 {logoUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={logoUrl} alt={`${brandName} logo`} className="h-full w-full object-contain" />
+                  <img src={logoUrl} alt={`${previewName} logo`} className="h-full w-full object-contain" />
                 ) : (
-                  <LayoutDashboard className="size-5" />
+                  <LayoutDashboard className="size-4" />
                 )}
               </div>
-              <div className="min-w-0 truncate text-sm font-semibold">{brandName}</div>
+              <div className="min-w-0 truncate text-sm font-semibold">{previewName}</div>
             </div>
 
-            <div className="mt-4 grid gap-2">
-              {["Products", "Assets", "Settings"].map((item, index) => (
+            <div className="mt-5 grid gap-1.5">
+              {["Overview", "Products", "Assets", "Settings"].map((item, index) => (
                 <div
                   key={item}
-                  className="rounded-[10px] px-3 py-2 text-xs font-semibold"
+                  className="rounded-[9px] px-3 py-2 text-xs font-semibold"
                   style={{
-                    background: index === 2 ? `${selectedTheme.primaryColor}34` : `${selectedTheme.mutedTextColor}14`,
-                    color: index === 2 ? selectedTheme.textColor : selectedTheme.mutedTextColor,
+                    background: index === 0 ? `${selectedTheme.primaryColor}28` : "transparent",
+                    color: index === 0 ? selectedTheme.textColor : selectedTheme.mutedTextColor,
                   }}
                 >
                   {item}
@@ -91,117 +134,152 @@ export function BrandThemePresets({
             </div>
           </div>
 
-          <div className="ld-brand-preview-content grid content-between gap-3 rounded-[14px] p-2">
-            <div>
-              <div className="flex items-center gap-2 text-xs font-semibold uppercase" style={{ color: selectedTheme.accentColor }}>
-                <CircleDot className="size-3.5" />
-                {industryLabel}
+          <div className="ld-brand-preview-content">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <div className="text-[0.65rem] font-semibold uppercase" style={{ color: selectedTheme.accentColor }}>
+                  {selectedIndustry?.label ?? "Workspace"}
+                </div>
+                <div className="mt-2 text-xl font-semibold">Overview</div>
               </div>
-              <div className="mt-2 text-xl font-semibold">{brandName}</div>
+              <div className="size-8 rounded-full" style={{ background: `${selectedTheme.primaryColor}22` }} />
             </div>
 
-            <div className="grid gap-2 sm:grid-cols-3">
-              {categories.slice(0, 3).map((category) => (
-                <div key={category} className="rounded-[10px] px-3 py-3 text-sm" style={{ background: selectedTheme.surfaceColor }}>
-                  {category}
+            <div className="mt-5 grid grid-cols-3 gap-2">
+              {(selectedIndustry?.categories ?? []).slice(0, 3).map((category, index) => (
+                <div
+                  key={category}
+                  className="min-w-0 rounded-[10px] border px-2.5 py-3"
+                  style={{
+                    background: selectedTheme.surfaceColor,
+                    borderColor: `${selectedTheme.mutedTextColor}1f`,
+                  }}
+                >
+                  <div className="text-[0.62rem]" style={{ color: selectedTheme.mutedTextColor }}>
+                    {index === 0 ? "Products" : index === 1 ? "Live" : "Assets"}
+                  </div>
+                  <div className="mt-2 truncate text-xs font-semibold">{category}</div>
                 </div>
               ))}
             </div>
 
-            <button
-              type="button"
-              className="inline-flex min-h-10 w-fit items-center gap-2 rounded-full px-4 text-sm font-semibold text-white"
-              style={{ background: selectedTheme.primaryColor }}
-            >
-              <Palette className="size-4" />
-              Save settings
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-5">
-        <input type="hidden" name="themePreset" value={themePresetId} />
-        <input type="hidden" name="fontPreset" value={fontPresetId} />
-        {colorKeys.map((key) => (
-          <input key={key} type="hidden" name={key} value={selectedTheme[key]} />
-        ))}
-
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <div className="ld-kicker">Theme presets</div>
-          </div>
-          <span className="ld-brand-live-indicator">
-            <CircleDot className="size-3.5" />
-            Preview updates here
-          </span>
-        </div>
-
-        <div className="mt-5 grid gap-3 lg:grid-cols-2">
-          {brandThemePresets.map((preset) => {
-            const active = themePresetId === preset.id;
-
-            return (
-              <button
-                key={preset.id}
-                type="button"
-                className={`ld-brand-preset-card group grid gap-3 border p-3 text-left transition ${
-                  active
-                    ? "is-active border-[var(--ld-color-primary)] bg-white/[0.09]"
-                    : "border-white/10 bg-white/[0.035] hover:border-white/22 hover:bg-white/[0.06]"
-                }`}
-                onClick={() => setThemePresetId(preset.id)}
+            <div className="mt-5 flex items-center justify-between gap-3">
+              <div className="text-[0.68rem]" style={{ color: selectedTheme.mutedTextColor }}>
+                {selectedIndustry?.currency ?? "USD"} · {selectedFont.name}
+              </div>
+              <span
+                className="inline-flex min-h-9 items-center rounded-full px-3.5 text-xs font-semibold text-white"
+                style={{ background: selectedTheme.primaryColor }}
               >
-                <span className="flex items-start justify-between gap-3">
-                  <span>
-                    <span className="block text-sm font-semibold text-white">{preset.name}</span>
-                    <span className="mt-1 block text-xs leading-5 text-[var(--ld-color-muted)]">
-                      {preset.description}
+                New product
+              </span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <div className="ld-brand-controls">
+        <section className="ld-brand-control-section">
+          <div className="ld-brand-section-heading">
+            <div>
+              <span className="ld-kicker">Identity</span>
+              <h3 className="ld-panel-title mt-2">Name and industry</h3>
+            </div>
+          </div>
+
+          <label className="mt-5 grid gap-2">
+            <span className="ld-label">Brand name</span>
+            <input
+              className="ld-input"
+              name="brandName"
+              value={brandName}
+              maxLength={80}
+              onChange={(event) => setBrandName(event.target.value)}
+            />
+          </label>
+
+          <div className="mt-5 grid gap-2.5 sm:grid-cols-3">
+            {industryPresets.map((preset) => {
+              const active = industryPresetId === preset.id;
+
+              return (
+                <button
+                  key={preset.id}
+                  type="button"
+                  className={`ld-industry-preset ${active ? "is-active" : ""}`}
+                  aria-pressed={active}
+                  onClick={() => setIndustryPresetId(preset.id)}
+                >
+                  <span className="ld-industry-preset-icon">
+                    <IndustryIcon id={preset.id} />
+                  </span>
+                  <span className="min-w-0 text-left">
+                    <span className="block text-sm font-semibold">{preset.label}</span>
+                    <span className="mt-1 block truncate text-xs text-[var(--ld-color-muted)]">
+                      {preset.currency} · {preset.categories[0]}
+                    </span>
+                  </span>
+                  {active ? <Check className="ml-auto size-4 shrink-0 text-[var(--ld-color-primary-strong)]" /> : null}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="ld-brand-control-section">
+          <div className="ld-brand-section-heading">
+            <div>
+              <span className="ld-kicker">Appearance</span>
+              <h3 className="ld-panel-title mt-2">Colour system</h3>
+            </div>
+            <Palette className="size-4 text-[var(--ld-color-primary-strong)]" />
+          </div>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            {brandThemePresets.map((preset) => {
+              const active = themePresetId === preset.id;
+
+              return (
+                <button
+                  key={preset.id}
+                  type="button"
+                  className={`ld-brand-preset-card ${active ? "is-active" : ""}`}
+                  aria-pressed={active}
+                  onClick={() => setThemePresetId(preset.id)}
+                >
+                  <span className="flex min-w-0 items-center gap-3">
+                    <span
+                      className="ld-brand-palette-disc"
+                      style={{
+                        background: `conic-gradient(${preset.primaryColor} 0 42%, ${preset.accentColor} 42% 62%, ${preset.surfaceColor} 62% 100%)`,
+                      }}
+                    />
+                    <span className="min-w-0 text-left">
+                      <span className="block text-sm font-semibold text-[var(--ld-color-text)]">{preset.name}</span>
+                      <span className="mt-1 block text-xs leading-5 text-[var(--ld-color-muted)]">{preset.description}</span>
                     </span>
                   </span>
                   {active ? (
-                    <span className="inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-[var(--ld-color-primary)] text-white">
+                    <span className="ld-brand-selection-mark">
                       <Check className="size-3.5" />
                     </span>
                   ) : null}
-                </span>
-
-                <span
-                  className="ld-brand-mini-window"
-                  style={{
-                    backgroundColor: preset.pageBackground,
-                    borderColor: `${preset.mutedTextColor}33`,
-                    color: preset.textColor,
-                  }}
-                >
-                  <span className="ld-brand-mini-topbar">
-                    <span className="ld-brand-mini-dot" style={{ backgroundColor: preset.primaryColor }} />
-                    <span className="ld-brand-mini-line" style={{ backgroundColor: `${preset.mutedTextColor}44` }} />
-                  </span>
-                  <span className="ld-brand-mini-body">
-                    <span className="ld-brand-mini-panel" style={{ backgroundColor: preset.surfaceColor }}>
-                      <span style={{ backgroundColor: preset.primaryColor }} />
-                      <span style={{ backgroundColor: `${preset.mutedTextColor}44` }} />
-                      <span style={{ backgroundColor: `${preset.mutedTextColor}2e` }} />
-                    </span>
-                    <span className="ld-brand-swatch-row">
-                      <span className="ld-brand-swatch ld-brand-swatch-main" style={{ backgroundColor: preset.surfaceColor }} />
-                      <span className="ld-brand-swatch" style={{ backgroundColor: preset.primaryColor }} />
-                      <span className="ld-brand-swatch" style={{ backgroundColor: preset.accentColor }} />
-                    </span>
-                  </span>
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="mt-6 border-t border-white/10 pt-5">
-          <div className="flex items-center gap-2">
-            <Type className="size-4 text-[var(--ld-color-primary-strong)]" />
-            <div className="ld-kicker">Typography</div>
+                </button>
+              );
+            })}
           </div>
-          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+        </section>
+
+        <section className="ld-brand-control-section">
+          <div className="ld-brand-section-heading">
+            <div>
+              <span className="ld-kicker">Typography</span>
+              <h3 className="ld-panel-title mt-2">Workspace font</h3>
+            </div>
+            <Type className="size-4 text-[var(--ld-color-primary-strong)]" />
+          </div>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
             {brandFontPresets.map((font) => {
               const active = fontPresetId === font.id;
 
@@ -209,28 +287,23 @@ export function BrandThemePresets({
                 <button
                   key={font.id}
                   type="button"
-                  className={`ld-brand-font-card border p-3 text-left transition ${
-                    active
-                      ? "border-[var(--ld-color-primary)] bg-white/[0.09]"
-                      : "border-white/10 bg-white/[0.035] hover:border-white/22 hover:bg-white/[0.06]"
-                  }`}
+                  className={`ld-brand-font-card ${active ? "is-active" : ""}`}
                   style={{ fontFamily: font.stack }}
+                  aria-pressed={active}
                   onClick={() => setFontPresetId(font.id)}
                 >
-                  <span className="flex items-center justify-between gap-2">
-                    <span className="text-sm font-semibold text-white">{font.name}</span>
-                    {active ? <Check className="size-4 text-[var(--ld-color-primary-strong)]" /> : null}
+                  <span className="text-[2rem] font-semibold leading-none text-[var(--ld-color-text)]">Aa</span>
+                  <span className="min-w-0 text-left">
+                    <span className="block text-sm font-semibold text-[var(--ld-color-text)]">{font.name}</span>
+                    <span className="mt-1 block text-xs text-[var(--ld-color-muted)]">{font.description}</span>
                   </span>
-                  <span className="mt-3 block text-2xl font-semibold leading-none text-white">Aa</span>
-                  <span className="mt-2 block text-xs leading-5 text-[var(--ld-color-muted)]">
-                    {font.description}
-                  </span>
+                  {active ? <Check className="ml-auto size-4 shrink-0 text-[var(--ld-color-primary-strong)]" /> : null}
                 </button>
               );
             })}
           </div>
-        </div>
+        </section>
       </div>
-    </>
+    </div>
   );
 }

@@ -579,7 +579,7 @@ export default async function ProductDetailPage({
 
         {!canEdit && (canManageLifecycle || canDeleteProducts) ? (
           <div className="ld-solid-panel ld-panel">
-            <div className="ld-kicker">Product control</div>
+            <div className="ld-kicker">Product details</div>
             <h3 className="ld-panel-title mt-2">Archive or remove</h3>
             <p className="ld-panel-copy mt-2">
               Use these controls when the product should leave the live catalogue or be removed fully.

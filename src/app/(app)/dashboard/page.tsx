@@ -1,32 +1,21 @@
 import Link from "next/link";
-import { ArrowRight, Boxes, Clock3, FolderKanban, Settings, Target } from "lucide-react";
+import { ArrowRight, Boxes, Clock3, FolderKanban, Radio, Settings } from "lucide-react";
 
 import { chipClassName, priorityChipTone, statusChipTone } from "@/components/chip";
-import { PreviewAccessSwitcher } from "@/components/preview-access-switcher";
 import { requirePermission } from "@/lib/auth/server";
 import { getRoleLabel } from "@/lib/config/industries";
 import { priorityLabels, productAccessLabels, statusLabels } from "@/lib/constants";
-import { getDashboardData, getPeopleData, getWorkspaceSettings } from "@/lib/data";
+import { getDashboardData, getWorkspaceSettings } from "@/lib/data";
 import { formatCurrencyFromCents, formatDateLabel, formatExpiryCountdown, getExpiryTone } from "@/lib/utils";
 
 export default async function DashboardPage() {
   const viewer = await requirePermission("dashboard:view");
-  const canPreviewUsers =
-    viewer.actualPermissions.includes("people:view") || viewer.actualPermissions.includes("people:manage");
-  const [data, people, workspaceSettings] = await Promise.all([
+  const [data, workspaceSettings] = await Promise.all([
     getDashboardData(viewer),
-    canPreviewUsers ? getPeopleData() : Promise.resolve([]),
     getWorkspaceSettings(),
   ]);
   const canOpenSettings = viewer.permissions.includes("people:view") || viewer.permissions.includes("activity:view");
   const canEditProducts = viewer.permissions.includes("products:edit");
-  const previewCandidates = people
-    .filter((person) => person.isActive && person.id !== viewer.actualUserId)
-    .map((person) => ({
-      id: person.id,
-      name: person.name,
-      role: person.role,
-    }));
   const healthRows = [
     { label: "Live", value: data.stats.published, tone: "tone-success" },
     { label: "Draft", value: data.stats.draft, tone: "tone-calm" },
@@ -41,76 +30,54 @@ export default async function DashboardPage() {
 
   return (
     <div className="ld-page">
-      <section className="ld-glass-vibrant ld-hero">
+      <section className="ld-overview-header">
         <div className="ld-page-header">
           <div>
             <div className="ld-page-meta">
-              <span className={chipClassName("accent")}>
-                <Target className="size-3.5" />
-                Daily control
-              </span>
               <span className={chipClassName("info")}>
                 {viewer.isPreviewing
                   ? `Viewing ${getRoleLabel(viewer.role, workspaceSettings.industryTemplate)}`
-                  : `Master ${getRoleLabel(viewer.actualRole, workspaceSettings.industryTemplate)} view`}
+                  : getRoleLabel(viewer.actualRole, workspaceSettings.industryTemplate)}
               </span>
             </div>
-            <h2 className="ld-title mt-4">Product control.</h2>
-            <p className="ld-subtitle mt-3">Track offers, assets, and expiry pressure.</p>
-          </div>
-
-          <div className="ld-stat-grid w-full xl:max-w-[620px]">
-            {[
-              { label: "Products", value: data.stats.products, tone: "tone-calm" },
-              { label: "Live", value: data.stats.published, tone: "tone-success" },
-              { label: "Expiring", value: data.stats.expiringSoon, tone: "tone-warning" },
-              { label: "Assets", value: data.stats.assets, tone: "tone-calm" },
-            ].map((stat) => (
-              <div key={stat.label} className="ld-stat-card">
-                <div className="ld-stat-label">{stat.label}</div>
-                <div className="mt-3 flex items-center justify-between gap-3">
-                  <div className="ld-stat-value">{stat.value}</div>
-                  <span className={`rounded-full px-3 py-1 text-sm font-semibold ${stat.tone}`}>
-                    {stat.label === "Expiring" ? "Watch" : "Now"}
-                  </span>
-                </div>
-              </div>
-            ))}
+            <h2 className="ld-title mt-3">Overview</h2>
+            <p className="ld-subtitle mt-2">Products, assets, and key deadlines at a glance.</p>
           </div>
         </div>
       </section>
 
-      {canPreviewUsers && previewCandidates.length ? (
-        <section className="ld-glass-card ld-panel">
-          <div className="ld-panel-header">
-            <div>
-              <div className="ld-kicker">Role preview</div>
-              <h3 className="ld-panel-title mt-2">Switch the dashboard view</h3>
-            </div>
-          </div>
+      <section className="ld-stat-grid">
+        {[
+          { label: "Products", value: data.stats.products, detail: "Total catalogue", icon: Boxes, tone: "tone-calm" },
+          { label: "Live", value: data.stats.published, detail: "Ready to share", icon: Radio, tone: "tone-success" },
+          { label: "Expiring", value: data.stats.expiringSoon, detail: "Needs review", icon: Clock3, tone: "tone-warning" },
+          { label: "Assets", value: data.stats.assets, detail: "Files and links", icon: FolderKanban, tone: "tone-calm" },
+        ].map((stat) => {
+          const Icon = stat.icon;
 
-          <div className="mt-5">
-            <PreviewAccessSwitcher
-              actualUserId={viewer.actualUserId}
-              actualUserName={viewer.actualName}
-              actualUserRole={viewer.actualRole}
-              effectiveUserId={viewer.userId}
-              effectiveUserName={viewer.name}
-              effectiveUserRole={viewer.role}
-              isPreviewing={viewer.isPreviewing}
-              candidates={previewCandidates}
-              industryTemplate={workspaceSettings.industryTemplate}
-            />
-          </div>
-        </section>
-      ) : null}
+          return (
+            <div key={stat.label} className="ld-stat-card ld-stat-card-premium">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <div className="ld-stat-label">{stat.label}</div>
+                  <div className="ld-stat-value">{stat.value}</div>
+                </div>
+                <span className={`ld-stat-icon ${stat.tone}`}>
+                  <Icon className="size-4" />
+                </span>
+              </div>
+              <div className="ld-stat-detail">{stat.detail}</div>
+            </div>
+          );
+        })}
+      </section>
 
       <section className="ld-dashboard-grid">
         <div className="ld-solid-panel ld-panel">
           <div className="ld-panel-header">
             <div>
-              <div className="ld-kicker">Expiry watch</div>
-              <h3 className="ld-panel-title mt-2">Products needing attention</h3>
+              <div className="ld-kicker">Deadlines</div>
+              <h3 className="ld-panel-title mt-2">Needs attention</h3>
             </div>
             <Clock3 className="size-5 text-[var(--ld-color-accent)]" />
           </div>
@@ -139,7 +106,7 @@ export default async function DashboardPage() {
                 </Link>
               ))
             ) : (
-              <div className="ld-empty-state">No product is inside the current expiry window.</div>
+              <div className="ld-empty-state">No products are approaching expiry.</div>
             )}
           </div>
         </div>
@@ -147,8 +114,8 @@ export default async function DashboardPage() {
         <div className="ld-glass-card ld-panel">
           <div className="ld-panel-header">
             <div>
-              <div className="ld-kicker">Catalogue health</div>
-              <h3 className="ld-panel-title mt-2">Status mix</h3>
+              <div className="ld-kicker">Catalogue</div>
+              <h3 className="ld-panel-title mt-2">Status</h3>
             </div>
             <span className={chipClassName("count")}>{data.stats.products} products</span>
           </div>
@@ -190,8 +157,8 @@ export default async function DashboardPage() {
       <section className="ld-glass-card ld-panel">
         <div className="ld-panel-header">
           <div>
-            <div className="ld-kicker">Priority catalogue</div>
-            <h3 className="ld-panel-title mt-2">Products your team should see first</h3>
+            <div className="ld-kicker">Priority</div>
+            <h3 className="ld-panel-title mt-2">Featured products</h3>
           </div>
           <Link
             href={canEditProducts ? "/products#create-product" : "/products"}
