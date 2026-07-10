@@ -29,11 +29,13 @@ async function main() {
     .values({
       id: "default",
       brandName: siteConfig.brandName,
+      defaultCurrency,
     })
     .onConflictDoUpdate({
       target: workspaceSettings.id,
       set: {
         brandName: siteConfig.brandName,
+        defaultCurrency,
         updatedAt: new Date(),
       },
     });

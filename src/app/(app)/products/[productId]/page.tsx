@@ -10,10 +10,12 @@ import {
 } from "@/app/actions";
 import { chipClassName, priorityChipTone, statusChipTone } from "@/components/chip";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
+import { CurrencyField } from "@/components/currency-field";
 import { DateField } from "@/components/date-field";
 import { DateRangeFields } from "@/components/date-range-fields";
 import { FieldLabel } from "@/components/field-label";
 import { ProductFeesField } from "@/components/product-fees-field";
+import { ProductCustomFields, ProductCustomFieldSummary } from "@/components/product-custom-fields";
 import { ProductSuccessBanner } from "@/components/product-success-banner";
 import { AsyncRedirectForm } from "@/components/async-redirect-form";
 import { ValidatedForm } from "@/components/validated-form";
@@ -23,8 +25,6 @@ import {
   assetVisibilityLabels,
   ASSET_KIND,
   CATEGORY_OPTIONS,
-  CURRENCY_OPTIONS,
-  currencyLabels,
   PRODUCT_ACCESS_ROLES,
   PRODUCT_PRIORITY,
   type ProductAccessRole,
@@ -96,14 +96,18 @@ export default async function ProductDetailPage({
     product.route,
     ...(industryPreset.productDefaults.routes.length ? industryPreset.productDefaults.routes : [...ROUTE_OPTIONS]),
   ]));
-  const defaultCurrency = getDefaultCurrency(workspaceSettings.industryTemplate);
-  const currencyOptions = Array.from(new Set([product.currency, defaultCurrency, ...CURRENCY_OPTIONS]));
+  const defaultCurrency = getDefaultCurrency(
+    workspaceSettings.industryTemplate,
+    workspaceSettings.defaultCurrency,
+  );
   const expiryDays = getDaysToExpiry(product.expiresAt);
   const editError =
     pageState.error === "invalid-sales-period"
       ? "Sales start must be before sales end."
       : pageState.error === "price-permission"
         ? "You do not have permission to change pricing."
+        : pageState.error === "invalid-custom-fields"
+          ? "Complete the required custom fields."
         : pageState.error
           ? "Check the required fields or your pricing permission."
           : null;
@@ -309,6 +313,11 @@ export default async function ProductDetailPage({
               )}
             </div>
 
+            <ProductCustomFieldSummary
+              definitions={workspaceSettings.productFieldDefinitions}
+              values={product.customFields}
+            />
+
             <div className="mt-5">
               <div className="ld-kicker">Notes</div>
               <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-[var(--ld-color-text)]">
@@ -470,17 +479,7 @@ export default async function ProductDetailPage({
 
               <div className="ld-form-section">
                 <div className="ld-field-group">
-                  <div className="space-y-2">
-                    <FieldLabel label="Currency" />
-                    <div className="ld-segmented">
-                      {currencyOptions.map((currency) => (
-                        <label key={currency} className="ld-segmented-option">
-                          <input type="radio" name="currency" value={currency} defaultChecked={product.currency === currency} />
-                          <span>{currencyLabels[currency as keyof typeof currencyLabels] ?? currency}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
+                  <CurrencyField defaultValue={product.currency || defaultCurrency} />
 
                   <div className="ld-mini-stat-grid">
                     <label className="block space-y-2">
@@ -544,6 +543,11 @@ export default async function ProductDetailPage({
                   </label>
                 </div>
               </div>
+
+              <ProductCustomFields
+                definitions={workspaceSettings.productFieldDefinitions}
+                values={product.customFields}
+              />
 
               <button
                 type="submit"

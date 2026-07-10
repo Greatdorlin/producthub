@@ -3,18 +3,18 @@ import { ArrowRight, Plus } from "lucide-react";
 
 import { createProductAction } from "@/app/actions";
 import { chipClassName, priorityChipTone, statusChipTone } from "@/components/chip";
+import { CurrencyField } from "@/components/currency-field";
 import { DateField } from "@/components/date-field";
 import { DateRangeFields } from "@/components/date-range-fields";
 import { FieldLabel } from "@/components/field-label";
 import { ProductFormEffects } from "@/components/product-form-effects";
 import { ProductFeesField } from "@/components/product-fees-field";
+import { ProductCustomFields } from "@/components/product-custom-fields";
 import { ValidatedForm } from "@/components/validated-form";
 import { requirePermission } from "@/lib/auth/server";
 import { getDefaultCurrency, getFieldLabel, getIndustryPreset, getRoleLabel } from "@/lib/config/industries";
 import {
   CATEGORY_OPTIONS,
-  CURRENCY_OPTIONS,
-  currencyLabels,
   PRODUCT_ACCESS_ROLES,
   PRODUCT_PRIORITY,
   priorityLabels,
@@ -54,8 +54,10 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   const routeOptions = industryPreset.productDefaults.routes.length
     ? industryPreset.productDefaults.routes
     : [...ROUTE_OPTIONS];
-  const defaultCurrency = getDefaultCurrency(workspaceSettings.industryTemplate);
-  const currencyOptions = Array.from(new Set([defaultCurrency, ...CURRENCY_OPTIONS]));
+  const defaultCurrency = getDefaultCurrency(
+    workspaceSettings.industryTemplate,
+    workspaceSettings.defaultCurrency,
+  );
   const liveCount = allProducts.filter((product) => product.status === "active").length;
   const draftCount = allProducts.filter((product) => product.status === "draft").length;
   const affiliateReadyCount = allProducts.filter((product) => product.accessRoles.includes("affiliate")).length;
@@ -64,6 +66,8 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
       ? "Sales start must be before sales end."
       : params.error === "price-permission"
         ? "You do not have permission to change pricing."
+        : params.error === "invalid-custom-fields"
+          ? "Complete the required custom fields."
         : params.error === "not-found"
           ? "That product is no longer available."
           : params.error === "invalid-status"
@@ -383,17 +387,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
               <div className="ld-form-section">
                 <div className="ld-field-group">
-                  <div className="space-y-2">
-                    <FieldLabel label="Currency" />
-                    <div className="ld-segmented">
-                      {currencyOptions.map((currency) => (
-                        <label key={currency} className="ld-segmented-option">
-                          <input type="radio" name="currency" value={currency} defaultChecked={currency === defaultCurrency} />
-                          <span>{currencyLabels[currency as keyof typeof currencyLabels] ?? currency}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
+                  <CurrencyField defaultValue={defaultCurrency} />
 
                   <div className="ld-mini-stat-grid">
                     <label className="block space-y-2">
@@ -426,6 +420,8 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                   <ProductFeesField />
                 </div>
               </div>
+
+              <ProductCustomFields definitions={workspaceSettings.productFieldDefinitions} />
 
               <div className="ld-form-section">
                 <label className="block space-y-2">

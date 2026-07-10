@@ -1,11 +1,11 @@
-import { Camera, KeyRound, RotateCcw, ShieldCheck, ShieldOff, Smartphone, UserRound } from "lucide-react";
+import { KeyRound, ShieldCheck, ShieldOff, Smartphone } from "lucide-react";
 import { cookies } from "next/headers";
 import QRCode from "qrcode";
 
 import { changePasswordAction, disableMfaAction, enableMfaAction, regenerateRecoveryCodesAction, updateProfileIdentityAction } from "@/app/actions";
-import { AsyncRedirectForm } from "@/components/async-redirect-form";
 import { chipClassName } from "@/components/chip";
 import { FieldLabel } from "@/components/field-label";
+import { ProfilePhotoEditor } from "@/components/profile-photo-editor";
 import { buildTotpOtpAuthUrl, encryptMfaSecret, generateTotpSecret, MFA_RECOVERY_CODES_COOKIE, requireActualSession } from "@/lib/auth/server";
 import { getRoleLabel } from "@/lib/config/industries";
 import { getWorkspaceSettings } from "@/lib/data";
@@ -100,10 +100,7 @@ export default async function ProfileSettingsPage({
         <div className="ld-panel-header">
           <div>
             <p className="ld-kicker">Profile</p>
-            <h3 className="ld-panel-title mt-2">Profile picture</h3>
-            <p className="ld-panel-copy mt-2">
-              This appears in your dashboard and workspace menu.
-            </p>
+            <h3 className="ld-panel-title mt-2">Your account</h3>
           </div>
           {params.saved ? (
             <span className={chipClassName("success")}>Saved</span>
@@ -116,22 +113,11 @@ export default async function ProfileSettingsPage({
           </div>
         ) : null}
 
-        <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+        <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(220px,0.72fr)_minmax(0,1.28fr)]">
+          <ProfilePhotoEditor name={user.name} avatarUrl={user.avatarUrl} />
+
           <div className="ld-profile-identity">
             <div className="ld-profile-identity-main">
-              <div className="ld-profile-photo-preview">
-                {user.avatarUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={user.avatarUrl}
-                    alt={`${user.name} profile picture`}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <UserRound className="size-9 text-[var(--ld-color-accent)]" />
-                )}
-              </div>
-
               <div className="min-w-0">
                 <div className="text-xl font-semibold text-white">{user.name}</div>
                 <div className="mt-1 text-sm text-[var(--ld-color-muted)]">
@@ -139,10 +125,6 @@ export default async function ProfileSettingsPage({
                 </div>
                 <div className="mt-3 break-all text-sm text-[var(--ld-color-muted)]">{user.email}</div>
               </div>
-            </div>
-
-            <div className="ld-profile-identity-note">
-              This photo appears in your workspace menu and top profile area.
             </div>
 
             <form action={updateProfileIdentityAction} className="grid gap-4">
@@ -165,48 +147,6 @@ export default async function ProfileSettingsPage({
               </button>
             </form>
           </div>
-
-          <AsyncRedirectForm
-            action="/api/settings/profile"
-            method="post"
-            encType="multipart/form-data"
-            className="ld-form-section ld-profile-upload-panel"
-          >
-            <div className="grid gap-4">
-              <label className="grid gap-2">
-                <FieldLabel label="Upload profile picture" info="Optional PNG, JPG, or WebP. Keep it under 2 MB." />
-                <input
-                  className="ld-input ld-file-input file:mr-3 file:rounded-full file:border-0 file:bg-[var(--ld-color-primary)] file:px-4 file:py-2.5 file:text-sm file:font-semibold file:text-white"
-                  type="file"
-                  name="avatar"
-                  accept="image/png,image/jpeg,image/webp"
-                />
-              </label>
-
-              {user.avatarUrl ? (
-                <label className="ld-check-tile">
-                  <input type="checkbox" name="removeAvatar" />
-                  <span className="ld-check-tile-card">
-                    <span className="ld-check-tile-title flex items-center gap-2">
-                      <RotateCcw className="size-4" />
-                      Remove profile picture
-                    </span>
-                    <span className="ld-check-tile-copy">
-                      Your initials will show until you upload a new image.
-                    </span>
-                  </span>
-                </label>
-              ) : null}
-
-              <button
-                type="submit"
-                className="ld-glass-button inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-5 text-sm font-semibold transition hover:brightness-110"
-              >
-                <Camera className="size-4" />
-                Save profile picture
-              </button>
-            </div>
-          </AsyncRedirectForm>
         </div>
       </section>
 

@@ -3,21 +3,29 @@
 import {
   BriefcaseBusiness,
   Building2,
+  CalendarDays,
   Check,
   CircleDot,
   GraduationCap,
+  HeartPulse,
+  Hotel,
   LayoutDashboard,
   Palette,
+  ShoppingBag,
   Type,
 } from "lucide-react";
 import { useState } from "react";
 
+import { CustomFieldBuilder } from "@/components/custom-field-builder";
+import { FieldLabel } from "@/components/field-label";
 import {
   brandFontPresets,
   brandThemePresets,
   getBrandFontPreset,
   getBrandThemePreset,
 } from "@/lib/branding/presets";
+import { CURRENCY_CODES } from "@/lib/currencies";
+import type { ProductCustomFieldDefinition } from "@/lib/custom-fields";
 
 type IndustryChoice = {
   id: string;
@@ -32,6 +40,8 @@ type BrandThemePresetsProps = {
   industryPresets: IndustryChoice[];
   logoUrl: string | null;
   initialIndustryPreset: string;
+  initialDefaultCurrency: string;
+  initialCustomFields: ProductCustomFieldDefinition[];
   initialThemePreset: string;
   initialFontPreset: string;
 };
@@ -48,6 +58,10 @@ const colorKeys = [
 function IndustryIcon({ id }: { id: string }) {
   if (id === "education") return <GraduationCap className="size-4" />;
   if (id === "real-estate") return <Building2 className="size-4" />;
+  if (id === "events") return <CalendarDays className="size-4" />;
+  if (id === "retail") return <ShoppingBag className="size-4" />;
+  if (id === "hospitality") return <Hotel className="size-4" />;
+  if (id === "healthcare") return <HeartPulse className="size-4" />;
   return <BriefcaseBusiness className="size-4" />;
 }
 
@@ -56,11 +70,14 @@ export function BrandThemePresets({
   industryPresets,
   logoUrl,
   initialIndustryPreset,
+  initialDefaultCurrency,
+  initialCustomFields,
   initialThemePreset,
   initialFontPreset,
 }: BrandThemePresetsProps) {
   const [brandName, setBrandName] = useState(initialBrandName);
   const [industryPresetId, setIndustryPresetId] = useState(initialIndustryPreset);
+  const [defaultCurrency, setDefaultCurrency] = useState(initialDefaultCurrency);
   const [themePresetId, setThemePresetId] = useState(initialThemePreset);
   const [fontPresetId, setFontPresetId] = useState(initialFontPreset);
   const selectedTheme = getBrandThemePreset(themePresetId);
@@ -165,7 +182,7 @@ export function BrandThemePresets({
 
             <div className="mt-5 flex items-center justify-between gap-3">
               <div className="text-[0.68rem]" style={{ color: selectedTheme.mutedTextColor }}>
-                {selectedIndustry?.currency ?? "USD"} · {selectedFont.name}
+                {defaultCurrency || selectedIndustry?.currency || "USD"} · {selectedFont.name}
               </div>
               <span
                 className="inline-flex min-h-9 items-center rounded-full px-3.5 text-xs font-semibold text-white"
@@ -198,7 +215,7 @@ export function BrandThemePresets({
             />
           </label>
 
-          <div className="mt-5 grid gap-2.5 sm:grid-cols-3">
+          <div className="mt-5 grid gap-2.5 sm:grid-cols-2">
             {industryPresets.map((preset) => {
               const active = industryPresetId === preset.id;
 
@@ -224,6 +241,27 @@ export function BrandThemePresets({
               );
             })}
           </div>
+
+          <label className="mt-5 grid gap-2">
+            <FieldLabel label="Default currency" required info="Type any three-letter currency code." />
+            <input
+              className="ld-input uppercase"
+              name="defaultCurrency"
+              value={defaultCurrency}
+              list="workspace-currency-options"
+              required
+              minLength={3}
+              maxLength={3}
+              pattern="[A-Za-z]{3}"
+              placeholder="USD"
+              onChange={(event) =>
+                setDefaultCurrency(event.target.value.replace(/[^a-z]/gi, "").slice(0, 3).toUpperCase())
+              }
+            />
+            <datalist id="workspace-currency-options">
+              {CURRENCY_CODES.map((currency) => <option key={currency} value={currency} />)}
+            </datalist>
+          </label>
         </section>
 
         <section className="ld-brand-control-section">
@@ -248,12 +286,12 @@ export function BrandThemePresets({
                   onClick={() => setThemePresetId(preset.id)}
                 >
                   <span className="flex min-w-0 items-center gap-3">
-                    <span
-                      className="ld-brand-palette-disc"
-                      style={{
-                        background: `conic-gradient(${preset.primaryColor} 0 42%, ${preset.accentColor} 42% 62%, ${preset.surfaceColor} 62% 100%)`,
-                      }}
-                    />
+                    <span className="ld-brand-palette-wheel" style={{ backgroundColor: preset.pageBackground }}>
+                      <span style={{ backgroundColor: preset.primaryColor }} />
+                      <span style={{ backgroundColor: preset.accentColor }} />
+                      <span style={{ backgroundColor: preset.surfaceColor }} />
+                      <i style={{ backgroundColor: preset.textColor }} />
+                    </span>
                     <span className="min-w-0 text-left">
                       <span className="block text-sm font-semibold text-[var(--ld-color-text)]">{preset.name}</span>
                       <span className="mt-1 block text-xs leading-5 text-[var(--ld-color-muted)]">{preset.description}</span>
@@ -302,6 +340,10 @@ export function BrandThemePresets({
               );
             })}
           </div>
+        </section>
+
+        <section className="ld-brand-control-section">
+          <CustomFieldBuilder initialDefinitions={initialCustomFields} />
         </section>
       </div>
     </div>

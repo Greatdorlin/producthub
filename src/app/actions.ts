@@ -40,9 +40,10 @@ import {
   verifyTotpToken,
 } from "@/lib/auth/server";
 import { getDefaultCurrency, getIndustryPreset } from "@/lib/config/industries";
+import { isCurrencyCode } from "@/lib/currencies";
+import { readProductCustomFieldValues } from "@/lib/custom-fields";
 import {
   CATEGORY_OPTIONS,
-  CURRENCY_OPTIONS,
   PERMISSIONS,
   PRODUCT_ACCESS_ROLES,
   PRODUCT_PRIORITY,
@@ -156,9 +157,11 @@ function buildSalesPeriodSummary(start: Date | null, end: Date | null) {
   return startLabel ? `From ${startLabel}` : `Until ${endLabel}`;
 }
 
-async function getAllowedProductDefaults(existing?: { category?: string; route?: string; currency?: string }) {
-  const settings = await getWorkspaceSettings();
-  const preset = getIndustryPreset(settings.industryTemplate);
+function getAllowedProductDefaults(
+  industryTemplate: string,
+  existing?: { category?: string; route?: string },
+) {
+  const preset = getIndustryPreset(industryTemplate);
 
   return {
     categories: new Set([
@@ -171,12 +174,6 @@ async function getAllowedProductDefaults(existing?: { category?: string; route?:
       ...ROUTE_OPTIONS,
       ...preset.productDefaults.routes,
     ].filter(Boolean)),
-    currencies: new Set([
-      existing?.currency,
-      getDefaultCurrency(settings.industryTemplate),
-      preset.productDefaults.currency,
-      ...CURRENCY_OPTIONS,
-    ].filter(Boolean).map((currency) => String(currency).toUpperCase())),
   };
 }
 
@@ -477,7 +474,9 @@ export async function createProductAction(formData: FormData) {
     .filter((value): value is (typeof PRODUCT_ACCESS_ROLES)[number] =>
       PRODUCT_ACCESS_ROLES.includes(value as (typeof PRODUCT_ACCESS_ROLES)[number]),
     );
-  const currency = String(formData.get("currency") ?? getDefaultCurrency(workspaceSettings.industryTemplate)).trim().toUpperCase();
+  const currency = String(
+    formData.get("currency") ?? getDefaultCurrency(workspaceSettings.industryTemplate, workspaceSettings.defaultCurrency),
+  ).trim().toUpperCase();
   const notes = String(formData.get("notes") ?? "").trim();
   const priceInCents = getOptionalPrice(formData.get("price"));
   const feeItems = getFeeItems(formData);
@@ -488,8 +487,9 @@ export async function createProductAction(formData: FormData) {
   const expectedSalesPeriod = buildSalesPeriodSummary(salesStartsAt, salesEndsAt);
   const expiresAt = getOptionalDate(formData.get("expiresAt"));
   const visibility = deriveAssetVisibilityFromRoles(assetAccessRoles);
+  const customFieldInput = readProductCustomFieldValues(formData, workspaceSettings.productFieldDefinitions);
 
-  const allowedDefaults = await getAllowedProductDefaults();
+  const allowedDefaults = getAllowedProductDefaults(workspaceSettings.industryTemplate);
 
   if (
     !name ||
@@ -504,9 +504,13 @@ export async function createProductAction(formData: FormData) {
     accessRoles.length === 0 ||
     assetAccessRoles.length === 0 ||
     !PRODUCT_STATUS.includes(status as (typeof PRODUCT_STATUS)[number]) ||
-    !allowedDefaults.currencies.has(currency)
+    !isCurrencyCode(currency)
   ) {
     redirect("/products?error=invalid-product");
+  }
+
+  if (!customFieldInput.isValid) {
+    redirect("/products?error=invalid-custom-fields");
   }
 
   if (salesStartsAt && salesEndsAt && salesStartsAt > salesEndsAt) {
@@ -541,6 +545,7 @@ export async function createProductAction(formData: FormData) {
     slotsAvailable,
     expectedSales,
     expectedSalesPeriod,
+    customFields: customFieldInput.values,
     salesStartsAt,
     salesEndsAt,
     expiresAt,
@@ -583,6 +588,8 @@ export async function updateProductAction(formData: FormData) {
     redirect("/products?error=not-found");
   }
 
+  const workspaceSettings = await getWorkspaceSettings();
+
   const name = String(formData.get("name") ?? "").trim();
   const category = String(formData.get("category") ?? "").trim();
   const route = String(formData.get("route") ?? "").trim();
@@ -615,11 +622,15 @@ export async function updateProductAction(formData: FormData) {
   const expectedSalesPeriod = buildSalesPeriodSummary(salesStartsAt, salesEndsAt);
   const expiresAt = getOptionalDate(formData.get("expiresAt"));
   const visibility = deriveAssetVisibilityFromRoles(assetAccessRoles);
+  const customFieldInput = readProductCustomFieldValues(formData, workspaceSettings.productFieldDefinitions);
+  const activeCustomFieldIds = new Set(workspaceSettings.productFieldDefinitions.map((definition) => definition.id));
+  const preservedCustomFields = Object.fromEntries(
+    Object.entries(existing.customFields).filter(([id]) => !activeCustomFieldIds.has(id)),
+  );
 
-  const allowedDefaults = await getAllowedProductDefaults({
+  const allowedDefaults = getAllowedProductDefaults(workspaceSettings.industryTemplate, {
     category: existing.category,
     route: existing.route,
-    currency: existing.currency,
   });
 
   if (
@@ -635,9 +646,13 @@ export async function updateProductAction(formData: FormData) {
     accessRoles.length === 0 ||
     assetAccessRoles.length === 0 ||
     !PRODUCT_STATUS.includes(status as (typeof PRODUCT_STATUS)[number]) ||
-    !allowedDefaults.currencies.has(currency)
+    !isCurrencyCode(currency)
   ) {
     redirect(`/products/${productId}?error=invalid-product`);
+  }
+
+  if (!customFieldInput.isValid) {
+    redirect(`/products/${productId}?error=invalid-custom-fields`);
   }
 
   if (salesStartsAt && salesEndsAt && salesStartsAt > salesEndsAt) {
@@ -669,6 +684,7 @@ export async function updateProductAction(formData: FormData) {
       slotsAvailable,
       expectedSales,
       expectedSalesPeriod,
+      customFields: { ...preservedCustomFields, ...customFieldInput.values },
       salesStartsAt,
       salesEndsAt,
       expiresAt,

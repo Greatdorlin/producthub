@@ -59,7 +59,16 @@ function run(command: string, args: string[]) {
 async function main() {
   const industryTemplate = await ask("Industry template", {
     defaultValue: "generic",
-    choices: ["generic", "education", "real-estate"],
+    choices: [
+      "generic",
+      "education",
+      "real-estate",
+      "events",
+      "professional-services",
+      "retail",
+      "hospitality",
+      "healthcare",
+    ],
   });
   const brandName = await ask("Brand name", { defaultValue: "ProductHub" });
   const defaultCurrency = await ask("Default currency", {

@@ -9,6 +9,8 @@ const defaultWorkspaceSettings = {
   brandName: siteConfig.brandName,
   logoUrl: null as string | null,
   logoStoragePath: null as string | null,
+  defaultCurrency: siteConfig.defaultCurrency,
+  productFieldDefinitions: [],
 };
 
 function buildBackupPath(reason: string) {

@@ -9,6 +9,8 @@ import { workspaceSettings } from "@/lib/db/schema";
 import { DEFAULT_WORKSPACE_SETTINGS } from "@/lib/data";
 import { presets } from "@/lib/config/industries";
 import { getBrandFontPreset, getBrandThemePreset } from "@/lib/branding/presets";
+import { isCurrencyCode } from "@/lib/currencies";
+import { parseProductFieldDefinitionsInput } from "@/lib/custom-fields";
 import { eq } from "drizzle-orm";
 
 const ALLOWED_LOGO_TYPES = new Set(["image/png", "image/jpeg", "image/webp"]);
@@ -53,6 +55,17 @@ export async function POST(request: NextRequest) {
   const brandName = getString(formData, "brandName", currentSettings.brandName);
   const requestedTemplate = getString(formData, "industryTemplate", currentSettings.industryTemplate);
   const industryTemplate = presets[requestedTemplate] ? requestedTemplate : "generic";
+  const defaultCurrency = getString(formData, "defaultCurrency", currentSettings.defaultCurrency).toUpperCase();
+  const productFieldDefinitions = parseProductFieldDefinitionsInput(formData.get("productFieldDefinitions"));
+
+  if (!isCurrencyCode(defaultCurrency)) {
+    return NextResponse.redirect(new URL("/settings/branding?error=invalid-currency", request.url));
+  }
+
+  if (!productFieldDefinitions) {
+    return NextResponse.redirect(new URL("/settings/branding?error=invalid-custom-fields", request.url));
+  }
+
   const themePreset = getBrandThemePreset(getString(formData, "themePreset", currentSettings.themePreset));
   const fontPreset = getBrandFontPreset(getString(formData, "fontPreset", currentSettings.fontPreset));
   const primaryColor = themePreset.primaryColor;
@@ -104,6 +117,8 @@ export async function POST(request: NextRequest) {
       logoUrl,
       logoStoragePath,
       industryTemplate,
+      defaultCurrency,
+      productFieldDefinitions,
       themePreset: themePreset.id,
       fontPreset: fontPreset.id,
       primaryColor,
@@ -122,6 +137,8 @@ export async function POST(request: NextRequest) {
         logoUrl,
         logoStoragePath,
         industryTemplate,
+        defaultCurrency,
+        productFieldDefinitions,
         themePreset: themePreset.id,
         fontPreset: fontPreset.id,
         primaryColor,
@@ -144,6 +161,8 @@ export async function POST(request: NextRequest) {
       changeType,
       brandName,
       industryTemplate,
+      defaultCurrency,
+      productFieldDefinitions,
       themePreset: themePreset.id,
       fontPreset: fontPreset.id,
       logoStoragePath,

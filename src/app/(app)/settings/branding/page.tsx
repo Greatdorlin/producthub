@@ -11,6 +11,8 @@ import { getWorkspaceSettings } from "@/lib/data";
 const errorCopy: Record<string, string> = {
   "invalid-logo": "Use a PNG, JPG, or WebP logo under 2 MB.",
   "blob-token": "Logo storage is not configured.",
+  "invalid-currency": "Enter a valid three-letter currency code.",
+  "invalid-custom-fields": "Check custom field labels and add at least two choices for dropdown or radio fields.",
 };
 
 export default async function BrandingSettingsPage({
@@ -61,6 +63,8 @@ export default async function BrandingSettingsPage({
           industryPresets={industryPresets}
           logoUrl={settings.logoUrl}
           initialIndustryPreset={settings.industryTemplate}
+          initialDefaultCurrency={settings.defaultCurrency}
+          initialCustomFields={settings.productFieldDefinitions}
           initialThemePreset={settings.themePreset}
           initialFontPreset={settings.fontPreset}
         />

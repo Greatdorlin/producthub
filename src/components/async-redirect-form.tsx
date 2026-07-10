@@ -29,9 +29,19 @@ export function AsyncRedirectForm({
 
     try {
       setPending(true);
+      const body = new FormData(form);
+      const submitter = (event.nativeEvent as SubmitEvent).submitter;
+
+      if (
+        (submitter instanceof HTMLButtonElement || submitter instanceof HTMLInputElement) &&
+        submitter.name
+      ) {
+        body.set(submitter.name, submitter.value);
+      }
+
       const response = await fetch(form.action || window.location.href, {
         method: (form.method || "post").toUpperCase(),
-        body: new FormData(form),
+        body,
         credentials: "same-origin",
       });
 

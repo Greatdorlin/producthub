@@ -7,6 +7,7 @@ import { auditLogs, productAssets, products, users, workspaceSettings } from "@/
 import type { ProductAccessRole } from "@/lib/constants";
 import { siteConfig } from "@/lib/config/site";
 import { getBrandFontPreset, getBrandThemePreset } from "@/lib/branding/presets";
+import { normalizeProductFieldDefinitions } from "@/lib/custom-fields";
 import { canUserAccessProductAssets } from "@/lib/product-access";
 import { getDaysToExpiry } from "@/lib/utils";
 export { getWorkspaceBackupSnapshots } from "@/lib/backups";
@@ -20,6 +21,8 @@ export const DEFAULT_WORKSPACE_SETTINGS = {
   logoUrl: null as string | null,
   logoStoragePath: null as string | null,
   industryTemplate: siteConfig.industryTemplate,
+  defaultCurrency: siteConfig.defaultCurrency,
+  productFieldDefinitions: [],
   themePreset: "command-graphite",
   fontPreset: "system",
   primaryColor: getBrandThemePreset("command-graphite").primaryColor,
@@ -150,6 +153,8 @@ export async function getWorkspaceSettings() {
       logoUrl: workspaceSettings.logoUrl,
       logoStoragePath: workspaceSettings.logoStoragePath,
       industryTemplate: workspaceSettings.industryTemplate,
+      defaultCurrency: workspaceSettings.defaultCurrency,
+      productFieldDefinitions: workspaceSettings.productFieldDefinitions,
       themePreset: workspaceSettings.themePreset,
       fontPreset: workspaceSettings.fontPreset,
       primaryColor: workspaceSettings.primaryColor,
@@ -169,6 +174,7 @@ export async function getWorkspaceSettings() {
 
   return {
     ...settings,
+    productFieldDefinitions: normalizeProductFieldDefinitions(settings.productFieldDefinitions),
     fontFamily: getBrandFontPreset(settings.fontPreset).stack,
   };
 }

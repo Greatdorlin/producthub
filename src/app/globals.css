@@ -2554,6 +2554,248 @@ section > .ld-glass-panel {
   border-radius: 999px;
 }
 
+.ld-brand-palette-wheel {
+  position: relative;
+  display: inline-flex;
+  height: 3rem;
+  width: 3rem;
+  flex: 0 0 auto;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--ld-color-text) 14%, transparent);
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--ld-color-background) 42%, transparent);
+}
+
+.ld-brand-palette-wheel > span {
+  position: absolute;
+  display: block;
+  height: 1.8rem;
+  width: 1.8rem;
+  border: 2px solid color-mix(in srgb, var(--ld-color-text) 18%, transparent);
+  border-radius: 999px;
+}
+
+.ld-brand-palette-wheel > span:nth-child(1) {
+  left: -0.15rem;
+  top: -0.15rem;
+}
+
+.ld-brand-palette-wheel > span:nth-child(2) {
+  right: -0.2rem;
+  top: 0.2rem;
+}
+
+.ld-brand-palette-wheel > span:nth-child(3) {
+  bottom: -0.25rem;
+  left: 0.65rem;
+}
+
+.ld-brand-palette-wheel > i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: block;
+  height: 0.55rem;
+  width: 0.55rem;
+  transform: translate(-50%, -50%);
+  border: 2px solid color-mix(in srgb, var(--ld-color-background) 70%, transparent);
+  border-radius: 999px;
+}
+
+.ld-custom-field-builder {
+  min-width: 0;
+}
+
+.ld-custom-field-card {
+  border: 1px solid color-mix(in srgb, var(--ld-color-text) 9%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--ld-color-surface) 76%, transparent);
+  padding: 0.9rem;
+}
+
+.ld-custom-field-card-header {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.ld-custom-field-type-icon,
+.ld-icon-button {
+  display: inline-flex;
+  height: 2rem;
+  width: 2rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--ld-color-text) 9%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--ld-color-primary) 12%, transparent);
+  color: var(--ld-color-primary-strong);
+}
+
+.ld-icon-button {
+  background: transparent;
+  color: var(--ld-color-muted);
+  transition: border-color 150ms ease, background 150ms ease, color 150ms ease;
+}
+
+.ld-icon-button:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--ld-color-primary) 34%, transparent);
+  background: color-mix(in srgb, var(--ld-color-primary) 10%, transparent);
+  color: var(--ld-color-text);
+}
+
+.ld-icon-button.is-danger:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--ld-color-danger) 36%, transparent);
+  background: color-mix(in srgb, var(--ld-color-danger) 10%, transparent);
+  color: var(--ld-color-danger);
+}
+
+.ld-icon-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.32;
+}
+
+.ld-input.is-invalid {
+  border-color: color-mix(in srgb, var(--ld-color-danger) 54%, transparent);
+}
+
+.ld-inline-error {
+  color: var(--ld-color-danger);
+  font-size: 0.75rem;
+}
+
+.ld-option-preview-chip {
+  display: inline-flex;
+  min-height: 1.7rem;
+  align-items: center;
+  border: 1px solid color-mix(in srgb, var(--ld-color-text) 9%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ld-color-surface) 72%, white 3%);
+  padding: 0 0.55rem;
+  color: var(--ld-color-muted);
+  font-size: 0.68rem;
+}
+
+.ld-custom-required-toggle {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--ld-color-muted);
+  cursor: pointer;
+  font-size: 0.78rem;
+}
+
+.ld-custom-required-toggle input {
+  position: absolute;
+  height: 1px;
+  width: 1px;
+  opacity: 0;
+}
+
+.ld-custom-required-toggle > span {
+  position: relative;
+  display: inline-flex;
+  height: 1.45rem;
+  width: 2.55rem;
+  border: 1px solid color-mix(in srgb, var(--ld-color-text) 13%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ld-color-surface) 70%, white 5%);
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.ld-custom-required-toggle > span::after {
+  position: absolute;
+  left: 0.18rem;
+  top: 50%;
+  height: 0.95rem;
+  width: 0.95rem;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  background: var(--ld-color-muted);
+  content: "";
+  transition: left 150ms ease, background 150ms ease;
+}
+
+.ld-custom-required-toggle input:checked + span {
+  border-color: color-mix(in srgb, var(--ld-color-primary) 54%, transparent);
+  background: color-mix(in srgb, var(--ld-color-primary) 26%, transparent);
+}
+
+.ld-custom-required-toggle input:checked + span::after {
+  left: 1.35rem;
+  background: var(--ld-color-primary-strong);
+}
+
+.ld-custom-required-toggle input:focus-visible + span {
+  outline: 2px solid color-mix(in srgb, var(--ld-color-primary) 78%, white);
+  outline-offset: 3px;
+}
+
+.ld-custom-field-empty {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: 1px dashed color-mix(in srgb, var(--ld-color-text) 12%, transparent);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.ld-custom-option-grid {
+  display: grid;
+  gap: 0.55rem;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+
+.ld-profile-photo-editor {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 1rem;
+  min-height: 100%;
+  border-right: 1px solid color-mix(in srgb, var(--ld-color-text) 8%, transparent);
+  padding: 1rem clamp(1rem, 2vw, 1.5rem) 1rem 0;
+}
+
+.ld-profile-avatar-button {
+  position: relative;
+  display: inline-flex;
+  border-radius: 999px;
+}
+
+.ld-profile-avatar-button .ld-profile-photo-preview {
+  height: 7rem;
+  width: 7rem;
+  transition: border-color 150ms ease, filter 150ms ease, transform 150ms ease;
+}
+
+.ld-profile-avatar-button:hover .ld-profile-photo-preview {
+  border-color: color-mix(in srgb, var(--ld-color-primary) 44%, transparent);
+  filter: brightness(0.82);
+  transform: scale(0.99);
+}
+
+.ld-profile-avatar-action {
+  position: absolute;
+  bottom: 0.15rem;
+  right: 0.15rem;
+  display: inline-flex;
+  height: 2.15rem;
+  width: 2.15rem;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--ld-color-surface);
+  border-radius: 999px;
+  background: var(--ld-color-primary);
+  color: white;
+}
+
+.ld-profile-identity-main {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .ld-brand-font-card {
   min-height: 78px;
 }
@@ -2741,6 +2983,12 @@ section > .ld-glass-panel {
 
   .ld-brand-savebar button {
     width: 100%;
+  }
+
+  .ld-profile-photo-editor {
+    border-right: 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--ld-color-text) 8%, transparent);
+    padding: 0 0 1.25rem;
   }
 }
 
